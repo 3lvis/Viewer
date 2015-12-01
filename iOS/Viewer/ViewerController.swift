@@ -16,7 +16,7 @@ protocol ViewerItem {
 
 protocol ViewerControllerDataSource: class {
     func elementsForViewerController(viewerController: ViewerController) -> [ViewerItem]
-    func viewerController(viewerController: ViewerController, viewItemAtIndex index: Int)
+    func viewerController(viewerController: ViewerController, viewItemAtIndex index: Int) -> ViewerItem
 }
 
 protocol ViewerControllerDelegate: class {
@@ -55,10 +55,12 @@ class ViewerController: UIPageViewController {
     }
 
     private func setInitialController() {
-        let initialViewController = self.dataItemViewControllerForPage(pageIndex)
-        self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
+        if let viewerItem = self.controllerDataSource?.viewerController(self, viewItemAtIndex: self.pageIndex), initialViewController = self.dataItemViewControllerCache.objectForKey(viewerItem.remoteID) as? ViewerItemController {
+            self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
+        }
     }
 
+    /*
     private func indexOfDataItemForViewController(viewController: UIViewController) -> Int {
         guard let viewController = viewController as? ViewerItemController else { fatalError("Unexpected view controller type in page view controller.") }
         let indexPath = self.controllerDataSource?.viewerController(self, viewItemAtIndex: )
@@ -84,16 +86,21 @@ class ViewerController: UIPageViewController {
         viewerItemController.timelineItem = timelineItem
 
         return viewerItemController
-    }
+    }*/
 }
 
 extension ViewerController: UIPageViewControllerDataSource {
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        let index = self.indexOfDataItemForViewController(viewController)
+        let newIndex = self.pageIndex - 1
 
-        self.controllerDelegate?.viewerController(self, didChangeIndexPath: NSIndexPath(forRow: index, inSection: 0))
+        self.controllerDelegate?.viewerController(self, didChangeIndexPath: NSIndexPath(forRow: self.pageIndex, inSection: 0))
 
-        return index > 0 ? self.dataItemViewControllerForPage(index - 1) : nil
+        let viewerItem = self.controllerDataSource!.viewerController(self, viewItemAtIndex: newIndex)
+        let viewController = self.dataItemViewControllerCache.objectForKey(viewerItem.remoteID) as! ViewerItemController
+            self.setViewControllers([viewController], direction: .Forward, animated: false, completion: nil)
+        }
+
+        return self.pageIndex > 0 ? self.dataItemViewControllerForPage(newIndex) : nil
     }
 
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
