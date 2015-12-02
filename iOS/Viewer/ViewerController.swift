@@ -59,56 +59,18 @@ class ViewerController: UIPageViewController {
             self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
         }
     }
-
-    /*
-    private func indexOfDataItemForViewController(viewController: UIViewController) -> Int {
-        guard let viewController = viewController as? ViewerItemController else { fatalError("Unexpected view controller type in page view controller.") }
-        let indexPath = self.controllerDataSource?.viewerController(self, viewItemAtIndex: )
-
-        self.fetchedResultsController.indexPathForObject(viewController.timelineItem!)
-
-        return indexPath?.row ?? 0
-    }
-
-    private func dataItemViewControllerForPage(pageIndex: Int) -> ViewerItemController {
-        guard let timelineItem = self.fetchedResultsController.objectAtIndexPath(NSIndexPath(forRow: pageIndex, inSection: 0)) as? TimelineItem, remoteID = timelineItem.remoteID else { fatalError("No photo was found for the current pageIndex") }
-
-        var viewerItemController: ViewerItemController
-
-        if let cachedController = self.dataItemViewControllerCache.objectForKey(remoteID) as? ViewerItemController {
-            viewerItemController = cachedController
-        } else {
-            viewerItemController = ViewerItemController(fetcher: self.fetcher)
-            viewerItemController.controllerDelegate = self
-            self.dataItemViewControllerCache.setObject(viewerItemController, forKey: remoteID)
-        }
-
-        viewerItemController.timelineItem = timelineItem
-
-        return viewerItemController
-    }*/
 }
 
 extension ViewerController: UIPageViewControllerDataSource {
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        let newIndex = self.pageIndex - 1
+        // get ViewerItem from viewController
+        // indexForViewerItem
 
-        self.controllerDelegate?.viewerController(self, didChangeIndexPath: NSIndexPath(forRow: self.pageIndex, inSection: 0))
-
-        let viewerItem = self.controllerDataSource!.viewerController(self, viewItemAtIndex: newIndex)
-        let viewController = self.dataItemViewControllerCache.objectForKey(viewerItem.remoteID) as! ViewerItemController
-            self.setViewControllers([viewController], direction: .Forward, animated: false, completion: nil)
-        }
-
-        return self.pageIndex > 0 ? self.dataItemViewControllerForPage(newIndex) : nil
+        return nil
     }
 
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        let index = indexOfDataItemForViewController(viewController)
-
-        self.controllerDelegate?.viewerController(self, didChangeIndexPath: NSIndexPath(forRow: index, inSection: 0))
-
-        return index < self.fetchedResultsController.fetchedObjects!.count - 1 ? self.dataItemViewControllerForPage(index + 1) : nil
+        return nil
     }
 }
 

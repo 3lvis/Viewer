@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		143B5C3B1C0EED51000B6A18 /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B5C3A1C0EED51000B6A18 /* PhotoCell.swift */; };
 		14A139B41AEFC72B00AD732F /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A139B31AEFC72B00AD732F /* Tests.swift */; };
 		14C984001C0DE79200B5E515 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C983FF1C0DE79200B5E515 /* AppDelegate.swift */; };
 		14C984021C0DE79200B5E515 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14C984011C0DE79200B5E515 /* Assets.xcassets */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		143B5C3A1C0EED51000B6A18 /* PhotoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
 		146D72AC1AB782920058798C /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		146D72B11AB782920058798C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		14A139B31AEFC72B00AD732F /* Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				14C9840C1C0DE94700B5E515 /* Viewer */,
 				14C983FF1C0DE79200B5E515 /* AppDelegate.swift */,
 				14C9840A1C0DE7B300B5E515 /* CollectionController.swift */,
+				143B5C3A1C0EED51000B6A18 /* PhotoCell.swift */,
 				14C984011C0DE79200B5E515 /* Assets.xcassets */,
 				14C984031C0DE79200B5E515 /* LaunchScreen.storyboard */,
 				14C984061C0DE79200B5E515 /* Info.plist */,
@@ -243,6 +246,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14C984001C0DE79200B5E515 /* AppDelegate.swift in Sources */,
+				143B5C3B1C0EED51000B6A18 /* PhotoCell.swift in Sources */,
 				14C9840F1C0DE94700B5E515 /* ViewerController.swift in Sources */,
 				14C984101C0DE94700B5E515 /* ViewerItemController.swift in Sources */,
 				14C9840B1C0DE7B300B5E515 /* CollectionController.swift in Sources */,
@@ -426,6 +430,7 @@
 				14C984081C0DE79200B5E515 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
