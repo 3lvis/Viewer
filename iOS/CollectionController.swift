@@ -26,10 +26,33 @@ extension CollectionController {
     }
 
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        if let existingCell = collectionView.cellForItemAtIndexPath(indexPath) {
+            existingCell.alpha = 0
+
+            guard let window = UIApplication.sharedApplication().delegate?.window?! else { return }
+            let convertedRect = window.convertRect(existingCell.frame, fromView: self.collectionView!)
+            let transformedCell = UIImageView(frame: convertedRect)
+
+            if let photo = self.photos[indexPath.row] as? Photo {
+                transformedCell.image = photo.image
+                transformedCell.contentMode = .ScaleAspectFill
+                transformedCell.clipsToBounds = true
+                window.addSubview(transformedCell)
+
+                UIView.animateWithDuration(1.0, animations: {
+                    transformedCell.clipsToBounds = false
+                    transformedCell.contentMode = .ScaleAspectFit
+                    transformedCell.frame = UIScreen.mainScreen().bounds
+                })
+            }
+        }
+
+        /*
         let viewerController = ViewerController(pageIndex: indexPath.row)
         viewerController.controllerDelegate = self
         viewerController.controllerDataSource = self
         self.presentViewController(viewerController, animated: true, completion: nil)
+        */
     }
 }
 
