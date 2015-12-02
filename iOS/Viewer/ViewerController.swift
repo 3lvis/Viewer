@@ -9,14 +9,8 @@ You can swipe right or left to navigate between photos.
 When the ViewerController jumps betweeetn photos it triggers a call to the viewerControllerDidChangeIndexPath delegate.
 */
 
-protocol ViewerItem {
-    var remoteID: String { get }
-    var image: UIImage { get }
-}
-
 protocol ViewerControllerDataSource: class {
-    func elementsForViewerController(viewerController: ViewerController) -> [ViewerItem]
-    func viewerController(viewerController: ViewerController, viewItemAtIndex index: Int) -> ViewerItem
+    func viewerItemsForViewerController(viewerController: ViewerController) -> [ViewerItem]
 }
 
 protocol ViewerControllerDelegate: class {
@@ -27,7 +21,7 @@ protocol ViewerControllerDelegate: class {
 class ViewerController: UIPageViewController {
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
-    let dataItemViewControllerCache = NSCache()
+    let viewerItemControllerCache = NSCache()
     var pageIndex = 0
 
     // MARK: - Initializers
@@ -49,27 +43,57 @@ class ViewerController: UIPageViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.backgroundColor = UIColor.blackColor()
+        self.view.backgroundColor = UIColor.purpleColor()
 
         self.setInitialController()
     }
 
     private func setInitialController() {
-        if let viewerItem = self.controllerDataSource?.viewerController(self, viewItemAtIndex: self.pageIndex), initialViewController = self.dataItemViewControllerCache.objectForKey(viewerItem.remoteID) as? ViewerItemController {
+        if let viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
+            let initialViewController = self.viewerItemController(viewerItems[self.pageIndex])
             self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
         }
+    }
+
+    private func viewerItemController(viewerItem: ViewerItem) -> ViewerItemController {
+        var viewerItemController: ViewerItemController
+
+        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.id) as? ViewerItemController {
+            viewerItemController = cachedController
+        } else {
+            viewerItemController = ViewerItemController()
+            viewerItemController.controllerDelegate = self
+            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.id)
+        }
+
+        viewerItemController.viewerItem = viewerItem
+
+        return viewerItemController
     }
 }
 
 extension ViewerController: UIPageViewControllerDataSource {
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        // get ViewerItem from viewController
-        // indexForViewerItem
+        if let viewerItemController = viewController as? ViewerItemController, viewerItem = viewerItemController.viewerItem, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
+            let index = viewerItems.indexOf({ $0.id == viewerItem.id })!
+            if index > 0 {
+                let previousItem = viewerItems[index - 1]
+                return self.viewerItemController(previousItem)
+            }
+        }
 
         return nil
     }
 
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
+        if let viewerItemController = viewController as? ViewerItemController, viewerItem = viewerItemController.viewerItem, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
+            let index = viewerItems.indexOf({ $0.id == viewerItem.id })!
+            if index < viewerItems.count - 1 {
+                let previousItem = viewerItems[index + 1]
+                return self.viewerItemController(previousItem)
+            }
+        }
+
         return nil
     }
 }

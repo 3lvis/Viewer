@@ -1,24 +1,5 @@
 import UIKit
 
-struct Photo {
-    var id: Int
-
-    init(id: Int) {
-        self.id = id
-    }
-
-    static func constructElements() -> [Photo] {
-        var elements = [Photo]()
-
-        for i in 1..<400 {
-            let photo = Photo(id: i)
-            elements.append(photo)
-        }
-
-        return elements
-    }
-}
-
 class CollectionController: UICollectionViewController {
     var photos = Photo.constructElements()
 
@@ -40,5 +21,27 @@ extension CollectionController {
         cell.text = String(photo.id)
 
         return cell
+    }
+
+    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let viewerController = ViewerController(pageIndex: indexPath.row)
+        viewerController.controllerDelegate = self
+        viewerController.controllerDataSource = self
+        self.presentViewController(viewerController, animated: true, completion: nil)
+    }
+}
+
+extension CollectionController: ViewerControllerDataSource {
+    func viewerItemsForViewerController(viewerController: ViewerController) -> [ViewerItem] {
+        return self.photos
+    }
+}
+
+extension CollectionController: ViewerControllerDelegate {
+    func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath) {
+    }
+
+    func viewerControllerDidDismiss(viewerController: ViewerController) {
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
 }
