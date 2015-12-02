@@ -1,5 +1,8 @@
+import UIKit
+
 struct Photo: ViewerItem {
     var id: Int
+    var image: UIImage?
 
     init(id: Int) {
         self.id = id
@@ -9,7 +12,8 @@ struct Photo: ViewerItem {
         var elements = [ViewerItem]()
 
         for i in 1..<60 {
-            let photo = Photo(id: i)
+            var photo = Photo(id: i)
+            photo.image = UIImage(named: "photo.jpg")
             elements.append(photo)
         }
 

@@ -7,14 +7,22 @@ class PhotoCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = UIColor.whiteColor()
         label.textAlignment = .Center
+        label.font = UIFont.systemFontOfSize(40)
 
         return label
+    }()
+
+    lazy var imageView: UIImageView = {
+        let view = UIImageView()
+
+        return view
     }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
         self.backgroundColor = UIColor.redColor()
+        self.addSubview(self.imageView)
         self.addSubview(self.label)
     }
 
@@ -28,9 +36,16 @@ class PhotoCell: UICollectionViewCell {
         }
     }
 
+    var image: UIImage? {
+        didSet {
+            self.imageView.image = image
+        }
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
 
         self.label.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
+        self.imageView.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
     }
 }
