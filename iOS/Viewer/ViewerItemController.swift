@@ -9,16 +9,18 @@ class ViewerItemController: UIViewController {
 
     var viewerItem: ViewerItem? {
         didSet {
-             self.label.text = String(viewerItem?.id ?? 0)
+            if let photo = viewerItem as? Photo {
+                self.label.text = String(photo.id ?? 0)
+                self.imageView.image = photo.image
+            }
         }
     }
 
     lazy var label: UILabel = {
         let label = UILabel(frame: UIScreen.mainScreen().bounds)
-        label.backgroundColor = UIColor.redColor()
         label.textAlignment = .Center
         label.textColor = UIColor.whiteColor()
-        label.font = UIFont.systemFontOfSize(30)
+        label.font = UIFont.systemFontOfSize(80)
 
         return label
     }()
