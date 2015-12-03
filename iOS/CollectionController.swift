@@ -30,9 +30,16 @@ extension CollectionController {
             existingCell.alpha = 0
 
             guard let window = UIApplication.sharedApplication().delegate?.window?! else { return }
+
+            let overlayView = UIView(frame: UIScreen.mainScreen().bounds)
+            overlayView.backgroundColor = UIColor.blackColor()
+            overlayView.alpha = 0
+            overlayView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            window.addSubview(overlayView)
+
             let convertedRect = window.convertRect(existingCell.frame, fromView: self.collectionView!)
             let transformedCell = UIImageView(frame: convertedRect)
-
+            transformedCell.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
             if let photo = self.photos[indexPath.row] as? Photo {
                 transformedCell.image = photo.image
                 transformedCell.contentMode = .ScaleAspectFill
@@ -40,6 +47,8 @@ extension CollectionController {
                 window.addSubview(transformedCell)
 
                 UIView.animateWithDuration(1.0, animations: {
+                    overlayView.alpha = 1.0
+
                     transformedCell.clipsToBounds = false
                     transformedCell.contentMode = .ScaleAspectFit
                     transformedCell.frame = UIScreen.mainScreen().bounds
