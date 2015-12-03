@@ -59,19 +59,29 @@ class ViewerItemController: UIViewController {
         self.controllerDelegate?.viewerItemControllerDidTapItem(self)
     }
 
-    func panAction(gesture: UIPanGestureRecognizer) {
-        switch gesture.state {
-        case .Changed:
-            self.updatePosition(gesture)
-            break
-        default:
-            break
-        }
-    }
+    var initialCenter = CGPointZero
+    var finalCenter = CGPointZero
 
-    func updatePosition(gesture: UIPanGestureRecognizer) {
+    func panAction(gesture: UIPanGestureRecognizer) {
+        if gesture.state == .Began {
+            self.initialCenter = gesture.translationInView(gesture.view!)
+        }
+
+        print("view: \(gesture.view!.center)")
         let point = gesture.translationInView(self.view)
-        gesture.view!.center = point
+        print("point: \(point)")
+        let diffTranslation = CGPoint(x: point.x - self.initialCenter.x, y: point.y - self.initialCenter.y)
+        print("diffTranslation: \(diffTranslation)")
+        let x = diffTranslation.x - gesture.view!.center.x
+        let y = diffTranslation.y - gesture.view!.center.y
+        let convertedTranslation = CGPoint(x: x, y: y)
+        print("convertedTranslation: \(convertedTranslation)")
+        gesture.view!.center = convertedTranslation
+        print(" ")
+
+        if gesture.state == .Ended {
+            self.finalCenter = gesture.translationInView(gesture.view!)
+        }
     }
 }
 
