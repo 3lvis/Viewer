@@ -30,8 +30,16 @@ class ViewerItemController: UIViewController {
         view.backgroundColor = UIColor.blackColor()
         view.contentMode = .ScaleAspectFit
         view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        view.userInteractionEnabled = true
 
         return view
+    }()
+
+    lazy var panGestureRecognizer: UIPanGestureRecognizer = {
+        let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
+        gesture.delegate = self
+
+        return gesture
     }()
 
     override func viewDidLoad() {
@@ -43,9 +51,39 @@ class ViewerItemController: UIViewController {
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: "tapAction")
         self.view.addGestureRecognizer(tapRecognizer)
+
+        self.imageView.addGestureRecognizer(self.panGestureRecognizer)
     }
 
     func tapAction() {
         self.controllerDelegate?.viewerItemControllerDidTapItem(self)
+    }
+
+    func panAction(gesture: UIPanGestureRecognizer) {
+        switch gesture.state {
+        case .Changed:
+            self.updatePosition(gesture)
+            break
+        default:
+            break
+        }
+    }
+
+    func updatePosition(gesture: UIPanGestureRecognizer) {
+        let point = gesture.translationInView(self.view)
+        gesture.view!.center = point
+    }
+}
+
+extension ViewerItemController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == self.panGestureRecognizer {
+            let velocity = self.panGestureRecognizer.velocityInView(panGestureRecognizer.view!)
+            let allowOnlyVerticalScrolls = fabs(velocity.y) > fabs(velocity.x)
+
+            return allowOnlyVerticalScrolls
+        }
+
+        return true
     }
 }
