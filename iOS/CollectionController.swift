@@ -46,22 +46,22 @@ extension CollectionController {
                 transformedCell.clipsToBounds = true
                 window.addSubview(transformedCell)
 
-                UIView.animateWithDuration(1.0, animations: {
+                UIView.animateWithDuration(0.3, animations: {
                     overlayView.alpha = 1.0
-
                     transformedCell.clipsToBounds = false
                     transformedCell.contentMode = .ScaleAspectFit
                     transformedCell.frame = UIScreen.mainScreen().bounds
+                    }, completion: { finished in
+                        let viewerController = ViewerController(pageIndex: indexPath.row)
+                        viewerController.controllerDelegate = self
+                        viewerController.controllerDataSource = self
+                        self.presentViewController(viewerController, animated: false, completion: {
+                            transformedCell.removeFromSuperview()
+                            overlayView.removeFromSuperview()
+                        })
                 })
             }
         }
-
-        /*
-        let viewerController = ViewerController(pageIndex: indexPath.row)
-        viewerController.controllerDelegate = self
-        viewerController.controllerDataSource = self
-        self.presentViewController(viewerController, animated: true, completion: nil)
-        */
     }
 }
 

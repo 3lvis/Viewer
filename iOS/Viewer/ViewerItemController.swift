@@ -27,7 +27,7 @@ class ViewerItemController: UIViewController {
 
     lazy var imageView: UIImageView = {
         let view = UIImageView(frame: UIScreen.mainScreen().bounds)
-        view.backgroundColor = UIColor.greenColor()
+        view.backgroundColor = UIColor.blackColor()
         view.contentMode = .ScaleAspectFit
         view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 
