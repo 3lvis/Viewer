@@ -39,45 +39,39 @@ extension CollectionController {
     }
 
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        self.selectedIndexPath = indexPath
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = collectionView.cellForItemAtIndexPath(indexPath), photo = self.photos[indexPath.row] as? Photo else { return }
+        selectedIndexPath = indexPath
 
-        if let existingCell = collectionView.cellForItemAtIndexPath(indexPath) {
-            existingCell.alpha = 0
+        window.addSubview(overlayView)
+        existingCell.alpha = 0
 
-            guard let window = UIApplication.sharedApplication().delegate?.window?! else { return }
+        let convertedRect = window.convertRect(existingCell.frame, fromView: self.collectionView!)
+        self.originalRect = convertedRect
+        let transformedCell = UIImageView(frame: convertedRect)
+        transformedCell.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        transformedCell.contentMode = .ScaleAspectFill
+        transformedCell.clipsToBounds = true
 
-            window.addSubview(overlayView)
+        transformedCell.image = photo.image
+        window.addSubview(transformedCell)
 
-            let convertedRect = window.convertRect(existingCell.frame, fromView: self.collectionView!)
-            self.originalRect = convertedRect
-            let transformedCell = UIImageView(frame: convertedRect)
-            transformedCell.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-            transformedCell.contentMode = .ScaleAspectFill
-            transformedCell.clipsToBounds = true
+        let screenBound = UIScreen.mainScreen().bounds
+        let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
+        let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
 
-            if let photo = self.photos[indexPath.row] as? Photo {
-                transformedCell.image = photo.image
-                window.addSubview(transformedCell)
-
-                let screenBound = UIScreen.mainScreen().bounds
-                let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
-                let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
-
-                UIView.animateWithDuration(0.25, animations: {
-                    self.overlayView.alpha = 1.0
-                    transformedCell.frame = finalImageViewFrame
-                    }, completion: { finished in
-                        let viewerController = ViewerController(pageIndex: indexPath.row)
-                        viewerController.controllerDelegate = self
-                        viewerController.controllerDataSource = self
-                        self.presentViewController(viewerController, animated: false, completion: {
-                            transformedCell.removeFromSuperview()
-                            self.cell = transformedCell
-                            self.overlayView.removeFromSuperview()
-                        })
+        UIView.animateWithDuration(0.25, animations: {
+            self.overlayView.alpha = 1.0
+            transformedCell.frame = finalImageViewFrame
+            }, completion: { finished in
+                let viewerController = ViewerController(pageIndex: indexPath.row)
+                viewerController.controllerDelegate = self
+                viewerController.controllerDataSource = self
+                self.presentViewController(viewerController, animated: false, completion: {
+                    transformedCell.removeFromSuperview()
+                    self.cell = transformedCell
+                    self.overlayView.removeFromSuperview()
                 })
-            }
-        }
+        })
     }
 }
 
