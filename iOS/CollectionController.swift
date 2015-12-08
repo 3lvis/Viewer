@@ -51,7 +51,7 @@ extension CollectionController {
                 let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
                 let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
 
-                UIView.animateWithDuration(0.3, animations: {
+                UIView.animateWithDuration(0.25, animations: {
                     overlayView.alpha = 1.0
                     transformedCell.frame = finalImageViewFrame
                     }, completion: { finished in
