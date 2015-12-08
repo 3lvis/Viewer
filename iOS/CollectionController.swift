@@ -40,17 +40,20 @@ extension CollectionController {
             let convertedRect = window.convertRect(existingCell.frame, fromView: self.collectionView!)
             let transformedCell = UIImageView(frame: convertedRect)
             transformedCell.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            transformedCell.contentMode = .ScaleAspectFill
+            transformedCell.clipsToBounds = true
+
             if let photo = self.photos[indexPath.row] as? Photo {
                 transformedCell.image = photo.image
-                transformedCell.contentMode = .ScaleAspectFill
-                transformedCell.clipsToBounds = true
                 window.addSubview(transformedCell)
+
+                let screenBound = UIScreen.mainScreen().bounds
+                let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
+                let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
 
                 UIView.animateWithDuration(0.3, animations: {
                     overlayView.alpha = 1.0
-                    transformedCell.clipsToBounds = false
-                    transformedCell.contentMode = .ScaleAspectFit
-                    transformedCell.frame = UIScreen.mainScreen().bounds
+                    transformedCell.frame = finalImageViewFrame
                     }, completion: { finished in
                         let viewerController = ViewerController(pageIndex: indexPath.row)
                         viewerController.controllerDelegate = self
