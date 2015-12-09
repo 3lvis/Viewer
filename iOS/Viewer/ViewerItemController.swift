@@ -7,6 +7,10 @@ protocol ViewerItemControllerDelegate: class {
 class ViewerItemController: UIViewController {
     weak var controllerDelegate: ViewerItemControllerDelegate?
 
+    var window: UIWindow {
+        return (UIApplication.sharedApplication().delegate?.window?!)!
+    }
+
     var viewerItem: ViewerItem? {
         didSet {
             if let photo = viewerItem as? Photo {
@@ -59,28 +63,29 @@ class ViewerItemController: UIViewController {
         self.controllerDelegate?.viewerItemControllerDidTapItem(self)
     }
 
-    var initialCenter = CGPointZero
-    var finalCenter = CGPointZero
+    var firstX = CGFloat(0)
+    var firstY = CGFloat(0)
+    var isDragging = false
 
     func panAction(gesture: UIPanGestureRecognizer) {
+        let viewHeight = self.view.frame.size.height
+        let viewHalfHeight = viewHeight / 2
+        var translatedPoint = gesture.translationInView(self.view)
+
         if gesture.state == .Began {
-            self.initialCenter = gesture.translationInView(gesture.view!)
+            firstX = self.view.center.x
+            firstY = self.view.center.y
+            isDragging = true
+            setNeedsStatusBarAppearanceUpdate()
         }
 
-        print("view: \(gesture.view!.center)")
-        let point = gesture.translationInView(self.view)
-        print("point: \(point)")
-        let diffTranslation = CGPoint(x: point.x - self.initialCenter.x, y: point.y - self.initialCenter.y)
-        print("diffTranslation: \(diffTranslation)")
-        let x = diffTranslation.x - gesture.view!.center.x
-        let y = diffTranslation.y - gesture.view!.center.y
-        let convertedTranslation = CGPoint(x: x, y: y)
-        print("convertedTranslation: \(convertedTranslation)")
-        gesture.view!.center = convertedTranslation
-        print(" ")
+        translatedPoint = CGPoint(x: firstX, y: firstY + translatedPoint.y)
+        view.center = translatedPoint
 
         if gesture.state == .Ended {
-            self.finalCenter = gesture.translationInView(gesture.view!)
+            if view.center.x > viewHalfHeight + 40 || view.center.y < viewHalfHeight - 40 {
+                print("dismiss")
+            }
         }
     }
 }
