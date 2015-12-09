@@ -22,14 +22,13 @@ class ViewerController: UIPageViewController {
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
     let viewerItemControllerCache = NSCache()
-    var pageIndex = 0
     var indexPath: NSIndexPath
     var collectionView: UICollectionView
+    var presentedCell: UIImageView?
 
     // MARK: - Initializers
 
     init(indexPath: NSIndexPath, collectionView: UICollectionView) {
-        self.pageIndex = indexPath.row
         self.indexPath = indexPath
         self.collectionView = collectionView
 
@@ -54,12 +53,6 @@ class ViewerController: UIPageViewController {
     }()
 
     // MARK: View Lifecycle
-
-    var cell: UIImageView?
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
 
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
@@ -93,7 +86,7 @@ class ViewerController: UIPageViewController {
                 transformedCell.frame = finalImageViewFrame
                 }) { completed in
                     transformedCell.removeFromSuperview()
-                    self.cell = transformedCell
+                    self.presentedCell = transformedCell
                     self.overlayView.removeFromSuperview()
 
                     self.setInitialController()
@@ -103,7 +96,7 @@ class ViewerController: UIPageViewController {
 
     private func setInitialController() {
         if let viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
-            let initialViewController = self.viewerItemController(viewerItems[self.pageIndex])
+            let initialViewController = self.viewerItemController(viewerItems[self.indexPath.row])
             self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
         }
     }
@@ -160,7 +153,7 @@ extension ViewerController: ViewerItemControllerDelegate {
         viewerItemController.view.alpha = 0
 
         let screenBound = UIScreen.mainScreen().bounds
-        let transformedCell = self.cell!
+        let transformedCell = self.presentedCell!
         let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
         transformedCell.frame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
 
