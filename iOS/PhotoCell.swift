@@ -5,7 +5,7 @@ class PhotoCell: UICollectionViewCell {
 
     lazy var label: UILabel = {
         let label = UILabel()
-        label.textColor = UIColor.whiteColor()
+        label.textColor = UIColor.blackColor().colorWithAlphaComponent(0.3)
         label.textAlignment = .Center
         label.font = UIFont.systemFontOfSize(40)
 
