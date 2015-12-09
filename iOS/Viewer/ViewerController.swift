@@ -18,7 +18,7 @@ protocol ViewerControllerDelegate: class {
     func viewerControllerDidDismiss(viewerController: ViewerController)
 }
 
-class ViewerController: UIPageViewController {
+class ViewerController: UIViewController {
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
     let viewerItemControllerCache = NSCache()
@@ -37,9 +37,10 @@ class ViewerController: UIPageViewController {
         self.photo = photo
         self.collectionView = collectionView
 
-        super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+        super.init(nibName: nil, bundle: nil)
 
-        self.dataSource = self
+        self.modalPresentationStyle = .OverCurrentContext
+        self.view.backgroundColor = UIColor.clearColor()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -63,10 +64,8 @@ class ViewerController: UIPageViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.backgroundColor = UIColor.purpleColor()
 
-        self.setInitialController()
-
+        //self.setInitialController()
         present()
     }
 
@@ -108,7 +107,7 @@ class ViewerController: UIPageViewController {
     private func setInitialController() {
         if let viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
             let initialViewController = self.viewerItemController(viewerItems[self.pageIndex])
-            self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
+            //self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
         }
     }
 
