@@ -25,16 +25,14 @@ class ViewerController: UIPageViewController {
     var pageIndex = 0
     var indexPath: NSIndexPath
     var existingCell: UICollectionViewCell
-    var photo: Photo
     var collectionView: UICollectionView
 
     // MARK: - Initializers
 
-    init(pageIndex: Int, indexPath: NSIndexPath, existingCell: UICollectionViewCell, photo: Photo, collectionView: UICollectionView) {
-        self.pageIndex = pageIndex
+    init(indexPath: NSIndexPath, collectionView: UICollectionView) {
+        self.pageIndex = indexPath.row
         self.indexPath = indexPath
-        self.existingCell = existingCell
-        self.photo = photo
+        self.existingCell = collectionView.cellForItemAtIndexPath(indexPath)!
         self.collectionView = collectionView
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
@@ -64,6 +62,10 @@ class ViewerController: UIPageViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
 
         present()
     }
@@ -81,23 +83,26 @@ class ViewerController: UIPageViewController {
         transformedCell.contentMode = .ScaleAspectFill
         transformedCell.clipsToBounds = true
 
-        transformedCell.image = photo.image
-        window.addSubview(transformedCell)
+        if let items = self.controllerDataSource?.viewerItemsForViewerController(self) {
+            let item = items[indexPath.row]
+            transformedCell.image = item.image
+            window.addSubview(transformedCell)
 
-        let screenBound = UIScreen.mainScreen().bounds
-        let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
-        let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
+            let screenBound = UIScreen.mainScreen().bounds
+            let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
+            let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
 
-        UIView.animateWithDuration(0.25, animations: {
-            self.overlayView.alpha = 1.0
-            transformedCell.frame = finalImageViewFrame
-            }, completion: { finished in
-                transformedCell.removeFromSuperview()
-                self.cell = transformedCell
-                self.overlayView.removeFromSuperview()
-
-                self.setInitialController()
-        })
+            UIView.animateWithDuration(0.25, animations: {
+                self.overlayView.alpha = 1.0
+                transformedCell.frame = finalImageViewFrame
+                }, completion: { finished in
+                    transformedCell.removeFromSuperview()
+                    self.cell = transformedCell
+                    self.overlayView.removeFromSuperview()
+                    
+                    self.setInitialController()
+            })
+        }
     }
 
     private func setInitialController() {
@@ -152,6 +157,30 @@ extension ViewerController: UIPageViewControllerDataSource {
 
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController) {
-        self.controllerDelegate?.viewerControllerDidDismiss(self)
+        viewerItemController.view.alpha = 0
+
+        let screenBound = UIScreen.mainScreen().bounds
+        let transformedCell = self.cell!
+        let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
+        transformedCell.frame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
+
+        self.overlayView.alpha = 1.0
+        guard let window = UIApplication.sharedApplication().delegate?.window?! else { return }
+        window.addSubview(overlayView)
+        window.addSubview(transformedCell)
+
+        UIView.animateWithDuration(0.25, animations: {
+            self.overlayView.alpha = 0.0
+            transformedCell.frame = self.originalRect
+            }, completion: { finished in
+                if let existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) {
+                    existingCell.alpha = 1
+                }
+
+                transformedCell.removeFromSuperview()
+                self.overlayView.removeFromSuperview()
+                self.dismissViewControllerAnimated(false, completion: nil)
+                self.controllerDelegate?.viewerControllerDidDismiss(self)
+        })
     }
 }

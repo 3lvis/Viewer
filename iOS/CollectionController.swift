@@ -26,9 +26,9 @@ extension CollectionController {
     }
 
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        guard let collectionView = self.collectionView, existingCell = collectionView.cellForItemAtIndexPath(indexPath), photo = self.photos[indexPath.row] as? Photo else { return }
+        guard let collectionView = self.collectionView else { return }
 
-        let viewerController = ViewerController(pageIndex: indexPath.row, indexPath: indexPath, existingCell: existingCell, photo: photo, collectionView: collectionView)
+        let viewerController = ViewerController(indexPath: indexPath, collectionView: collectionView)
         viewerController.controllerDelegate = self
         viewerController.controllerDataSource = self
         self.presentViewController(viewerController, animated: false, completion: nil)
@@ -46,29 +46,5 @@ extension CollectionController: ViewerControllerDelegate {
     }
 
     func viewerControllerDidDismiss(viewerController3: ViewerController) {
-        /*
-        self.dismissViewControllerAnimated(false, completion: nil)
-
-        let screenBound = UIScreen.mainScreen().bounds
-        let transformedCell = self.cell!
-        let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
-        transformedCell.frame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
-
-        self.overlayView.alpha = 1.0
-        guard let window = UIApplication.sharedApplication().delegate?.window?! else { return }
-        window.addSubview(overlayView)
-        window.addSubview(transformedCell)
-
-        UIView.animateWithDuration(0.25, animations: {
-            self.overlayView.alpha = 0.0
-            transformedCell.frame = self.originalRect
-            }, completion: { finished in
-                if let existingCell = self.collectionView?.cellForItemAtIndexPath(self.selectedIndexPath) {
-                    existingCell.alpha = 1
-                }
-
-                transformedCell.removeFromSuperview()
-                self.overlayView.removeFromSuperview()
-        })*/
     }
 }
