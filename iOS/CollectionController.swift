@@ -9,6 +9,16 @@ class CollectionController: UICollectionViewController {
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
     }
+
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+
+        let layout = self.collectionView?.collectionViewLayout as! UICollectionViewFlowLayout
+
+        let bounds = UIScreen.mainScreen().bounds
+        let size = (bounds.width - 4) / 4
+        layout.itemSize = CGSize(width: size, height: size)
+    }
 }
 
 extension CollectionController {
