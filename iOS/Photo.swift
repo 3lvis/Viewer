@@ -14,7 +14,7 @@ struct Photo: ViewerItem {
         for i in 1..<60 {
             var photo = Photo(id: i)
 
-            let index = Int(arc4random_uniform(3))
+            let index = Int(arc4random_uniform(4))
             switch index {
             case 0:
                 photo.image = UIImage(named: "a.jpg")
@@ -24,6 +24,9 @@ struct Photo: ViewerItem {
                 break
             case 2:
                 photo.image = UIImage(named: "c.jpg")
+                break
+            case 3:
+                photo.image = UIImage(named: "d.jpg")
                 break
             default: break
             }
