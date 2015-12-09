@@ -8,19 +8,6 @@ class CollectionController: UICollectionViewController {
 
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
     }
-
-    lazy var overlayView: UIView = {
-        let view = UIView(frame: UIScreen.mainScreen().bounds)
-        view.backgroundColor = UIColor.blackColor()
-        view.alpha = 0
-        view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-
-        return view
-    }()
-
-    var cell: UIImageView?
-    var originalRect = CGRectZero
-    var selectedIndexPath = NSIndexPath(forRow: 0, inSection: 0)
 }
 
 extension CollectionController {
@@ -39,39 +26,12 @@ extension CollectionController {
     }
 
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = collectionView.cellForItemAtIndexPath(indexPath), photo = self.photos[indexPath.row] as? Photo else { return }
-        selectedIndexPath = indexPath
+        guard let collectionView = self.collectionView, existingCell = collectionView.cellForItemAtIndexPath(indexPath), photo = self.photos[indexPath.row] as? Photo else { return }
 
-        window.addSubview(overlayView)
-        existingCell.alpha = 0
-
-        let convertedRect = window.convertRect(existingCell.frame, fromView: self.collectionView!)
-        self.originalRect = convertedRect
-        let transformedCell = UIImageView(frame: convertedRect)
-        transformedCell.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        transformedCell.contentMode = .ScaleAspectFill
-        transformedCell.clipsToBounds = true
-
-        transformedCell.image = photo.image
-        window.addSubview(transformedCell)
-
-        let screenBound = UIScreen.mainScreen().bounds
-        let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
-        let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
-
-        UIView.animateWithDuration(0.25, animations: {
-            self.overlayView.alpha = 1.0
-            transformedCell.frame = finalImageViewFrame
-            }, completion: { finished in
-                let viewerController = ViewerController(pageIndex: indexPath.row)
-                viewerController.controllerDelegate = self
-                viewerController.controllerDataSource = self
-                self.presentViewController(viewerController, animated: false, completion: {
-                    transformedCell.removeFromSuperview()
-                    self.cell = transformedCell
-                    self.overlayView.removeFromSuperview()
-                })
-        })
+        let viewerController = ViewerController(pageIndex: indexPath.row, indexPath: indexPath, existingCell: existingCell, photo: photo, collectionView: collectionView)
+        viewerController.controllerDelegate = self
+        viewerController.controllerDataSource = self
+        self.presentViewController(viewerController, animated: false, completion: nil)
     }
 }
 
@@ -85,7 +45,8 @@ extension CollectionController: ViewerControllerDelegate {
     func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath) {
     }
 
-    func viewerControllerDidDismiss(viewerController: ViewerController) {
+    func viewerControllerDidDismiss(viewerController3: ViewerController) {
+        /*
         self.dismissViewControllerAnimated(false, completion: nil)
 
         let screenBound = UIScreen.mainScreen().bounds
@@ -108,6 +69,6 @@ extension CollectionController: ViewerControllerDelegate {
 
                 transformedCell.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
-        })
+        })*/
     }
 }

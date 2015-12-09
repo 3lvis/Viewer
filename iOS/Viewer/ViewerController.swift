@@ -23,11 +23,19 @@ class ViewerController: UIPageViewController {
     weak var controllerDataSource: ViewerControllerDataSource?
     let viewerItemControllerCache = NSCache()
     var pageIndex = 0
+    var indexPath: NSIndexPath
+    var existingCell: UICollectionViewCell
+    var photo: Photo
+    var collectionView: UICollectionView
 
     // MARK: - Initializers
 
-    init(pageIndex: Int) {
+    init(pageIndex: Int, indexPath: NSIndexPath, existingCell: UICollectionViewCell, photo: Photo, collectionView: UICollectionView) {
         self.pageIndex = pageIndex
+        self.indexPath = indexPath
+        self.existingCell = existingCell
+        self.photo = photo
+        self.collectionView = collectionView
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
 
@@ -38,7 +46,19 @@ class ViewerController: UIPageViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    lazy var overlayView: UIView = {
+        let view = UIView(frame: UIScreen.mainScreen().bounds)
+        view.backgroundColor = UIColor.blackColor()
+        view.alpha = 0
+        view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+
+        return view
+    }()
+
     // MARK: View Lifecycle
+
+    var cell: UIImageView?
+    var originalRect = CGRectZero
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,6 +66,43 @@ class ViewerController: UIPageViewController {
         self.view.backgroundColor = UIColor.purpleColor()
 
         self.setInitialController()
+
+        present()
+    }
+
+    func present() {
+        guard let window = UIApplication.sharedApplication().delegate?.window?! else { return }
+
+        window.addSubview(overlayView)
+        existingCell.alpha = 0
+
+        let convertedRect = window.convertRect(existingCell.frame, fromView: collectionView)
+        self.originalRect = convertedRect
+        let transformedCell = UIImageView(frame: convertedRect)
+        transformedCell.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        transformedCell.contentMode = .ScaleAspectFill
+        transformedCell.clipsToBounds = true
+
+        transformedCell.image = photo.image
+        window.addSubview(transformedCell)
+
+        let screenBound = UIScreen.mainScreen().bounds
+        let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
+        let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
+
+        UIView.animateWithDuration(0.25, animations: {
+            self.overlayView.alpha = 1.0
+            transformedCell.frame = finalImageViewFrame
+            }, completion: { finished in
+                /* let viewerController = ViewerController(pageIndex: indexPath.row)
+                viewerController.controllerDelegate = self
+                viewerController.controllerDataSource = self
+                self.presentViewController(viewerController, animated: false, completion: {
+                    transformedCell.removeFromSuperview()
+                    self.cell = transformedCell
+                    self.overlayView.removeFromSuperview()
+                })*/
+        })
     }
 
     private func setInitialController() {
