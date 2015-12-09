@@ -61,36 +61,36 @@ class ViewerController: UIPageViewController {
     }
 
     func present() {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = collectionView.cellForItemAtIndexPath(indexPath) else { return }
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { return }
 
         window.addSubview(overlayView)
-        existingCell.alpha = 0
+        selectedCell.alpha = 0
 
-        let convertedRect = window.convertRect(existingCell.frame, fromView: collectionView)
-        let transformedCell = UIImageView(frame: convertedRect)
-        transformedCell.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        transformedCell.contentMode = .ScaleAspectFill
-        transformedCell.clipsToBounds = true
+        let presentedView = UIImageView(frame: window.convertRect(selectedCell.frame, fromView: collectionView))
+        presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        presentedView.contentMode = .ScaleAspectFill
+        presentedView.clipsToBounds = true
+        presentedView.image = image
+        window.addSubview(presentedView)
 
-        if let items = self.controllerDataSource?.viewerItemsForViewerController(self) {
-            let item = items[indexPath.row]
-            transformedCell.image = item.image
-            window.addSubview(transformedCell)
+        let screenBounds = UIScreen.mainScreen().bounds
+        let scaleFactor = image.size.width / screenBounds.size.width
+        let finalImageViewFrame = CGRectMake(0, (screenBounds.size.height / 2) - ((image.size.height / scaleFactor) / 2), screenBounds.size.width, image.size.height / scaleFactor)
 
-            let screenBound = UIScreen.mainScreen().bounds
-            let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
-            let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
+        print("screenBounds: \(screenBounds)")
+        print("scaleFactor: \(scaleFactor)")
+        print("finalImageViewFrame: \(finalImageViewFrame)")
+        print(" ")
 
-            UIView.animateWithDuration(0.25, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.CurveEaseInOut, .BeginFromCurrentState, .AllowUserInteraction], animations: {
-                self.overlayView.alpha = 1.0
-                transformedCell.frame = finalImageViewFrame
-                }) { completed in
-                    transformedCell.removeFromSuperview()
-                    self.presentedCell = transformedCell
-                    self.overlayView.removeFromSuperview()
+        UIView.animateWithDuration(0.25, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.CurveEaseInOut, .BeginFromCurrentState, .AllowUserInteraction], animations: {
+            self.overlayView.alpha = 1.0
+            presentedView.frame = finalImageViewFrame
+            }) { completed in
+                presentedView.removeFromSuperview()
+                self.presentedCell = presentedView
+                self.overlayView.removeFromSuperview()
 
-                    self.setInitialController()
-            }
+                self.setInitialController()
         }
     }
 
