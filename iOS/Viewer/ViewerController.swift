@@ -74,23 +74,20 @@ class ViewerController: UIPageViewController {
         window.addSubview(presentedView)
 
         let screenBounds = UIScreen.mainScreen().bounds
-        var scaleFactor = image.size.width / screenBounds.size.width
-        let y = (screenBounds.size.height / 2) - ((image.size.height / scaleFactor) / 2)
+        let widthScaleFactor = image.size.width / screenBounds.size.width
+        let heightScaleFactor = image.size.height / screenBounds.size.height
         var finalImageViewFrame = CGRectZero
-        if y < 0 {
-            scaleFactor = image.size.height / screenBounds.size.height
-            let x = (screenBounds.size.width / 2) - ((image.size.width / scaleFactor) / 2)
-            finalImageViewFrame = CGRectMake(x, 0, screenBounds.size.width, image.size.height / scaleFactor)
+
+        let shouldFitHorizontally = widthScaleFactor > heightScaleFactor
+        if shouldFitHorizontally {
+            let y = (screenBounds.size.height / 2) - ((image.size.height / widthScaleFactor) / 2)
+            finalImageViewFrame = CGRectMake(0, y, screenBounds.size.width, image.size.height / widthScaleFactor)
         } else {
-             finalImageViewFrame = CGRectMake(0, y, screenBounds.size.width, image.size.height / scaleFactor)
+            let x = (screenBounds.size.width / 2) - ((image.size.width / heightScaleFactor) / 2)
+            finalImageViewFrame = CGRectMake(x, 0, screenBounds.size.width - (2 * x), screenBounds.size.height)
         }
 
-        print("screenBounds: \(screenBounds)")
-        print("scaleFactor: \(scaleFactor)")
-        print("finalImageViewFrame: \(finalImageViewFrame)")
-        print(" ")
-
-        UIView.animateWithDuration(0.25, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.CurveEaseInOut, .BeginFromCurrentState, .AllowUserInteraction], animations: {
+        UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
             presentedView.frame = finalImageViewFrame
             }) { completed in
@@ -154,24 +151,17 @@ extension ViewerController: UIPageViewControllerDataSource {
 
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController) {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = collectionView.cellForItemAtIndexPath(indexPath) else { return }
-
-        let originalRect = window.convertRect(existingCell.frame, fromView: collectionView)
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) else { return }
 
         viewerItemController.view.alpha = 0
-
-        let screenBound = UIScreen.mainScreen().bounds
         let transformedCell = self.presentedCell!
-        let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
-        transformedCell.frame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
-
         self.overlayView.alpha = 1.0
         window.addSubview(overlayView)
         window.addSubview(transformedCell)
 
-        UIView.animateWithDuration(0.30, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.CurveEaseInOut, .BeginFromCurrentState, .AllowUserInteraction], animations: {
+        UIView.animateWithDuration(0.30, animations: {
             self.overlayView.alpha = 0.0
-            transformedCell.frame = originalRect
+            transformedCell.frame = window.convertRect(existingCell.frame, fromView: self.collectionView)
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) {
                     existingCell.alpha = 1
