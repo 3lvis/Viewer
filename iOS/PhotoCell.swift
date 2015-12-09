@@ -8,6 +8,7 @@ class PhotoCell: UICollectionViewCell {
         label.textColor = UIColor.blackColor().colorWithAlphaComponent(0.3)
         label.textAlignment = .Center
         label.font = UIFont.systemFontOfSize(40)
+        label.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 
         return label
     }()

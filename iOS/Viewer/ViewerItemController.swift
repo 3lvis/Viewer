@@ -25,6 +25,7 @@ class ViewerItemController: UIViewController {
         label.textAlignment = .Center
         label.textColor = UIColor.blackColor().colorWithAlphaComponent(0.3)
         label.font = UIFont.systemFontOfSize(80)
+        label.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 
         return label
     }()
