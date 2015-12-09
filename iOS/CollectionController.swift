@@ -6,6 +6,7 @@ class CollectionController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
     }
 }
