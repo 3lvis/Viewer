@@ -18,7 +18,7 @@ protocol ViewerControllerDelegate: class {
     func viewerControllerDidDismiss(viewerController: ViewerController)
 }
 
-class ViewerController: UIViewController {
+class ViewerController: UIPageViewController {
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
     let viewerItemControllerCache = NSCache()
@@ -37,10 +37,11 @@ class ViewerController: UIViewController {
         self.photo = photo
         self.collectionView = collectionView
 
-        super.init(nibName: nil, bundle: nil)
+        super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
 
         self.modalPresentationStyle = .OverCurrentContext
         self.view.backgroundColor = UIColor.clearColor()
+        self.dataSource = self
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -64,8 +65,6 @@ class ViewerController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-
-        //self.setInitialController()
         present()
     }
 
@@ -93,21 +92,18 @@ class ViewerController: UIViewController {
             self.overlayView.alpha = 1.0
             transformedCell.frame = finalImageViewFrame
             }, completion: { finished in
-                /* let viewerController = ViewerController(pageIndex: indexPath.row)
-                viewerController.controllerDelegate = self
-                viewerController.controllerDataSource = self
-                self.presentViewController(viewerController, animated: false, completion: {
-                    transformedCell.removeFromSuperview()
-                    self.cell = transformedCell
-                    self.overlayView.removeFromSuperview()
-                })*/
+                transformedCell.removeFromSuperview()
+                self.cell = transformedCell
+                self.overlayView.removeFromSuperview()
+
+                self.setInitialController()
         })
     }
 
     private func setInitialController() {
         if let viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
             let initialViewController = self.viewerItemController(viewerItems[self.pageIndex])
-            //self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
+            self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
         }
     }
 
