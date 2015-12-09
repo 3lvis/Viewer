@@ -7,7 +7,7 @@ protocol ViewerItemControllerDelegate: class {
 class ViewerItemController: UIViewController {
     weak var controllerDelegate: ViewerItemControllerDelegate?
 
-    var window: UIWindow {
+    var applicationWindow: UIWindow {
         return (UIApplication.sharedApplication().delegate?.window?!)!
     }
 
@@ -80,13 +80,20 @@ class ViewerItemController: UIViewController {
         }
 
         translatedPoint = CGPoint(x: firstX, y: firstY + translatedPoint.y)
+        let alpha = ((translatedPoint.y - viewHalfHeight) / viewHalfHeight)
         view.center = translatedPoint
+
+        print("translatedPoint: \(translatedPoint)")
+        print("viewHalfHeight: \(viewHalfHeight)")
+        print("alpha: \(alpha)")
 
         if gesture.state == .Ended {
             if view.center.x > viewHalfHeight + 40 || view.center.y < viewHalfHeight - 40 {
                 print("dismiss")
             }
         }
+
+        print(" ")
     }
 }
 
