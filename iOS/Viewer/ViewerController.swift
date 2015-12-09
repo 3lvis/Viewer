@@ -24,7 +24,6 @@ class ViewerController: UIPageViewController {
     let viewerItemControllerCache = NSCache()
     var pageIndex = 0
     var indexPath: NSIndexPath
-    var existingCell: UICollectionViewCell
     var collectionView: UICollectionView
 
     // MARK: - Initializers
@@ -32,7 +31,6 @@ class ViewerController: UIPageViewController {
     init(indexPath: NSIndexPath, collectionView: UICollectionView) {
         self.pageIndex = indexPath.row
         self.indexPath = indexPath
-        self.existingCell = collectionView.cellForItemAtIndexPath(indexPath)!
         self.collectionView = collectionView
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
@@ -58,7 +56,6 @@ class ViewerController: UIPageViewController {
     // MARK: View Lifecycle
 
     var cell: UIImageView?
-    var originalRect = CGRectZero
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,13 +68,12 @@ class ViewerController: UIPageViewController {
     }
 
     func present() {
-        guard let window = UIApplication.sharedApplication().delegate?.window?! else { return }
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = collectionView.cellForItemAtIndexPath(indexPath) else { return }
 
         window.addSubview(overlayView)
         existingCell.alpha = 0
 
         let convertedRect = window.convertRect(existingCell.frame, fromView: collectionView)
-        self.originalRect = convertedRect
         let transformedCell = UIImageView(frame: convertedRect)
         transformedCell.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         transformedCell.contentMode = .ScaleAspectFill
@@ -157,6 +153,10 @@ extension ViewerController: UIPageViewControllerDataSource {
 
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController) {
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = collectionView.cellForItemAtIndexPath(indexPath) else { return }
+
+        let originalRect = window.convertRect(existingCell.frame, fromView: collectionView)
+
         viewerItemController.view.alpha = 0
 
         let screenBound = UIScreen.mainScreen().bounds
@@ -165,13 +165,12 @@ extension ViewerController: ViewerItemControllerDelegate {
         transformedCell.frame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
 
         self.overlayView.alpha = 1.0
-        guard let window = UIApplication.sharedApplication().delegate?.window?! else { return }
         window.addSubview(overlayView)
         window.addSubview(transformedCell)
 
         UIView.animateWithDuration(0.30, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.CurveEaseInOut, .BeginFromCurrentState, .AllowUserInteraction], animations: {
             self.overlayView.alpha = 0.0
-            transformedCell.frame = self.originalRect
+            transformedCell.frame = originalRect
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) {
                     existingCell.alpha = 1
