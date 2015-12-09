@@ -92,16 +92,16 @@ class ViewerController: UIPageViewController {
             let scaleFactor = transformedCell.image!.size.width / screenBound.size.width
             let finalImageViewFrame = CGRectMake(0, (screenBound.size.height/2) - ((transformedCell.image!.size.height / scaleFactor)/2), screenBound.size.width, transformedCell.image!.size.height / scaleFactor)
 
-            UIView.animateWithDuration(0.25, animations: {
+            UIView.animateWithDuration(0.25, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.CurveEaseInOut, .BeginFromCurrentState, .AllowUserInteraction], animations: {
                 self.overlayView.alpha = 1.0
                 transformedCell.frame = finalImageViewFrame
-                }, completion: { finished in
+                }) { completed in
                     transformedCell.removeFromSuperview()
                     self.cell = transformedCell
                     self.overlayView.removeFromSuperview()
-                    
+
                     self.setInitialController()
-            })
+            }
         }
     }
 
@@ -169,10 +169,10 @@ extension ViewerController: ViewerItemControllerDelegate {
         window.addSubview(overlayView)
         window.addSubview(transformedCell)
 
-        UIView.animateWithDuration(0.25, animations: {
+        UIView.animateWithDuration(0.30, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.CurveEaseInOut, .BeginFromCurrentState, .AllowUserInteraction], animations: {
             self.overlayView.alpha = 0.0
             transformedCell.frame = self.originalRect
-            }, completion: { finished in
+            }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) {
                     existingCell.alpha = 1
                 }
@@ -181,6 +181,6 @@ extension ViewerController: ViewerItemControllerDelegate {
                 self.overlayView.removeFromSuperview()
                 self.dismissViewControllerAnimated(false, completion: nil)
                 self.controllerDelegate?.viewerControllerDidDismiss(self)
-        })
+        }
     }
 }
