@@ -74,8 +74,16 @@ class ViewerController: UIPageViewController {
         window.addSubview(presentedView)
 
         let screenBounds = UIScreen.mainScreen().bounds
-        let scaleFactor = image.size.width / screenBounds.size.width
-        let finalImageViewFrame = CGRectMake(0, (screenBounds.size.height / 2) - ((image.size.height / scaleFactor) / 2), screenBounds.size.width, image.size.height / scaleFactor)
+        var scaleFactor = image.size.width / screenBounds.size.width
+        let y = (screenBounds.size.height / 2) - ((image.size.height / scaleFactor) / 2)
+        var finalImageViewFrame = CGRectZero
+        if y < 0 {
+            scaleFactor = image.size.height / screenBounds.size.height
+            let x = (screenBounds.size.width / 2) - ((image.size.width / scaleFactor) / 2)
+            finalImageViewFrame = CGRectMake(x, 0, screenBounds.size.width, image.size.height / scaleFactor)
+        } else {
+             finalImageViewFrame = CGRectMake(0, y, screenBounds.size.width, image.size.height / scaleFactor)
+        }
 
         print("screenBounds: \(screenBounds)")
         print("scaleFactor: \(scaleFactor)")
