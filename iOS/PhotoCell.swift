@@ -24,7 +24,7 @@ class PhotoCell: UICollectionViewCell {
         super.init(frame: frame)
 
         self.clipsToBounds = true
-        self.backgroundColor = UIColor.redColor()
+        self.backgroundColor = UIColor.blackColor()
         self.addSubview(self.imageView)
         self.addSubview(self.label)
     }
