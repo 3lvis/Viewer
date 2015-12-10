@@ -70,7 +70,7 @@ class ViewerController: UIPageViewController {
     }
 
     func present(indexPath: NSIndexPath) {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
 
         window.addSubview(self.overlayView)
         selectedCell.alpha = 0
