@@ -57,7 +57,7 @@ class ViewerController: UIPageViewController {
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
-        present()
+        self.present(self.indexPath)
     }
 
     func presentedViewCopy(frame: CGRect) -> UIImageView {
@@ -69,7 +69,7 @@ class ViewerController: UIPageViewController {
         return presentedView
     }
 
-    func present() {
+    func present(indexPath: NSIndexPath) {
         guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
 
         window.addSubview(self.overlayView)
@@ -87,18 +87,18 @@ class ViewerController: UIPageViewController {
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
 
-                self.setInitialController()
+                self.setInitialController(indexPath.row)
         }
     }
 
-    private func setInitialController() {
-        if let viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
-            let initialViewController = self.viewerItemController(viewerItems[self.indexPath.row])
-            self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
-        }
+    private func setInitialController(index: Int) {
+        let initialViewController = self.findOrCreateViewerItemController(index)
+        self.setViewControllers([initialViewController], direction: .Forward, animated: false, completion: nil)
     }
 
-    private func viewerItemController(viewerItem: ViewerItem) -> ViewerItemController {
+    private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
+        let viewerItems = self.controllerDataSource!.viewerItemsForViewerController(self)
+        let viewerItem = viewerItems[index]
         var viewerItemController: ViewerItemController
 
         if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.id) as? ViewerItemController {
@@ -110,6 +110,7 @@ class ViewerController: UIPageViewController {
         }
 
         viewerItemController.viewerItem = viewerItem
+        viewerItemController.index = index
 
         return viewerItemController
     }
@@ -120,8 +121,7 @@ extension ViewerController: UIPageViewControllerDataSource {
         if let viewerItemController = viewController as? ViewerItemController, viewerItem = viewerItemController.viewerItem, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
             let index = viewerItems.indexOf({ $0.id == viewerItem.id })!
             if index > 0 {
-                let previousItem = viewerItems[index - 1]
-                return self.viewerItemController(previousItem)
+                return self.findOrCreateViewerItemController(index - 1)
             }
         }
 
@@ -132,8 +132,7 @@ extension ViewerController: UIPageViewControllerDataSource {
         if let viewerItemController = viewController as? ViewerItemController, viewerItem = viewerItemController.viewerItem, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
             let index = viewerItems.indexOf({ $0.id == viewerItem.id })!
             if index < viewerItems.count - 1 {
-                let previousItem = viewerItems[index + 1]
-                return self.viewerItemController(previousItem)
+                return self.findOrCreateViewerItemController(index + 1)
             }
         }
 

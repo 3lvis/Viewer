@@ -20,6 +20,8 @@ class ViewerItemController: UIViewController {
         }
     }
 
+    var index = 0
+
     lazy var label: UILabel = {
         let label = UILabel(frame: UIScreen.mainScreen().bounds)
         label.textAlignment = .Center
