@@ -24,7 +24,6 @@ class ViewerController: UIPageViewController {
     let viewerItemControllerCache = NSCache()
     var indexPath: NSIndexPath
     var collectionView: UICollectionView
-    var presentedCell: UIImageView?
 
     // MARK: - Initializers
 
@@ -36,6 +35,7 @@ class ViewerController: UIPageViewController {
 
         self.modalPresentationStyle = .OverCurrentContext
         self.view.backgroundColor = UIColor.clearColor()
+        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.dataSource = self
     }
 
@@ -60,39 +60,31 @@ class ViewerController: UIPageViewController {
         present()
     }
 
-    func present() {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { return }
-
-        window.addSubview(overlayView)
-        selectedCell.alpha = 0
-
-        let presentedView = UIImageView(frame: window.convertRect(selectedCell.frame, fromView: collectionView))
+    func presentedViewCopy(frame: CGRect) -> UIImageView {
+        let window = UIApplication.sharedApplication().delegate!.window!!
+        let presentedView = UIImageView(frame: window.convertRect(frame, fromView: self.collectionView))
         presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         presentedView.contentMode = .ScaleAspectFill
         presentedView.clipsToBounds = true
+        return presentedView
+    }
+
+    func present() {
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
+
+        window.addSubview(self.overlayView)
+        selectedCell.alpha = 0
+
+        let presentedView = self.presentedViewCopy(selectedCell.frame)
         presentedView.image = image
         window.addSubview(presentedView)
-
-        let screenBounds = UIScreen.mainScreen().bounds
-        let widthScaleFactor = image.size.width / screenBounds.size.width
-        let heightScaleFactor = image.size.height / screenBounds.size.height
-        var finalImageViewFrame = CGRectZero
-
-        let shouldFitHorizontally = widthScaleFactor > heightScaleFactor
-        if shouldFitHorizontally {
-            let y = (screenBounds.size.height / 2) - ((image.size.height / widthScaleFactor) / 2)
-            finalImageViewFrame = CGRectMake(0, y, screenBounds.size.width, image.size.height / widthScaleFactor)
-        } else {
-            let x = (screenBounds.size.width / 2) - ((image.size.width / heightScaleFactor) / 2)
-            finalImageViewFrame = CGRectMake(x, 0, screenBounds.size.width - (2 * x), screenBounds.size.height)
-        }
+        let centeredImageFrame = image.centeredFrame()
 
         UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
-            presentedView.frame = finalImageViewFrame
+            presentedView.frame = centeredImageFrame
             }) { completed in
                 presentedView.removeFromSuperview()
-                self.presentedCell = presentedView
                 self.overlayView.removeFromSuperview()
 
                 self.setInitialController()
@@ -151,23 +143,31 @@ extension ViewerController: UIPageViewControllerDataSource {
 
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController) {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) else { return }
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(self.indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
 
         viewerItemController.view.alpha = 0
-        let transformedCell = self.presentedCell!
+
+        let presentedView = self.presentedViewCopy(selectedCellFrame)
+        presentedView.image = image
+        window.addSubview(presentedView)
+
+        let centeredImageFrame = image.centeredFrame()
+        presentedView.frame = centeredImageFrame
+
         self.overlayView.alpha = 1.0
+        overlayView.frame = UIScreen.mainScreen().bounds
         window.addSubview(overlayView)
-        window.addSubview(transformedCell)
+        window.addSubview(presentedView)
 
         UIView.animateWithDuration(0.30, animations: {
             self.overlayView.alpha = 0.0
-            transformedCell.frame = window.convertRect(existingCell.frame, fromView: self.collectionView)
+            presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) {
                     existingCell.alpha = 1
                 }
 
-                transformedCell.removeFromSuperview()
+                presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
                 self.dismissViewControllerAnimated(false, completion: nil)
                 self.controllerDelegate?.viewerControllerDidDismiss(self)
