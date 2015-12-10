@@ -59,6 +59,6 @@ extension CollectionController: ViewerControllerDelegate {
         }
     }
 
-    func viewerControllerDidDismiss(viewerController3: ViewerController) {
+    func viewerControllerDidDismiss(viewerController: ViewerController) {
     }
 }
