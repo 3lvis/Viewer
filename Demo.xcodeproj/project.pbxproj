@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1421DD6C1C19798E00E17EF9 /* UIImage+CenteredFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1421DD6B1C19798E00E17EF9 /* UIImage+CenteredFrame.swift */; };
 		143B5C3B1C0EED51000B6A18 /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B5C3A1C0EED51000B6A18 /* PhotoCell.swift */; };
 		143B5C3D1C0EF490000B6A18 /* ViewerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B5C3C1C0EF490000B6A18 /* ViewerItem.swift */; };
 		143B5C3F1C0EF76E000B6A18 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B5C3E1C0EF76E000B6A18 /* Photo.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1421DD6B1C19798E00E17EF9 /* UIImage+CenteredFrame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+CenteredFrame.swift"; sourceTree = "<group>"; };
 		143B5C3A1C0EED51000B6A18 /* PhotoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
 		143B5C3C1C0EF490000B6A18 /* ViewerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewerItem.swift; sourceTree = "<group>"; };
 		143B5C3E1C0EF76E000B6A18 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				14C9840D1C0DE94700B5E515 /* ViewerController.swift */,
 				14C9840E1C0DE94700B5E515 /* ViewerItemController.swift */,
 				143B5C3C1C0EF490000B6A18 /* ViewerItem.swift */,
+				1421DD6B1C19798E00E17EF9 /* UIImage+CenteredFrame.swift */,
 			);
 			path = Viewer;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				14C9840F1C0DE94700B5E515 /* ViewerController.swift in Sources */,
 				14C984101C0DE94700B5E515 /* ViewerItemController.swift in Sources */,
 				14C9840B1C0DE7B300B5E515 /* CollectionController.swift in Sources */,
+				1421DD6C1C19798E00E17EF9 /* UIImage+CenteredFrame.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

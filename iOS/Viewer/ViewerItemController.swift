@@ -53,6 +53,7 @@ class ViewerItemController: UIViewController {
         self.view.backgroundColor = UIColor.orangeColor()
         self.view.addSubview(self.imageView)
         self.view.addSubview(self.label)
+        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: "tapAction")
         self.view.addGestureRecognizer(tapRecognizer)

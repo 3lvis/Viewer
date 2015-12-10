@@ -36,6 +36,7 @@ class ViewerController: UIPageViewController {
 
         self.modalPresentationStyle = .OverCurrentContext
         self.view.backgroundColor = UIColor.clearColor()
+        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.dataSource = self
     }
 
@@ -61,35 +62,22 @@ class ViewerController: UIPageViewController {
     }
 
     func present() {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { return }
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { return }
 
-        window.addSubview(overlayView)
+        window.addSubview(self.overlayView)
         selectedCell.alpha = 0
 
-        let presentedView = UIImageView(frame: window.convertRect(selectedCell.frame, fromView: collectionView))
+        let presentedView = UIImageView(frame: window.convertRect(selectedCell.frame, fromView: self.collectionView))
         presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         presentedView.contentMode = .ScaleAspectFill
         presentedView.clipsToBounds = true
         presentedView.image = image
         window.addSubview(presentedView)
-
-        let screenBounds = UIScreen.mainScreen().bounds
-        let widthScaleFactor = image.size.width / screenBounds.size.width
-        let heightScaleFactor = image.size.height / screenBounds.size.height
-        var finalImageViewFrame = CGRectZero
-
-        let shouldFitHorizontally = widthScaleFactor > heightScaleFactor
-        if shouldFitHorizontally {
-            let y = (screenBounds.size.height / 2) - ((image.size.height / widthScaleFactor) / 2)
-            finalImageViewFrame = CGRectMake(0, y, screenBounds.size.width, image.size.height / widthScaleFactor)
-        } else {
-            let x = (screenBounds.size.width / 2) - ((image.size.width / heightScaleFactor) / 2)
-            finalImageViewFrame = CGRectMake(x, 0, screenBounds.size.width - (2 * x), screenBounds.size.height)
-        }
+        let centeredImageFrame = image.centeredFrame()
 
         UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
-            presentedView.frame = finalImageViewFrame
+            presentedView.frame = centeredImageFrame
             }) { completed in
                 presentedView.removeFromSuperview()
                 self.presentedCell = presentedView
@@ -151,17 +139,20 @@ extension ViewerController: UIPageViewControllerDataSource {
 
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController) {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) else { return }
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { return }
 
         viewerItemController.view.alpha = 0
         let transformedCell = self.presentedCell!
+        let centeredImageFrame = image.centeredFrame()
+        transformedCell.frame = centeredImageFrame
         self.overlayView.alpha = 1.0
+        overlayView.frame = UIScreen.mainScreen().bounds
         window.addSubview(overlayView)
         window.addSubview(transformedCell)
 
         UIView.animateWithDuration(0.30, animations: {
             self.overlayView.alpha = 0.0
-            transformedCell.frame = window.convertRect(existingCell.frame, fromView: self.collectionView)
+            transformedCell.frame = window.convertRect(selectedCell.frame, fromView: self.collectionView)
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) {
                     existingCell.alpha = 1
