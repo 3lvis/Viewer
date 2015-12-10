@@ -84,6 +84,7 @@ class ViewerController: UIPageViewController {
             self.overlayView.alpha = 1.0
             presentedView.frame = centeredImageFrame
             }) { completed in
+                selectedCell.alpha = 1
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
 
@@ -118,8 +119,8 @@ class ViewerController: UIPageViewController {
 
 extension ViewerController: UIPageViewControllerDataSource {
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, viewerItem = viewerItemController.viewerItem, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
-            let index = viewerItems.indexOf({ $0.id == viewerItem.id })!
+        if let viewerItemController = viewController as? ViewerItemController {
+            let index = viewerItemController.index
             if index > 0 {
                 return self.findOrCreateViewerItemController(index - 1)
             }
@@ -129,8 +130,8 @@ extension ViewerController: UIPageViewControllerDataSource {
     }
 
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, viewerItem = viewerItemController.viewerItem, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
-            let index = viewerItems.indexOf({ $0.id == viewerItem.id })!
+        if let viewerItemController = viewController as? ViewerItemController, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
+            let index = viewerItemController.index
             if index < viewerItems.count - 1 {
                 return self.findOrCreateViewerItemController(index + 1)
             }
@@ -142,7 +143,12 @@ extension ViewerController: UIPageViewControllerDataSource {
 
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController) {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(self.indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
+        let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
+
+        if let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+            selectedCell.alpha = 0
+        }
 
         viewerItemController.view.alpha = 0
 
@@ -162,7 +168,7 @@ extension ViewerController: ViewerItemControllerDelegate {
             self.overlayView.alpha = 0.0
             presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
             }) { completed in
-                if let existingCell = self.collectionView.cellForItemAtIndexPath(self.indexPath) {
+                if let existingCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
                     existingCell.alpha = 1
                 }
 
