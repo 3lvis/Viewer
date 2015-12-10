@@ -54,6 +54,9 @@ extension CollectionController: ViewerControllerDataSource {
 
 extension CollectionController: ViewerControllerDelegate {
     func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath) {
+        if self.collectionView?.cellForItemAtIndexPath(indexPath) == nil {
+            self.collectionView?.scrollToItemAtIndexPath(indexPath, atScrollPosition: .CenteredVertically, animated: true)
+        }
     }
 
     func viewerControllerDidDismiss(viewerController3: ViewerController) {

@@ -122,7 +122,9 @@ extension ViewerController: UIPageViewControllerDataSource {
         if let viewerItemController = viewController as? ViewerItemController {
             let index = viewerItemController.index
             if index > 0 {
-                return self.findOrCreateViewerItemController(index - 1)
+                let newIndex = index - 1
+                self.controllerDelegate?.viewerController(self, didChangeIndexPath: NSIndexPath(forRow: newIndex, inSection: 0))
+                return self.findOrCreateViewerItemController(newIndex)
             }
         }
 
@@ -133,7 +135,9 @@ extension ViewerController: UIPageViewControllerDataSource {
         if let viewerItemController = viewController as? ViewerItemController, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
             let index = viewerItemController.index
             if index < viewerItems.count - 1 {
-                return self.findOrCreateViewerItemController(index + 1)
+                let newIndex = index + 1
+                self.controllerDelegate?.viewerController(self, didChangeIndexPath: NSIndexPath(forRow: newIndex, inSection: 0))
+                return self.findOrCreateViewerItemController(newIndex)
             }
         }
 
