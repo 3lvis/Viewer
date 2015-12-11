@@ -57,7 +57,7 @@ class ViewerController: UIPageViewController {
     }()
 
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
-        let gesture = UIPanGestureRecognizer(target: self, action: "pan:")
+        let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
         gesture.delegate = self
 
         return gesture
@@ -146,7 +146,7 @@ class ViewerController: UIPageViewController {
         }
     }
 
-    func pan(gesture: UIPanGestureRecognizer) {
+    func panAction(gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewerItemController(self.currentIndex)
 
         let viewHeight = controller.imageView.frame.size.height
