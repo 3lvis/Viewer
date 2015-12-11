@@ -57,7 +57,7 @@ class ViewerController: UIPageViewController {
     }()
 
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
-        let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
+        let gesture = UIPanGestureRecognizer(target: self, action: "pan:")
         gesture.delegate = self
 
         return gesture
@@ -96,7 +96,6 @@ class ViewerController: UIPageViewController {
             self.overlayView.alpha = 1.0
             presentedView.frame = centeredImageFrame
             }) { completed in
-                selectedCell.alpha = 1
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
 
@@ -113,6 +112,7 @@ class ViewerController: UIPageViewController {
         }
 
         viewerItemController.imageView.alpha = 0
+        viewerItemController.view.backgroundColor = UIColor.clearColor()
 
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
@@ -146,7 +146,7 @@ class ViewerController: UIPageViewController {
         }
     }
 
-    func panAction(gesture: UIPanGestureRecognizer) {
+    func pan(gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewerItemController(self.currentIndex)
 
         let viewHeight = controller.imageView.frame.size.height
@@ -167,7 +167,6 @@ class ViewerController: UIPageViewController {
         self.lastAlpha = alpha
 
         controller.imageView.center = translatedPoint
-        controller.imageView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
 
         if gesture.state == .Ended {

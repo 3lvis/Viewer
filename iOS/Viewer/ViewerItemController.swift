@@ -30,7 +30,7 @@ class ViewerItemController: UIViewController {
 
     lazy var imageView: UIImageView = {
         let view = UIImageView(frame: UIScreen.mainScreen().bounds)
-        view.backgroundColor = UIColor.blackColor()
+        view.backgroundColor = UIColor.clearColor()
         view.contentMode = .ScaleAspectFit
         view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         view.userInteractionEnabled = true
