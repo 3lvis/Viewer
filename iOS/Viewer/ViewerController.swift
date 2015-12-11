@@ -206,66 +206,57 @@ class ViewerController: UIPageViewController {
 
         self.currentIndex = index
 
-
         return viewerItemController
     }
 }
 
 extension ViewerController: UIPageViewControllerDataSource {
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController {
-            viewerItemController.imageView.removeGestureRecognizer(self.panGestureRecognizer)
+        guard let viewerItemController = viewController as? ViewerItemController where viewerItemController.index > 0  else { return nil }
 
-            let index = viewerItemController.index
-            let indexPath = NSIndexPath(forRow: index, inSection: 0)
-            if let currentCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-                currentCell.alpha = 1
-            }
+        let index = viewerItemController.index
+        viewerItemController.imageView.removeGestureRecognizer(self.panGestureRecognizer)
 
-            if index > 0 {
-                let newIndex = index - 1
-                let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
-                if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
-                    newCell.alpha = 0
-                }
-
-                self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
-                let controller = self.findOrCreateViewerItemController(newIndex)
-                controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
-
-                return controller
-            }
+        let indexPath = NSIndexPath(forRow: index, inSection: 0)
+        if let currentCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+            currentCell.alpha = 1
         }
 
-        return nil
+        let newIndex = index - 1
+        let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
+        if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
+            newCell.alpha = 0
+        }
+
+        self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
+        let controller = self.findOrCreateViewerItemController(newIndex)
+        controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
+
+        return controller
     }
 
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) {
-            viewerItemController.imageView.removeGestureRecognizer(self.panGestureRecognizer)
+        guard let viewerItemController = viewController as? ViewerItemController, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) where viewerItemController.index < viewerItems.count - 1 else { return nil }
 
-            let index = viewerItemController.index
-            let indexPath = NSIndexPath(forRow: index, inSection: 0)
-            if let currentCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-                currentCell.alpha = 1
-            }
+        let index = viewerItemController.index
+        viewerItemController.imageView.removeGestureRecognizer(self.panGestureRecognizer)
 
-            if index < viewerItems.count - 1 {
-                let newIndex = index + 1
-                let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
-                if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
-                    newCell.alpha = 0
-                }
-
-                self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
-                let controller = self.findOrCreateViewerItemController(newIndex)
-                controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
-
-                return controller
-            }
+        let indexPath = NSIndexPath(forRow: index, inSection: 0)
+        if let currentCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+            currentCell.alpha = 1
         }
 
-        return nil
+        let newIndex = index + 1
+        let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
+        if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
+            newCell.alpha = 0
+        }
+
+        self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
+        let controller = self.findOrCreateViewerItemController(newIndex)
+        controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
+
+        return controller
     }
 }
 
