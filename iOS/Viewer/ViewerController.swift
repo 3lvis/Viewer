@@ -71,9 +71,8 @@ class ViewerController: UIPageViewController {
         self.present(self.indexPath)
     }
 
-    func presentedViewCopy(frame: CGRect) -> UIImageView {
-        let window = UIApplication.sharedApplication().delegate!.window!!
-        let presentedView = UIImageView(frame: window.convertRect(frame, fromView: self.collectionView))
+    func presentedViewCopy() -> UIImageView {
+        let presentedView = UIImageView()
         presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         presentedView.contentMode = .ScaleAspectFill
         presentedView.clipsToBounds = true
@@ -86,7 +85,9 @@ class ViewerController: UIPageViewController {
         window.addSubview(self.overlayView)
         selectedCell.alpha = 0
 
-        let presentedView = self.presentedViewCopy(selectedCell.frame)
+        let presentedView = self.presentedViewCopy()
+        presentedView.frame = window.convertRect(selectedCell.frame, fromView: self.collectionView)
+
         presentedView.image = image
         window.addSubview(presentedView)
         let centeredImageFrame = image.centeredFrame()
@@ -113,7 +114,8 @@ class ViewerController: UIPageViewController {
 
         viewerItemController.imageView.alpha = 0
 
-        let presentedView = self.presentedViewCopy(image.centeredFrame())
+        let presentedView = self.presentedViewCopy()
+        presentedView.frame = image.centeredFrame()
         presentedView.image = image
 
         if self.isDragging {
