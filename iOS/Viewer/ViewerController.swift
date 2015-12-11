@@ -24,6 +24,10 @@ class ViewerController: UIPageViewController {
     let viewerItemControllerCache = NSCache()
     var indexPath: NSIndexPath
     var collectionView: UICollectionView
+    var originalDraggedCenter = CGPointZero
+    var isDragging = false
+    var lastAlpha = CGFloat(0)
+    var currentIndex = 0
 
     // MARK: - Initializers
 
@@ -99,6 +103,84 @@ class ViewerController: UIPageViewController {
         }
     }
 
+    func dismiss(viewerItemController: ViewerItemController, completion: (() -> ())?) {
+        let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
+        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
+
+        if let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+            selectedCell.alpha = 0
+        }
+
+        viewerItemController.imageView.alpha = 0
+
+        let presentedView = self.presentedViewCopy(image.centeredFrame())
+        presentedView.image = image
+
+        if self.isDragging {
+            presentedView.center = viewerItemController.imageView.center
+            self.overlayView.alpha = self.lastAlpha
+        } else {
+            self.overlayView.alpha = 1.0
+        }
+
+        self.overlayView.frame = UIScreen.mainScreen().bounds
+        window.addSubview(self.overlayView)
+        window.addSubview(presentedView)
+
+        UIView.animateWithDuration(0.30, animations: {
+            self.overlayView.alpha = 0.0
+            presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
+            }) { completed in
+                if let existingCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                    existingCell.alpha = 1
+                }
+
+                presentedView.removeFromSuperview()
+                self.overlayView.removeFromSuperview()
+                self.dismissViewControllerAnimated(false, completion: nil)
+                self.controllerDelegate?.viewerControllerDidDismiss(self)
+                
+                completion?()
+        }
+    }
+
+    func panAction(gesture: UIPanGestureRecognizer) {
+        let controller = self.findOrCreateViewerItemController(self.currentIndex)
+
+        let viewHeight = controller.imageView.frame.size.height
+        let viewHalfHeight = viewHeight / 2
+        var translatedPoint = gesture.translationInView(controller.imageView)
+
+        if gesture.state == .Began {
+            self.originalDraggedCenter = controller.imageView.center
+            self.isDragging = true
+            setNeedsStatusBarAppearanceUpdate()
+        }
+
+        translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
+        let alphaDiff = ((translatedPoint.y - viewHalfHeight) / viewHalfHeight) * 2.5
+        let isDraggedUp = translatedPoint.y < viewHalfHeight
+        let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
+
+        self.lastAlpha = alpha
+
+        controller.imageView.center = translatedPoint
+        controller.imageView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
+        controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
+
+        if gesture.state == .Ended {
+            let draggingMargin = CGFloat(60)
+            let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - draggingMargin
+            let centerBellowDraggingArea = controller.imageView.center.y > viewHalfHeight + draggingMargin
+            if centerAboveDraggingArea || centerBellowDraggingArea {
+                self.dismiss(controller, completion: nil)
+            } else {
+                self.isDragging = false
+                controller.imageView.center = self.originalDraggedCenter
+            }
+        }
+    }
+
     private func setInitialController(index: Int) {
         let controller = self.findOrCreateViewerItemController(index)
         controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
@@ -126,51 +208,6 @@ class ViewerController: UIPageViewController {
 
         return viewerItemController
     }
-
-    var originalDraggedCenter = CGPointZero
-    var isDragging = false
-    var lastAlpha = CGFloat(0)
-
-    func panAction(gesture: UIPanGestureRecognizer) {
-        let controller = self.findOrCreateViewerItemController(self.currentIndex)
-
-        let viewHeight = controller.imageView.frame.size.height
-        let viewHalfHeight = viewHeight / 2
-        var translatedPoint = gesture.translationInView(controller.imageView)
-
-        if gesture.state == .Began {
-            self.originalDraggedCenter = controller.imageView.center
-            self.isDragging = true
-            setNeedsStatusBarAppearanceUpdate()
-        }
-
-        translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
-        let alphaDiff = ((translatedPoint.y - viewHalfHeight) / viewHalfHeight) * 2.5
-        let isDraggedUp = translatedPoint.y < viewHalfHeight
-        let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
-
-        print("translatedPoint: \(translatedPoint)")
-
-        self.lastAlpha = alpha
-
-        controller.imageView.center = translatedPoint
-        controller.imageView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
-        controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
-
-        if gesture.state == .Ended {
-            let draggingMargin = CGFloat(60)
-            let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - draggingMargin
-            let centerBellowDraggingArea = controller.imageView.center.y > viewHalfHeight + draggingMargin
-            if centerAboveDraggingArea || centerBellowDraggingArea {
-                self.viewerItemControllerDidTapItem(controller, completion: nil)
-            } else {
-                self.isDragging = false
-                controller.imageView.center = self.originalDraggedCenter
-            }
-        }
-    }
-
-    var currentIndex = 0
 }
 
 extension ViewerController: UIPageViewControllerDataSource {
@@ -213,45 +250,7 @@ extension ViewerController: UIPageViewControllerDataSource {
 
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> ())?) {
-        let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
-
-        if let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-            selectedCell.alpha = 0
-        }
-
-        viewerItemController.imageView.alpha = 0
-
-        let presentedView = self.presentedViewCopy(image.centeredFrame())
-        presentedView.image = image
-        window.addSubview(presentedView)
-
-        if self.isDragging {
-            presentedView.center = viewerItemController.imageView.center
-            self.overlayView.alpha = self.lastAlpha
-        } else {
-            self.overlayView.alpha = 1.0
-        }
-
-        self.overlayView.frame = UIScreen.mainScreen().bounds
-        window.addSubview(self.overlayView)
-        window.addSubview(presentedView)
-
-        UIView.animateWithDuration(0.30, animations: {
-            self.overlayView.alpha = 0.0
-            presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
-            }) { completed in
-                if let existingCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-                    existingCell.alpha = 1
-                }
-
-                presentedView.removeFromSuperview()
-                self.overlayView.removeFromSuperview()
-                self.dismissViewControllerAnimated(false, completion: nil)
-                self.controllerDelegate?.viewerControllerDidDismiss(self)
-
-                completion?()
-        }
+        dismiss(viewerItemController, completion: completion)
     }
 }
 
