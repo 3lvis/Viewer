@@ -22,7 +22,7 @@ class ViewerController: UIPageViewController {
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
     let viewerItemControllerCache = NSCache()
-    var indexPath: NSIndexPath
+    var initialIndexPath: NSIndexPath
     var collectionView: UICollectionView
     var originalDraggedCenter = CGPointZero
     var isDragging = false
@@ -32,7 +32,7 @@ class ViewerController: UIPageViewController {
     // MARK: - Initializers
 
     init(indexPath: NSIndexPath, collectionView: UICollectionView) {
-        self.indexPath = indexPath
+        self.initialIndexPath = indexPath
         self.collectionView = collectionView
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
@@ -68,7 +68,7 @@ class ViewerController: UIPageViewController {
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
-        self.present(self.indexPath)
+        self.present(self.initialIndexPath)
     }
 
     func presentedViewCopy() -> UIImageView {
@@ -217,9 +217,19 @@ extension ViewerController: UIPageViewControllerDataSource {
             viewerItemController.imageView.removeGestureRecognizer(self.panGestureRecognizer)
 
             let index = viewerItemController.index
+            let indexPath = NSIndexPath(forRow: index, inSection: 0)
+            if let currentCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                currentCell.alpha = 1
+            }
+
             if index > 0 {
                 let newIndex = index - 1
-                self.controllerDelegate?.viewerController(self, didChangeIndexPath: NSIndexPath(forRow: newIndex, inSection: 0))
+                let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
+                if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
+                    newCell.alpha = 0
+                }
+
+                self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
                 let controller = self.findOrCreateViewerItemController(newIndex)
                 controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
 
@@ -235,9 +245,19 @@ extension ViewerController: UIPageViewControllerDataSource {
             viewerItemController.imageView.removeGestureRecognizer(self.panGestureRecognizer)
 
             let index = viewerItemController.index
+            let indexPath = NSIndexPath(forRow: index, inSection: 0)
+            if let currentCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                currentCell.alpha = 1
+            }
+
             if index < viewerItems.count - 1 {
                 let newIndex = index + 1
-                self.controllerDelegate?.viewerController(self, didChangeIndexPath: NSIndexPath(forRow: newIndex, inSection: 0))
+                let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
+                if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
+                    newCell.alpha = 0
+                }
+
+                self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
                 let controller = self.findOrCreateViewerItemController(newIndex)
                 controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
 
