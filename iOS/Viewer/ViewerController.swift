@@ -1,12 +1,10 @@
 import UIKit
 import CoreData
 
-/*
+/**
 The ViewerController takes care of displaying the user's photos/videos in full-screen.
 
 You can swipe right or left to navigate between photos.
-
-When the ViewerController jumps betweeetn photos it triggers a call to the viewerControllerDidChangeIndexPath delegate.
 */
 
 public protocol ViewerControllerDataSource: class {
@@ -14,7 +12,14 @@ public protocol ViewerControllerDataSource: class {
 }
 
 public protocol ViewerControllerDelegate: class {
+    /**
+    When the ViewerController jumps between photos it triggers a call to the viewerController:didChangeIndexPath: delegate.
+    */
     func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath)
+
+    /**
+    When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate.
+    */
     func viewerControllerDidDismiss(viewerController: ViewerController)
 }
 
@@ -24,12 +29,23 @@ public class ViewerController: UIPageViewController {
     private let viewerItemControllerCache = NSCache()
 
     /**
-    Used to
+    Temporary variable used to present the initial controller on viewDidAppear
     */
     private var initialIndexPath: NSIndexPath
 
-    var collectionView: UICollectionView
+    /**
+     The UICollectionView to be used when dismissing and presenting elements
+     */
+    unowned var collectionView: UICollectionView
+
+    /**
+     CGPoint used for diffing the panning on an image
+     */
     var originalDraggedCenter = CGPointZero
+
+    /**
+     Used for doing a different animation when dismissing in the middle of a dragging gesture
+     */
     var isDragging = false
     var currentIndex = 0
 
