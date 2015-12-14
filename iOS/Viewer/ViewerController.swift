@@ -72,6 +72,8 @@ class ViewerController: UIPageViewController {
         self.present(self.initialIndexPath)
     }
 
+    // MARK: Private methods
+
     func presentedViewCopy() -> UIImageView {
         let presentedView = UIImageView()
         presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
@@ -81,8 +83,9 @@ class ViewerController: UIPageViewController {
     }
 
     func present(indexPath: NSIndexPath) {
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
+        guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
 
+        let window = self.applicationWindow()
         window.addSubview(self.overlayView)
         selectedCell.alpha = 0
 
@@ -106,7 +109,7 @@ class ViewerController: UIPageViewController {
 
     func dismiss(viewerItemController: ViewerItemController, completion: (() -> ())?) {
         let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
-        guard let window = UIApplication.sharedApplication().delegate?.window?!, selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
+        guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
 
         if let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
             selectedCell.alpha = 0
@@ -127,6 +130,7 @@ class ViewerController: UIPageViewController {
         }
 
         self.overlayView.frame = UIScreen.mainScreen().bounds
+        let window = self.applicationWindow()
         window.addSubview(self.overlayView)
         window.addSubview(presentedView)
 
