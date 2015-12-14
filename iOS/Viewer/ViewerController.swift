@@ -54,7 +54,7 @@ public class ViewerController: UIPageViewController {
 
     // MARK: - Initializers
 
-    var shouldHide = true
+    var shouldHide = false
 
     public override func prefersStatusBarHidden() -> Bool {
         return self.shouldHide
@@ -125,8 +125,10 @@ public class ViewerController: UIPageViewController {
         window.addSubview(presentedView)
         let centeredImageFrame = image.centeredFrame()
 
+        self.shouldHide = true
         UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
+            self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = centeredImageFrame
             }) { completed in
                 presentedView.removeFromSuperview()

@@ -19,12 +19,6 @@ class CollectionController: UICollectionViewController {
         let size = (bounds.width - 4) / 4
         layout.itemSize = CGSize(width: size, height: size)
     }
-
-    var shouldHide = false
-
-    override func prefersStatusBarHidden() -> Bool {
-        return self.shouldHide
-    }
 }
 
 extension CollectionController {
@@ -44,11 +38,7 @@ extension CollectionController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        self.shouldHide = true
-        UIView.animateWithDuration(0.3, animations: {
-            self.setNeedsStatusBarAppearanceUpdate()
-        })
-
+        self.modalPresentationCapturesStatusBarAppearance = true
         let viewerController = ViewerController(indexPath: indexPath, collectionView: collectionView)
         viewerController.controllerDelegate = self
         viewerController.controllerDataSource = self
@@ -70,6 +60,5 @@ extension CollectionController: ViewerControllerDelegate {
     }
 
     func viewerControllerDidDismiss(viewerController: ViewerController) {
-        self.shouldHide = false
     }
 }
