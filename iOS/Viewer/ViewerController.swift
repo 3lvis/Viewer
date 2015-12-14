@@ -26,7 +26,6 @@ class ViewerController: UIPageViewController {
     var collectionView: UICollectionView
     var originalDraggedCenter = CGPointZero
     var isDragging = false
-    var lastAlpha = CGFloat(0)
     var currentIndex = 0
 
     // MARK: - Initializers
@@ -124,7 +123,7 @@ class ViewerController: UIPageViewController {
 
         if self.isDragging {
             presentedView.center = viewerItemController.imageView.center
-            self.overlayView.alpha = self.lastAlpha
+            self.overlayView.alpha = CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor)
         } else {
             self.overlayView.alpha = 1.0
         }
@@ -168,8 +167,6 @@ class ViewerController: UIPageViewController {
         let alphaDiff = ((translatedPoint.y - viewHalfHeight) / viewHalfHeight) * 2.5
         let isDraggedUp = translatedPoint.y < viewHalfHeight
         let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
-
-        self.lastAlpha = alpha
 
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
