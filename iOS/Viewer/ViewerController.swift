@@ -169,7 +169,6 @@ public class ViewerController: UIPageViewController {
         UIView.animateWithDuration(0.30, animations: {
             self.overlayView.alpha = 0.0
             self.setNeedsStatusBarAppearanceUpdate()
-
             presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
