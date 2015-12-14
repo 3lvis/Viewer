@@ -1,6 +1,6 @@
 import UIKit
 
-protocol ViewerItem {
+public protocol ViewerItem {
     var id: Int { get }
     var image: UIImage? { get }
 }

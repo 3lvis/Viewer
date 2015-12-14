@@ -9,20 +9,25 @@ You can swipe right or left to navigate between photos.
 When the ViewerController jumps betweeetn photos it triggers a call to the viewerControllerDidChangeIndexPath delegate.
 */
 
-protocol ViewerControllerDataSource: class {
+public protocol ViewerControllerDataSource: class {
     func viewerItemsForViewerController(viewerController: ViewerController) -> [ViewerItem]
 }
 
-protocol ViewerControllerDelegate: class {
+public protocol ViewerControllerDelegate: class {
     func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath)
     func viewerControllerDidDismiss(viewerController: ViewerController)
 }
 
-class ViewerController: UIPageViewController {
+public class ViewerController: UIPageViewController {
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
-    let viewerItemControllerCache = NSCache()
-    var initialIndexPath: NSIndexPath
+    private let viewerItemControllerCache = NSCache()
+
+    /**
+    Used to
+    */
+    private var initialIndexPath: NSIndexPath
+
     var collectionView: UICollectionView
     var originalDraggedCenter = CGPointZero
     var isDragging = false
@@ -43,7 +48,7 @@ class ViewerController: UIPageViewController {
         self.delegate = self
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -65,7 +70,7 @@ class ViewerController: UIPageViewController {
 
     // MARK: View Lifecycle
 
-    override func viewDidAppear(animated: Bool) {
+    public override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
         self.present(self.initialIndexPath)
@@ -212,7 +217,7 @@ class ViewerController: UIPageViewController {
 }
 
 extension ViewerController: UIPageViewControllerDataSource {
-    func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         guard let viewerItemController = viewController as? ViewerItemController where viewerItemController.index > 0  else { return nil }
 
         let newIndex = viewerItemController.index - 1
@@ -223,7 +228,7 @@ extension ViewerController: UIPageViewControllerDataSource {
         return controller
     }
 
-    func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         guard let viewerItemController = viewController as? ViewerItemController, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) where viewerItemController.index < viewerItems.count - 1 else { return nil }
 
         let newIndex = viewerItemController.index + 1
@@ -236,7 +241,7 @@ extension ViewerController: UIPageViewControllerDataSource {
 }
 
 extension ViewerController: UIPageViewControllerDelegate {
-    func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
+    public func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
         guard let controllers = pendingViewControllers as? [ViewerItemController] else { fatalError() }
 
         for controller in controllers {
@@ -249,7 +254,7 @@ extension ViewerController: UIPageViewControllerDelegate {
         }
     }
 
-    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+    public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         guard let controllers = previousViewControllers as? [ViewerItemController] else { fatalError() }
 
         for controller in controllers {
@@ -263,13 +268,13 @@ extension ViewerController: UIPageViewControllerDelegate {
 }
 
 extension ViewerController: ViewerItemControllerDelegate {
-    func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
+    public func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         dismiss(viewerItemController, completion: completion)
     }
 }
 
 extension ViewerController: UIGestureRecognizerDelegate {
-    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+    public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer == self.panGestureRecognizer {
             let velocity = self.panGestureRecognizer.velocityInView(panGestureRecognizer.view!)
             let allowOnlyVerticalScrolls = fabs(velocity.y) > fabs(velocity.x)
