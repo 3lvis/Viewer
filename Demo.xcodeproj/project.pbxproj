@@ -24,7 +24,7 @@
 		14D081371C18579700E3FFC3 /* 0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081341C18579700E3FFC3 /* 0.jpg */; };
 		14D081381C18579700E3FFC3 /* 1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081351C18579700E3FFC3 /* 1.jpg */; };
 		14D081391C18579700E3FFC3 /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081361C18579700E3FFC3 /* 2.jpg */; };
-		14FBFA961C1F1313001B0B84 /* FixedNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FBFA951C1F1313001B0B84 /* FixedNavigationBar.swift */; };
+		14FBFA961C1F1313001B0B84 /* FixedHeightNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FBFA951C1F1313001B0B84 /* FixedHeightNavigationBar.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,7 +55,7 @@
 		14D081341C18579700E3FFC3 /* 0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 0.jpg; sourceTree = "<group>"; };
 		14D081351C18579700E3FFC3 /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
 		14D081361C18579700E3FFC3 /* 2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2.jpg; sourceTree = "<group>"; };
-		14FBFA951C1F1313001B0B84 /* FixedNavigationBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FixedNavigationBar.swift; sourceTree = "<group>"; };
+		14FBFA951C1F1313001B0B84 /* FixedHeightNavigationBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FixedHeightNavigationBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,7 +163,7 @@
 				143B5C3C1C0EF490000B6A18 /* ViewerItem.swift */,
 				1421DD6B1C19798E00E17EF9 /* UIImage+CenteredFrame.swift */,
 				14C552AB1C1EC25C00F30E01 /* UIViewController+Window.swift */,
-				14FBFA951C1F1313001B0B84 /* FixedNavigationBar.swift */,
+				14FBFA951C1F1313001B0B84 /* FixedHeightNavigationBar.swift */,
 			);
 			path = Viewer;
 			sourceTree = "<group>";
@@ -284,7 +284,7 @@
 				143B5C3F1C0EF76E000B6A18 /* Photo.swift in Sources */,
 				143B5C3D1C0EF490000B6A18 /* ViewerItem.swift in Sources */,
 				14C984001C0DE79200B5E515 /* AppDelegate.swift in Sources */,
-				14FBFA961C1F1313001B0B84 /* FixedNavigationBar.swift in Sources */,
+				14FBFA961C1F1313001B0B84 /* FixedHeightNavigationBar.swift in Sources */,
 				143B5C3B1C0EED51000B6A18 /* PhotoCell.swift in Sources */,
 				14C9840F1C0DE94700B5E515 /* ViewerController.swift in Sources */,
 				14C984101C0DE94700B5E515 /* ViewerItemController.swift in Sources */,

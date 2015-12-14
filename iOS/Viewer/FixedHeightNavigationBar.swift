@@ -1,6 +1,6 @@
 import UIKit
 
-class FixedNavigationBar: UINavigationBar {
+class FixedHeightNavigationBar: UINavigationBar {
     override func sizeThatFits(size: CGSize) -> CGSize {
         var size = super.sizeThatFits(size)
         if UIApplication.sharedApplication().statusBarHidden {
