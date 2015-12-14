@@ -47,7 +47,6 @@ public class ViewerController: UIPageViewController {
      Used for doing a different animation when dismissing in the middle of a dragging gesture
      */
     var isDragging = false
-    var currentIndex = 0
 
     // MARK: - Initializers
 
@@ -172,7 +171,7 @@ public class ViewerController: UIPageViewController {
     }
 
     func panAction(gesture: UIPanGestureRecognizer) {
-        let controller = self.findOrCreateViewerItemController(self.currentIndex)
+        let controller = self.findOrCreateViewerItemController(gesture.view!.tag)
 
         let viewHeight = controller.imageView.frame.size.height
         let viewHalfHeight = viewHeight / 2
@@ -210,7 +209,7 @@ public class ViewerController: UIPageViewController {
 
     private func setInitialController(index: Int) {
         let controller = self.findOrCreateViewerItemController(index)
-        self.currentIndex = controller.index
+        controller.imageView.tag = controller.index
         controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
         self.setViewControllers([controller], direction: .Forward, animated: false, completion: nil)
     }
@@ -265,7 +264,7 @@ extension ViewerController: UIPageViewControllerDelegate {
 
         for controller in controllers {
             controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
-            self.currentIndex = controller.index
+            controller.imageView.tag = controller.index
             let newIndexPath = NSIndexPath(forRow: controller.index, inSection: 0)
             if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
                 newCell.alpha = 0
