@@ -19,6 +19,12 @@ class CollectionController: UICollectionViewController {
         let size = (bounds.width - 4) / 4
         layout.itemSize = CGSize(width: size, height: size)
     }
+
+    var shouldHide = false
+
+    override func prefersStatusBarHidden() -> Bool {
+        return shouldHide
+    }
 }
 
 extension CollectionController {
@@ -38,10 +44,15 @@ extension CollectionController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        let viewerController = ViewerController(indexPath: indexPath, collectionView: collectionView)
-        viewerController.controllerDelegate = self
-        viewerController.controllerDataSource = self
-        self.presentViewController(viewerController, animated: false, completion: nil)
+        shouldHide = true
+        UIView.animateWithDuration(0.3, animations: {
+            self.setNeedsStatusBarAppearanceUpdate()
+            }) { finished in
+                let viewerController = ViewerController(indexPath: indexPath, collectionView: collectionView)
+                viewerController.controllerDelegate = self
+                viewerController.controllerDataSource = self
+                self.presentViewController(viewerController, animated: false, completion: nil)
+        }
     }
 }
 
@@ -59,5 +70,6 @@ extension CollectionController: ViewerControllerDelegate {
     }
 
     func viewerControllerDidDismiss(viewerController: ViewerController) {
+        shouldHide = false
     }
 }

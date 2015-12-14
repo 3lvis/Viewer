@@ -15,7 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let size = (bounds.width - 4) / 4
         layout.itemSize = CGSize(width: size, height: size)
         let controller = CollectionController(collectionViewLayout: layout)
-        let navigationController = UINavigationController(rootViewController: controller)
+
+        let navigationController = UINavigationController(navigationBarClass: FixedNavigationBar.self, toolbarClass: UIToolbar.self)
+        navigationController.viewControllers = [controller]
         self.window?.rootViewController = navigationController
 
         self.window!.makeKeyAndVisible()
