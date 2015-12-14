@@ -57,6 +57,11 @@ public class ViewerController: UIPageViewController {
     var shouldHide = false
 
     public override func prefersStatusBarHidden() -> Bool {
+        let orientation = UIApplication.sharedApplication().statusBarOrientation
+        if UIInterfaceOrientationIsLandscape(orientation) {
+            return true
+        }
+
         return self.shouldHide
     }
 
