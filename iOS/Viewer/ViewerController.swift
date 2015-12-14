@@ -57,7 +57,7 @@ public class ViewerController: UIPageViewController {
     var shouldHide = true
 
     public override func prefersStatusBarHidden() -> Bool {
-        return shouldHide
+        return self.shouldHide
     }
 
     init(indexPath: NSIndexPath, collectionView: UICollectionView) {
@@ -162,7 +162,7 @@ public class ViewerController: UIPageViewController {
         let window = self.applicationWindow()
         window.addSubview(self.overlayView)
         window.addSubview(presentedView)
-        shouldHide = false
+        self.shouldHide = false
 
         UIView.animateWithDuration(0.30, animations: {
             self.overlayView.alpha = 0.0

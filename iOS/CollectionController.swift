@@ -23,7 +23,7 @@ class CollectionController: UICollectionViewController {
     var shouldHide = false
 
     override func prefersStatusBarHidden() -> Bool {
-        return shouldHide
+        return self.shouldHide
     }
 }
 
@@ -44,15 +44,15 @@ extension CollectionController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        shouldHide = true
+        self.shouldHide = true
         UIView.animateWithDuration(0.3, animations: {
             self.setNeedsStatusBarAppearanceUpdate()
-            }) { finished in
-                let viewerController = ViewerController(indexPath: indexPath, collectionView: collectionView)
-                viewerController.controllerDelegate = self
-                viewerController.controllerDataSource = self
-                self.presentViewController(viewerController, animated: false, completion: nil)
-        }
+        })
+
+        let viewerController = ViewerController(indexPath: indexPath, collectionView: collectionView)
+        viewerController.controllerDelegate = self
+        viewerController.controllerDataSource = self
+        self.presentViewController(viewerController, animated: false, completion: nil)
     }
 }
 
@@ -70,6 +70,6 @@ extension CollectionController: ViewerControllerDelegate {
     }
 
     func viewerControllerDidDismiss(viewerController: ViewerController) {
-        shouldHide = false
+        self.shouldHide = false
     }
 }
