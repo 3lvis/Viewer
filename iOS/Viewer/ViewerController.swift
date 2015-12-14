@@ -54,6 +54,12 @@ public class ViewerController: UIPageViewController {
 
     // MARK: - Initializers
 
+    var shouldHide = false
+
+    public override func prefersStatusBarHidden() -> Bool {
+        return self.shouldHide
+    }
+
     init(indexPath: NSIndexPath, collectionView: UICollectionView) {
         self.initialIndexPath = indexPath
         self.collectionView = collectionView
@@ -119,8 +125,10 @@ public class ViewerController: UIPageViewController {
         window.addSubview(presentedView)
         let centeredImageFrame = image.centeredFrame()
 
+        self.shouldHide = true
         UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
+            self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = centeredImageFrame
             }) { completed in
                 presentedView.removeFromSuperview()
@@ -156,9 +164,11 @@ public class ViewerController: UIPageViewController {
         let window = self.applicationWindow()
         window.addSubview(self.overlayView)
         window.addSubview(presentedView)
+        self.shouldHide = false
 
         UIView.animateWithDuration(0.30, animations: {
             self.overlayView.alpha = 0.0
+            self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
@@ -184,7 +194,6 @@ public class ViewerController: UIPageViewController {
         if gesture.state == .Began {
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
-            setNeedsStatusBarAppearanceUpdate()
         }
 
         translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)

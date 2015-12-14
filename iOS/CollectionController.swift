@@ -38,6 +38,7 @@ extension CollectionController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         guard let collectionView = self.collectionView else { return }
 
+        self.modalPresentationCapturesStatusBarAppearance = true
         let viewerController = ViewerController(indexPath: indexPath, collectionView: collectionView)
         viewerController.controllerDelegate = self
         viewerController.controllerDataSource = self
