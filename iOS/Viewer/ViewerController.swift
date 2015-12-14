@@ -13,12 +13,12 @@ public protocol ViewerControllerDataSource: class {
 
 public protocol ViewerControllerDelegate: class {
     /**
-    When the ViewerController jumps between photos it triggers a call to the viewerController:didChangeIndexPath: delegate.
+    When the ViewerController jumps between photos it triggers a call to the viewerController:didChangeIndexPath: delegate
     */
     func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath)
 
     /**
-    When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate.
+    When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate
     */
     func viewerControllerDidDismiss(viewerController: ViewerController)
 }
@@ -26,6 +26,10 @@ public protocol ViewerControllerDelegate: class {
 public class ViewerController: UIPageViewController {
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
+
+    /**
+     Cache for the reused ViewerItemControllers
+     */
     private let viewerItemControllerCache = NSCache()
 
     /**
