@@ -1,7 +1,7 @@
 import UIKit
 
 protocol ViewerItemControllerDelegate: class {
-    func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> ())?)
+    func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?)
 }
 
 class ViewerItemController: UIViewController {

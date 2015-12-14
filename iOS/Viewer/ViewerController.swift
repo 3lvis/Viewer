@@ -107,7 +107,7 @@ class ViewerController: UIPageViewController {
         }
     }
 
-    func dismiss(viewerItemController: ViewerItemController, completion: (() -> ())?) {
+    func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
 
@@ -266,7 +266,7 @@ extension ViewerController: UIPageViewControllerDelegate {
 }
 
 extension ViewerController: ViewerItemControllerDelegate {
-    func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> ())?) {
+    func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         dismiss(viewerItemController, completion: completion)
     }
 }
