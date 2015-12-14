@@ -29,7 +29,6 @@ extension CollectionController {
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
         if let photo = self.photos[indexPath.row] as? Photo {
-            cell.text = String(photo.id)
             cell.image = photo.image
         }
 
