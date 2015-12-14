@@ -200,7 +200,10 @@ public class ViewerController: UIPageViewController {
                 self.dismiss(controller, completion: nil)
             } else {
                 self.isDragging = false
-                controller.imageView.center = self.originalDraggedCenter
+                UIView.animateWithDuration(0.20, animations: {
+                    controller.imageView.center = self.originalDraggedCenter
+                    controller.view.backgroundColor = UIColor.blackColor()
+                })
             }
         }
     }
