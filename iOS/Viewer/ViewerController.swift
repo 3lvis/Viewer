@@ -26,8 +26,8 @@ public protocol ViewerControllerDelegate: class {
 public class ViewerController: UIPageViewController {
     // MARK: Initializers
 
-    init(indexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
-        self.initialIndexPath = indexPath
+    init(initialIndexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
+        self.initialIndexPath = initialIndexPath
         self.collectionView = collectionView
 
         let height = CGFloat(50)
