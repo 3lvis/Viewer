@@ -197,6 +197,7 @@ public class ViewerController: UIPageViewController {
         self.shouldHide = false
 
         UIView.animateWithDuration(0.30, animations: {
+            self.fadeButtons(0)
             self.overlayView.alpha = 0.0
             self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
@@ -246,7 +247,7 @@ public class ViewerController: UIPageViewController {
                 UIView.animateWithDuration(0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = UIColor.blackColor()
-                    self.fadeButtons(0)
+                    self.fadeButtons(1)
                 })
             }
         }
