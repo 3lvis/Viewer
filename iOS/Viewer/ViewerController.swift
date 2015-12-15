@@ -52,7 +52,7 @@ public class ViewerController: UIPageViewController {
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.dataSource = self
         self.delegate = self
-        self.parentViewController?.modalPresentationCapturesStatusBarAppearance = true
+        self.presentingViewController?.modalPresentationCapturesStatusBarAppearance = true
     }
 
     public required init?(coder aDecoder: NSCoder) {
