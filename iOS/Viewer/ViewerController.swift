@@ -24,6 +24,27 @@ public protocol ViewerControllerDelegate: class {
 }
 
 public class ViewerController: UIPageViewController {
+    // MARK: Initializers
+
+    init(indexPath: NSIndexPath, collectionView: UICollectionView) {
+        self.initialIndexPath = indexPath
+        self.collectionView = collectionView
+
+        super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+
+        self.modalPresentationStyle = .OverCurrentContext
+        self.view.backgroundColor = UIColor.clearColor()
+        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        self.dataSource = self
+        self.delegate = self
+    }
+
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: Variables
+
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
 
@@ -52,35 +73,10 @@ public class ViewerController: UIPageViewController {
      */
     var isDragging = false
 
-    // MARK: - Initializers
-
-    var shouldHide = false
-
-    public override func prefersStatusBarHidden() -> Bool {
-        let orientation = UIApplication.sharedApplication().statusBarOrientation
-        if UIInterfaceOrientationIsLandscape(orientation) {
-            return true
-        }
-
-        return self.shouldHide
-    }
-
-    init(indexPath: NSIndexPath, collectionView: UICollectionView) {
-        self.initialIndexPath = indexPath
-        self.collectionView = collectionView
-
-        super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
-
-        self.modalPresentationStyle = .OverCurrentContext
-        self.view.backgroundColor = UIColor.clearColor()
-        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        self.dataSource = self
-        self.delegate = self
-    }
-
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    /**
+     Keeps track of where the status bar should be hidden or not
+     */
+    var shouldHideStatusBar = false
 
     lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
@@ -127,6 +123,15 @@ public class ViewerController: UIPageViewController {
         self.present(self.initialIndexPath)
     }
 
+    public override func prefersStatusBarHidden() -> Bool {
+        let orientation = UIApplication.sharedApplication().statusBarOrientation
+        if UIInterfaceOrientationIsLandscape(orientation) {
+            return true
+        }
+
+        return self.shouldHideStatusBar
+    }
+
     // MARK: Private methods
 
     func presentedViewCopy() -> UIImageView {
@@ -135,122 +140,6 @@ public class ViewerController: UIPageViewController {
         presentedView.contentMode = .ScaleAspectFill
         presentedView.clipsToBounds = true
         return presentedView
-    }
-
-    func present(indexPath: NSIndexPath) {
-        guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
-
-        let window = self.applicationWindow()
-        window.addSubview(self.overlayView)
-        selectedCell.alpha = 0
-
-        let presentedView = self.presentedViewCopy()
-        presentedView.frame = window.convertRect(selectedCell.frame, fromView: self.collectionView)
-
-        presentedView.image = image
-        window.addSubview(presentedView)
-        let centeredImageFrame = image.centeredFrame()
-
-        window.addSubview(self.headerView)
-        window.addSubview(self.footerView)
-
-        self.shouldHide = true
-        UIView.animateWithDuration(0.25, animations: {
-            self.overlayView.alpha = 1.0
-            self.setNeedsStatusBarAppearanceUpdate()
-            presentedView.frame = centeredImageFrame
-            }) { completed in
-                presentedView.removeFromSuperview()
-                self.overlayView.removeFromSuperview()
-
-                self.setInitialController(indexPath.row)
-        }
-    }
-
-    func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
-        let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
-        guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
-
-        if let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-            selectedCell.alpha = 0
-        }
-
-        viewerItemController.imageView.alpha = 0
-        viewerItemController.view.backgroundColor = UIColor.clearColor()
-        self.toogleButtons(false)
-
-        let presentedView = self.presentedViewCopy()
-        presentedView.frame = image.centeredFrame()
-        presentedView.image = image
-
-        if self.isDragging {
-            presentedView.center = viewerItemController.imageView.center
-            self.overlayView.alpha = CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor)
-        } else {
-            self.overlayView.alpha = 1.0
-        }
-
-        self.overlayView.frame = UIScreen.mainScreen().bounds
-        let window = self.applicationWindow()
-        window.addSubview(self.overlayView)
-        window.addSubview(presentedView)
-        self.shouldHide = false
-
-        UIView.animateWithDuration(0.30, animations: {
-            self.fadeButtons(0)
-            self.overlayView.alpha = 0.0
-            self.setNeedsStatusBarAppearanceUpdate()
-            presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
-            }) { completed in
-                if let existingCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-                    existingCell.alpha = 1
-                }
-
-                presentedView.removeFromSuperview()
-                self.overlayView.removeFromSuperview()
-                self.dismissViewControllerAnimated(false, completion: nil)
-                self.controllerDelegate?.viewerControllerDidDismiss(self)
-                
-                completion?()
-        }
-    }
-
-    func panAction(gesture: UIPanGestureRecognizer) {
-        let controller = self.findOrCreateViewerItemController(gesture.view!.tag)
-
-        let viewHeight = controller.imageView.frame.size.height
-        let viewHalfHeight = viewHeight / 2
-        var translatedPoint = gesture.translationInView(controller.imageView)
-
-        if gesture.state == .Began {
-            self.originalDraggedCenter = controller.imageView.center
-            self.isDragging = true
-        }
-
-        translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
-        let alphaDiff = ((translatedPoint.y - viewHalfHeight) / viewHalfHeight) * 2.5
-        let isDraggedUp = translatedPoint.y < viewHalfHeight
-        let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
-
-        controller.imageView.center = translatedPoint
-        controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
-        self.fadeButtons(alpha)
-
-        if gesture.state == .Ended {
-            let draggingMargin = CGFloat(60)
-            let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - draggingMargin
-            let centerBellowDraggingArea = controller.imageView.center.y > viewHalfHeight + draggingMargin
-            if centerAboveDraggingArea || centerBellowDraggingArea {
-                self.dismiss(controller, completion: nil)
-            } else {
-                self.isDragging = false
-                UIView.animateWithDuration(0.20, animations: {
-                    controller.imageView.center = self.originalDraggedCenter
-                    controller.view.backgroundColor = UIColor.blackColor()
-                    self.fadeButtons(1)
-                })
-            }
-        }
     }
 
     private func setInitialController(index: Int) {
@@ -291,6 +180,126 @@ public class ViewerController: UIPageViewController {
     public func fadeButtons(alpha: CGFloat) {
         self.headerView.alpha = alpha
         self.footerView.alpha = alpha
+    }
+}
+
+// MARK: Core Methods
+
+extension ViewerController {
+    func present(indexPath: NSIndexPath) {
+        guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
+
+        let window = self.applicationWindow()
+        window.addSubview(self.overlayView)
+        selectedCell.alpha = 0
+
+        let presentedView = self.presentedViewCopy()
+        presentedView.frame = window.convertRect(selectedCell.frame, fromView: self.collectionView)
+
+        presentedView.image = image
+        window.addSubview(presentedView)
+        let centeredImageFrame = image.centeredFrame()
+
+        window.addSubview(self.headerView)
+        window.addSubview(self.footerView)
+
+        self.shouldHideStatusBar = true
+        UIView.animateWithDuration(0.25, animations: {
+            self.overlayView.alpha = 1.0
+            self.setNeedsStatusBarAppearanceUpdate()
+            presentedView.frame = centeredImageFrame
+            }) { completed in
+                presentedView.removeFromSuperview()
+                self.overlayView.removeFromSuperview()
+
+                self.setInitialController(indexPath.row)
+        }
+    }
+
+    func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
+        let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
+        guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
+
+        if let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+            selectedCell.alpha = 0
+        }
+
+        viewerItemController.imageView.alpha = 0
+        viewerItemController.view.backgroundColor = UIColor.clearColor()
+        self.toogleButtons(false)
+
+        let presentedView = self.presentedViewCopy()
+        presentedView.frame = image.centeredFrame()
+        presentedView.image = image
+
+        if self.isDragging {
+            presentedView.center = viewerItemController.imageView.center
+            self.overlayView.alpha = CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor)
+        } else {
+            self.overlayView.alpha = 1.0
+        }
+
+        self.overlayView.frame = UIScreen.mainScreen().bounds
+        let window = self.applicationWindow()
+        window.addSubview(self.overlayView)
+        window.addSubview(presentedView)
+        self.shouldHideStatusBar = false
+
+        UIView.animateWithDuration(0.30, animations: {
+            self.fadeButtons(0)
+            self.overlayView.alpha = 0.0
+            self.setNeedsStatusBarAppearanceUpdate()
+            presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
+            }) { completed in
+                if let existingCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                    existingCell.alpha = 1
+                }
+
+                presentedView.removeFromSuperview()
+                self.overlayView.removeFromSuperview()
+                self.dismissViewControllerAnimated(false, completion: nil)
+                self.controllerDelegate?.viewerControllerDidDismiss(self)
+
+                completion?()
+        }
+    }
+
+    func panAction(gesture: UIPanGestureRecognizer) {
+        let controller = self.findOrCreateViewerItemController(gesture.view!.tag)
+
+        let viewHeight = controller.imageView.frame.size.height
+        let viewHalfHeight = viewHeight / 2
+        var translatedPoint = gesture.translationInView(controller.imageView)
+
+        if gesture.state == .Began {
+            self.originalDraggedCenter = controller.imageView.center
+            self.isDragging = true
+        }
+
+        translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
+        let alphaDiff = ((translatedPoint.y - viewHalfHeight) / viewHalfHeight) * 2.5
+        let isDraggedUp = translatedPoint.y < viewHalfHeight
+        let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
+
+        controller.imageView.center = translatedPoint
+        controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
+        self.fadeButtons(alpha)
+
+        if gesture.state == .Ended {
+            let draggingMargin = CGFloat(60)
+            let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - draggingMargin
+            let centerBellowDraggingArea = controller.imageView.center.y > viewHalfHeight + draggingMargin
+            if centerAboveDraggingArea || centerBellowDraggingArea {
+                self.dismiss(controller, completion: nil)
+            } else {
+                self.isDragging = false
+                UIView.animateWithDuration(0.20, animations: {
+                    controller.imageView.center = self.originalDraggedCenter
+                    controller.view.backgroundColor = UIColor.blackColor()
+                    self.fadeButtons(1)
+                })
+            }
+        }
     }
 }
 
