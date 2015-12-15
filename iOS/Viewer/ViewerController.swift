@@ -226,7 +226,7 @@ extension ViewerController {
 
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
-        self.toogleButtons(false)
+        self.fadeButtons(0)
 
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
@@ -246,7 +246,6 @@ extension ViewerController {
         self.shouldHideStatusBar = false
 
         UIView.animateWithDuration(0.30, animations: {
-            self.fadeButtons(0)
             self.overlayView.alpha = 0.0
             self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
