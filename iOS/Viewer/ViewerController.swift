@@ -78,6 +78,12 @@ public class ViewerController: UIPageViewController {
      */
     var shouldHideStatusBar = false
 
+    /**
+     Critical button visibility state tracker, it's used to force the buttons to keep being hidden when they are toggled
+     */
+    var buttonsAreVisible = false
+
+
     lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
         view.backgroundColor = UIColor.blackColor()
@@ -148,7 +154,7 @@ public class ViewerController: UIPageViewController {
         controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
         self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
             self.toggleButtons(true)
-            self.buttonsAreHidden = false
+            self.buttonsAreVisible = true
         })
     }
 
@@ -182,8 +188,6 @@ public class ViewerController: UIPageViewController {
         self.headerView.alpha = alpha
         self.footerView.alpha = alpha
     }
-
-    var buttonsAreHidden = true
 }
 
 // MARK: Core Methods
@@ -230,7 +234,7 @@ extension ViewerController {
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
         self.fadeButtons(0)
-        self.buttonsAreHidden = true
+        self.buttonsAreVisible = false
 
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
@@ -289,7 +293,7 @@ extension ViewerController {
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
 
-        if self.buttonsAreHidden == false {
+        if self.buttonsAreVisible == true {
             self.fadeButtons(alpha)
         }
 
@@ -305,7 +309,7 @@ extension ViewerController {
                     controller.imageView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = UIColor.blackColor()
 
-                    if self.buttonsAreHidden == false {
+                    if self.buttonsAreVisible == true {
                         self.fadeButtons(1)
                     }
                 })
@@ -367,8 +371,8 @@ extension ViewerController: UIPageViewControllerDelegate {
 
 extension ViewerController: ViewerItemControllerDelegate {
     public func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
-        self.toggleButtons(self.buttonsAreHidden)
-        self.buttonsAreHidden = !self.buttonsAreHidden
+        self.toggleButtons(!self.buttonsAreVisible)
+        self.buttonsAreVisible = !self.buttonsAreVisible
     }
 }
 
