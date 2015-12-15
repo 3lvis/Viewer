@@ -26,9 +26,24 @@ public protocol ViewerControllerDelegate: class {
 public class ViewerController: UIPageViewController {
     // MARK: Initializers
 
-    init(indexPath: NSIndexPath, collectionView: UICollectionView) {
+    init(indexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
         self.initialIndexPath = indexPath
         self.collectionView = collectionView
+
+        let height = CGFloat(50)
+        let headerClass = headerViewClass as! UIView.Type
+        self.headerView = headerClass.init()
+        let bounds = UIScreen.mainScreen().bounds
+        self.headerView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: height)
+        self.headerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
+        self.headerView.alpha = 0
+
+        let footerClass = footerViewClass as! UIView.Type
+        self.footerView = footerClass.init()
+        self.footerView.frame = CGRect(x: 0, y: bounds.size.height - height, width: bounds.width, height: height)
+        self.footerView.backgroundColor = UIColor.greenColor()
+        self.footerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
+        self.footerView.alpha = 0
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
 
@@ -93,26 +108,8 @@ public class ViewerController: UIPageViewController {
         return view
     }()
 
-    lazy var headerView: UIView = {
-        let bounds = UIScreen.mainScreen().bounds
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: bounds.width, height: 50))
-        view.backgroundColor = UIColor.redColor()
-        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
-        view.alpha = 0
-
-        return view
-    }()
-
-    lazy var footerView: UIView = {
-        let bounds = UIScreen.mainScreen().bounds
-        let y = bounds.size.height - 50
-        let view = UIView(frame: CGRect(x: 0, y: y, width: bounds.width, height: 50))
-        view.backgroundColor = UIColor.greenColor()
-        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
-        view.alpha = 0
-
-        return view
-    }()
+    var headerView: UIView
+    var footerView: UIView
 
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
         let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
