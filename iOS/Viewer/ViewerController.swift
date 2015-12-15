@@ -24,6 +24,27 @@ public protocol ViewerControllerDelegate: class {
 }
 
 public class ViewerController: UIPageViewController {
+    // MARK: Initializers
+
+    init(indexPath: NSIndexPath, collectionView: UICollectionView) {
+        self.initialIndexPath = indexPath
+        self.collectionView = collectionView
+
+        super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+
+        self.modalPresentationStyle = .OverCurrentContext
+        self.view.backgroundColor = UIColor.clearColor()
+        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        self.dataSource = self
+        self.delegate = self
+    }
+
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: Variables
+
     weak var controllerDelegate: ViewerControllerDelegate?
     weak var controllerDataSource: ViewerControllerDataSource?
 
@@ -52,41 +73,43 @@ public class ViewerController: UIPageViewController {
      */
     var isDragging = false
 
-    // MARK: - Initializers
+    /**
+     Keeps track of where the status bar should be hidden or not
+     */
+    var shouldHideStatusBar = false
 
-    var shouldHide = false
+    /**
+     Critical button visibility state tracker, it's used to force the buttons to keep being hidden when they are toggled
+     */
+    var buttonsAreVisible = false
 
-    public override func prefersStatusBarHidden() -> Bool {
-        let orientation = UIApplication.sharedApplication().statusBarOrientation
-        if UIInterfaceOrientationIsLandscape(orientation) {
-            return true
-        }
-
-        return self.shouldHide
-    }
-
-    init(indexPath: NSIndexPath, collectionView: UICollectionView) {
-        self.initialIndexPath = indexPath
-        self.collectionView = collectionView
-
-        super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
-
-        self.modalPresentationStyle = .OverCurrentContext
-        self.view.backgroundColor = UIColor.clearColor()
-        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        self.dataSource = self
-        self.delegate = self
-    }
-
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 
     lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
         view.backgroundColor = UIColor.blackColor()
         view.alpha = 0
         view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+
+        return view
+    }()
+
+    lazy var headerView: UIView = {
+        let bounds = UIScreen.mainScreen().bounds
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: bounds.width, height: 50))
+        view.backgroundColor = UIColor.redColor()
+        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
+        view.alpha = 0
+
+        return view
+    }()
+
+    lazy var footerView: UIView = {
+        let bounds = UIScreen.mainScreen().bounds
+        let y = bounds.size.height - 50
+        let view = UIView(frame: CGRect(x: 0, y: y, width: bounds.width, height: 50))
+        view.backgroundColor = UIColor.greenColor()
+        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
+        view.alpha = 0
 
         return view
     }()
@@ -106,6 +129,15 @@ public class ViewerController: UIPageViewController {
         self.present(self.initialIndexPath)
     }
 
+    public override func prefersStatusBarHidden() -> Bool {
+        let orientation = UIApplication.sharedApplication().statusBarOrientation
+        if UIInterfaceOrientationIsLandscape(orientation) {
+            return true
+        }
+
+        return self.shouldHideStatusBar
+    }
+
     // MARK: Private methods
 
     func presentedViewCopy() -> UIImageView {
@@ -116,6 +148,51 @@ public class ViewerController: UIPageViewController {
         return presentedView
     }
 
+    private func setInitialController(index: Int) {
+        let controller = self.findOrCreateViewerItemController(index)
+        controller.imageView.tag = controller.index
+        controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
+        self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
+            self.toggleButtons(true)
+            self.buttonsAreVisible = true
+        })
+    }
+
+    private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
+        let viewerItems = self.controllerDataSource!.viewerItemsForViewerController(self)
+        let viewerItem = viewerItems[index]
+        var viewerItemController: ViewerItemController
+
+        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.id) as? ViewerItemController {
+            viewerItemController = cachedController
+        } else {
+            viewerItemController = ViewerItemController()
+            viewerItemController.controllerDelegate = self
+            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.id)
+        }
+
+        viewerItemController.viewerItem = viewerItem
+        viewerItemController.index = index
+
+        return viewerItemController
+    }
+
+    public func toggleButtons(shouldShow: Bool) {
+        UIView.animateWithDuration(0.3) {
+            self.headerView.alpha = shouldShow ? 1 : 0
+            self.footerView.alpha = shouldShow ? 1 : 0
+        }
+    }
+
+    public func fadeButtons(alpha: CGFloat) {
+        self.headerView.alpha = alpha
+        self.footerView.alpha = alpha
+    }
+}
+
+// MARK: Core Methods
+
+extension ViewerController {
     func present(indexPath: NSIndexPath) {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
 
@@ -130,7 +207,10 @@ public class ViewerController: UIPageViewController {
         window.addSubview(presentedView)
         let centeredImageFrame = image.centeredFrame()
 
-        self.shouldHide = true
+        window.addSubview(self.headerView)
+        window.addSubview(self.footerView)
+
+        self.shouldHideStatusBar = true
         UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
             self.setNeedsStatusBarAppearanceUpdate()
@@ -153,6 +233,8 @@ public class ViewerController: UIPageViewController {
 
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
+        self.fadeButtons(0)
+        self.buttonsAreVisible = false
 
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
@@ -169,7 +251,7 @@ public class ViewerController: UIPageViewController {
         let window = self.applicationWindow()
         window.addSubview(self.overlayView)
         window.addSubview(presentedView)
-        self.shouldHide = false
+        self.shouldHideStatusBar = false
 
         UIView.animateWithDuration(0.30, animations: {
             self.overlayView.alpha = 0.0
@@ -180,11 +262,13 @@ public class ViewerController: UIPageViewController {
                     existingCell.alpha = 1
                 }
 
+                self.headerView.removeFromSuperview()
+                self.footerView.removeFromSuperview()
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
                 self.dismissViewControllerAnimated(false, completion: nil)
                 self.controllerDelegate?.viewerControllerDidDismiss(self)
-                
+
                 completion?()
         }
     }
@@ -209,6 +293,10 @@ public class ViewerController: UIPageViewController {
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
 
+        if self.buttonsAreVisible == true {
+            self.fadeButtons(alpha)
+        }
+
         if gesture.state == .Ended {
             let draggingMargin = CGFloat(60)
             let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - draggingMargin
@@ -220,35 +308,13 @@ public class ViewerController: UIPageViewController {
                 UIView.animateWithDuration(0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = UIColor.blackColor()
+
+                    if self.buttonsAreVisible == true {
+                        self.fadeButtons(1)
+                    }
                 })
             }
         }
-    }
-
-    private func setInitialController(index: Int) {
-        let controller = self.findOrCreateViewerItemController(index)
-        controller.imageView.tag = controller.index
-        controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
-        self.setViewControllers([controller], direction: .Forward, animated: false, completion: nil)
-    }
-
-    private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
-        let viewerItems = self.controllerDataSource!.viewerItemsForViewerController(self)
-        let viewerItem = viewerItems[index]
-        var viewerItemController: ViewerItemController
-
-        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.id) as? ViewerItemController {
-            viewerItemController = cachedController
-        } else {
-            viewerItemController = ViewerItemController()
-            viewerItemController.controllerDelegate = self
-            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.id)
-        }
-
-        viewerItemController.viewerItem = viewerItem
-        viewerItemController.index = index
-
-        return viewerItemController
     }
 }
 
@@ -305,7 +371,8 @@ extension ViewerController: UIPageViewControllerDelegate {
 
 extension ViewerController: ViewerItemControllerDelegate {
     public func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
-        dismiss(viewerItemController, completion: completion)
+        self.buttonsAreVisible = !self.buttonsAreVisible
+        self.toggleButtons(self.buttonsAreVisible)
     }
 }
 
