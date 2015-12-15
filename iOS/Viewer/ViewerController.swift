@@ -91,6 +91,27 @@ public class ViewerController: UIPageViewController {
         return view
     }()
 
+    lazy var headerView: UIView = {
+        let bounds = UIScreen.mainScreen().bounds
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: bounds.width, height: 50))
+        view.backgroundColor = UIColor.redColor()
+        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
+        view.alpha = 0
+
+        return view
+    }()
+
+    lazy var footerView: UIView = {
+        let bounds = UIScreen.mainScreen().bounds
+        let y = bounds.size.height - 50
+        let view = UIView(frame: CGRect(x: 0, y: y, width: bounds.width, height: 50))
+        view.backgroundColor = UIColor.greenColor()
+        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
+        view.alpha = 0
+
+        return view
+    }()
+
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
         let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
         gesture.delegate = self
@@ -130,6 +151,9 @@ public class ViewerController: UIPageViewController {
         window.addSubview(presentedView)
         let centeredImageFrame = image.centeredFrame()
 
+        window.addSubview(self.headerView)
+        window.addSubview(self.footerView)
+
         self.shouldHide = true
         UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
@@ -153,6 +177,7 @@ public class ViewerController: UIPageViewController {
 
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
+        self.toogleButtons(false)
 
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
@@ -208,6 +233,7 @@ public class ViewerController: UIPageViewController {
 
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
+        self.fadeButtons(alpha)
 
         if gesture.state == .Ended {
             let draggingMargin = CGFloat(60)
@@ -220,6 +246,7 @@ public class ViewerController: UIPageViewController {
                 UIView.animateWithDuration(0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = UIColor.blackColor()
+                    self.fadeButtons(0)
                 })
             }
         }
@@ -229,7 +256,9 @@ public class ViewerController: UIPageViewController {
         let controller = self.findOrCreateViewerItemController(index)
         controller.imageView.tag = controller.index
         controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
-        self.setViewControllers([controller], direction: .Forward, animated: false, completion: nil)
+        self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
+            self.toogleButtons(true)
+        })
     }
 
     private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
@@ -249,6 +278,18 @@ public class ViewerController: UIPageViewController {
         viewerItemController.index = index
 
         return viewerItemController
+    }
+
+    public func toogleButtons(shouldShow: Bool) {
+        UIView.animateWithDuration(0.3) {
+            self.headerView.alpha = shouldShow ? 1 : 0
+            self.footerView.alpha = shouldShow ? 1 : 0
+        }
+    }
+
+    public func fadeButtons(alpha: CGFloat) {
+        self.headerView.alpha = alpha
+        self.footerView.alpha = alpha
     }
 }
 
