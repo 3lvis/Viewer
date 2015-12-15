@@ -255,6 +255,8 @@ extension ViewerController {
                     existingCell.alpha = 1
                 }
 
+                self.headerView.removeFromSuperview()
+                self.footerView.removeFromSuperview()
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
                 self.dismissViewControllerAnimated(false, completion: nil)
