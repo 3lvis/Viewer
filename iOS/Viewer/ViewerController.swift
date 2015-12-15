@@ -147,7 +147,8 @@ public class ViewerController: UIPageViewController {
         controller.imageView.tag = controller.index
         controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
         self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
-            self.toogleButtons(true)
+            self.toggleButtons(true)
+            self.buttonsAreHidden = false
         })
     }
 
@@ -170,7 +171,7 @@ public class ViewerController: UIPageViewController {
         return viewerItemController
     }
 
-    public func toogleButtons(shouldShow: Bool) {
+    public func toggleButtons(shouldShow: Bool) {
         UIView.animateWithDuration(0.3) {
             self.headerView.alpha = shouldShow ? 1 : 0
             self.footerView.alpha = shouldShow ? 1 : 0
@@ -181,6 +182,8 @@ public class ViewerController: UIPageViewController {
         self.headerView.alpha = alpha
         self.footerView.alpha = alpha
     }
+
+    var buttonsAreHidden = true
 }
 
 // MARK: Core Methods
@@ -227,6 +230,7 @@ extension ViewerController {
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
         self.fadeButtons(0)
+        self.buttonsAreHidden = true
 
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
@@ -284,7 +288,10 @@ extension ViewerController {
 
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
-        self.fadeButtons(alpha)
+
+        if self.buttonsAreHidden == false {
+            self.fadeButtons(alpha)
+        }
 
         if gesture.state == .Ended {
             let draggingMargin = CGFloat(60)
@@ -297,7 +304,10 @@ extension ViewerController {
                 UIView.animateWithDuration(0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = UIColor.blackColor()
-                    self.fadeButtons(1)
+
+                    if self.buttonsAreHidden == false {
+                        self.fadeButtons(1)
+                    }
                 })
             }
         }
@@ -357,7 +367,8 @@ extension ViewerController: UIPageViewControllerDelegate {
 
 extension ViewerController: ViewerItemControllerDelegate {
     public func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
-        dismiss(viewerItemController, completion: completion)
+        self.toggleButtons(self.buttonsAreHidden)
+        self.buttonsAreHidden = !self.buttonsAreHidden
     }
 }
 
