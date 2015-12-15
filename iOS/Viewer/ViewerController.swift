@@ -371,8 +371,8 @@ extension ViewerController: UIPageViewControllerDelegate {
 
 extension ViewerController: ViewerItemControllerDelegate {
     public func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
-        self.toggleButtons(!self.buttonsAreVisible)
         self.buttonsAreVisible = !self.buttonsAreVisible
+        self.toggleButtons(self.buttonsAreVisible)
     }
 }
 
