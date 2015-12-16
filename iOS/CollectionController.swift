@@ -14,14 +14,6 @@ class CollectionController: UICollectionViewController {
             self.viewerController?.dismiss(nil)
         }
 
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
-            let button = notification.object as! UIButton
-            let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
-            let optionsController = OptionsController(sourceView: button, sourceRect: rect)
-            optionsController.controllerDelegate = self
-            self.viewerController?.presentViewController(optionsController, animated: true, completion: nil)
-        }
-
         NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
             let alertController = self.alertControllerWithTitle("Favorite pressed")
             self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
@@ -88,11 +80,5 @@ extension CollectionController: ViewerControllerDelegate {
     }
 
     func viewerControllerDidDismiss(viewerController: ViewerController) {
-    }
-}
-
-extension CollectionController: OptionsControllerDelegate {
-    func optionsController(optionsController: OptionsController, didSelectOption option: String) {
-        self.viewerController?.dismissViewControllerAnimated(true, completion: nil)
     }
 }
