@@ -26,9 +26,23 @@ public protocol ViewerControllerDelegate: class {
 public class ViewerController: UIPageViewController {
     // MARK: Initializers
 
-    init(indexPath: NSIndexPath, collectionView: UICollectionView) {
-        self.initialIndexPath = indexPath
+    init(initialIndexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
+        self.initialIndexPath = initialIndexPath
         self.collectionView = collectionView
+
+        let height = CGFloat(50)
+        let headerClass = headerViewClass as! UIView.Type
+        self.headerView = headerClass.init()
+        let bounds = UIScreen.mainScreen().bounds
+        self.headerView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: height)
+        self.headerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
+        self.headerView.alpha = 0
+
+        let footerClass = footerViewClass as! UIView.Type
+        self.footerView = footerClass.init()
+        self.footerView.frame = CGRect(x: 0, y: bounds.size.height - height, width: bounds.width, height: height)
+        self.footerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
+        self.footerView.alpha = 0
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
 
@@ -37,6 +51,7 @@ public class ViewerController: UIPageViewController {
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.dataSource = self
         self.delegate = self
+        self.presentingViewController?.modalPresentationCapturesStatusBarAppearance = true
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -83,6 +98,10 @@ public class ViewerController: UIPageViewController {
      */
     var buttonsAreVisible = false
 
+    /**
+     Tracks the index for the current viewer item controller
+     */
+    var currentIndex = 0
 
     lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
@@ -93,26 +112,8 @@ public class ViewerController: UIPageViewController {
         return view
     }()
 
-    lazy var headerView: UIView = {
-        let bounds = UIScreen.mainScreen().bounds
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: bounds.width, height: 50))
-        view.backgroundColor = UIColor.redColor()
-        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
-        view.alpha = 0
-
-        return view
-    }()
-
-    lazy var footerView: UIView = {
-        let bounds = UIScreen.mainScreen().bounds
-        let y = bounds.size.height - 50
-        let view = UIView(frame: CGRect(x: 0, y: y, width: bounds.width, height: 50))
-        view.backgroundColor = UIColor.greenColor()
-        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
-        view.alpha = 0
-
-        return view
-    }()
+    var headerView: UIView
+    var footerView: UIView
 
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
         let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
@@ -126,7 +127,7 @@ public class ViewerController: UIPageViewController {
     public override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
-        self.present(self.initialIndexPath)
+        self.present(self.initialIndexPath, completion: nil)
     }
 
     public override func prefersStatusBarHidden() -> Bool {
@@ -140,22 +141,12 @@ public class ViewerController: UIPageViewController {
 
     // MARK: Private methods
 
-    func presentedViewCopy() -> UIImageView {
+    private func presentedViewCopy() -> UIImageView {
         let presentedView = UIImageView()
         presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         presentedView.contentMode = .ScaleAspectFill
         presentedView.clipsToBounds = true
         return presentedView
-    }
-
-    private func setInitialController(index: Int) {
-        let controller = self.findOrCreateViewerItemController(index)
-        controller.imageView.tag = controller.index
-        controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
-        self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
-            self.toggleButtons(true)
-            self.buttonsAreVisible = true
-        })
     }
 
     private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
@@ -177,14 +168,14 @@ public class ViewerController: UIPageViewController {
         return viewerItemController
     }
 
-    public func toggleButtons(shouldShow: Bool) {
+    private func toggleButtons(shouldShow: Bool) {
         UIView.animateWithDuration(0.3) {
             self.headerView.alpha = shouldShow ? 1 : 0
             self.footerView.alpha = shouldShow ? 1 : 0
         }
     }
 
-    public func fadeButtons(alpha: CGFloat) {
+    private func fadeButtons(alpha: CGFloat) {
         self.headerView.alpha = alpha
         self.footerView.alpha = alpha
     }
@@ -193,7 +184,7 @@ public class ViewerController: UIPageViewController {
 // MARK: Core Methods
 
 extension ViewerController {
-    func present(indexPath: NSIndexPath) {
+    private func present(indexPath: NSIndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
 
         let window = self.applicationWindow()
@@ -219,11 +210,25 @@ extension ViewerController {
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
 
-                self.setInitialController(indexPath.row)
+                let controller = self.findOrCreateViewerItemController(indexPath.row)
+                controller.imageView.tag = controller.index
+                controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
+                self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
+                    self.toggleButtons(true)
+                    self.buttonsAreVisible = true
+                    self.currentIndex = indexPath.row
+
+                    completion?()
+                })
         }
     }
 
-    func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
+    func dismiss(completion: (() -> Void)?) {
+        let controller = self.findOrCreateViewerItemController(self.currentIndex)
+        self.dismiss(controller, completion: completion)
+    }
+
+    private func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
 
@@ -352,6 +357,7 @@ extension ViewerController: UIPageViewControllerDelegate {
             let newIndexPath = NSIndexPath(forRow: controller.index, inSection: 0)
             if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
                 newCell.alpha = 0
+                self.currentIndex = newIndexPath.row
             }
         }
     }
