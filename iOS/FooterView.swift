@@ -9,7 +9,7 @@ class FooterView: UIView {
         let image = UIImage(named: "favorite")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: "favoriteAction", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: "favoriteAction:", forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -18,7 +18,7 @@ class FooterView: UIView {
         let image = UIImage(named: "delete")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: "deleteAction", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: "deleteAction:", forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -51,11 +51,11 @@ class FooterView: UIView {
     }
 
 
-    func favoriteAction() {
-        NSNotificationCenter.defaultCenter().postNotificationName(FooterView.FavoriteNotificationName, object: nil)
+    func favoriteAction(button: UIButton) {
+        NSNotificationCenter.defaultCenter().postNotificationName(FooterView.FavoriteNotificationName, object: button)
     }
 
-    func deleteAction() {
-        NSNotificationCenter.defaultCenter().postNotificationName(FooterView.DeleteNotificationName, object: nil)
+    func deleteAction(button: UIButton) {
+        NSNotificationCenter.defaultCenter().postNotificationName(FooterView.DeleteNotificationName, object: button)
     }
 }
