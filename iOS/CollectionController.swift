@@ -15,15 +15,18 @@ class CollectionController: UICollectionViewController {
         }
 
         NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
-
+            let alertController = self.alertControllerWithTitle("Menu pressed")
+            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
         }
 
         NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
-
+            let alertController = self.alertControllerWithTitle("Favorite pressed")
+            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
         }
 
         NSNotificationCenter.defaultCenter().addObserverForName(FooterView.DeleteNotificationName, object: nil, queue: nil) { notification in
-
+            let alertController = self.alertControllerWithTitle("Delete pressed")
+            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
         }
     }
 
@@ -35,6 +38,12 @@ class CollectionController: UICollectionViewController {
         let bounds = UIScreen.mainScreen().bounds
         let size = (bounds.width - 4) / 4
         layout.itemSize = CGSize(width: size, height: size)
+    }
+
+    func alertControllerWithTitle(title: String) -> UIAlertController {
+        let alertController = UIAlertController(title: title, message: nil, preferredStyle: .Alert)
+        alertController.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+        return alertController
     }
 }
 
