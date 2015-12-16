@@ -41,7 +41,6 @@ public class ViewerController: UIPageViewController {
         let footerClass = footerViewClass as! UIView.Type
         self.footerView = footerClass.init()
         self.footerView.frame = CGRect(x: 0, y: bounds.size.height - height, width: bounds.width, height: height)
-        self.footerView.backgroundColor = UIColor.greenColor()
         self.footerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
         self.footerView.alpha = 0
 

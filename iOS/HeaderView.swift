@@ -6,7 +6,6 @@ class HeaderView: UIView {
     lazy var clearButton: UIButton = {
         let image = UIImage(named: "clear")!
         let button = UIButton(type: .Custom)
-        button.frame = CGRect(x: 0, y: 0, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
         button.setImage(image, forState: .Normal)
 
         return button
@@ -15,8 +14,6 @@ class HeaderView: UIView {
     lazy var menuButton: UIButton = {
         let image = UIImage(named: "menu")!
         let button = UIButton(type: .Custom)
-        let x = UIScreen.mainScreen().bounds.size.width - HeaderView.ButtonSize
-        button.frame = CGRect(x: x, y: 0, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
         button.setImage(image, forState: .Normal)
 
         return button
@@ -31,5 +28,14 @@ class HeaderView: UIView {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        self.clearButton.frame = CGRect(x: 0, y: 0, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
+
+        let x = UIScreen.mainScreen().bounds.size.width - HeaderView.ButtonSize
+        self.menuButton.frame = CGRect(x: x, y: 0, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
     }
 }
