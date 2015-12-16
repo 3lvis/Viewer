@@ -34,9 +34,9 @@ class CollectionController: UICollectionViewController {
         super.viewWillLayoutSubviews()
 
         let layout = self.collectionView?.collectionViewLayout as! UICollectionViewFlowLayout
-
+        let columns = CGFloat(4)
         let bounds = UIScreen.mainScreen().bounds
-        let size = (bounds.width - 4) / 4
+        let size = (bounds.width - columns) / columns
         layout.itemSize = CGSize(width: size, height: size)
     }
 
