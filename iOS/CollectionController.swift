@@ -2,12 +2,29 @@ import UIKit
 
 class CollectionController: UICollectionViewController {
     var photos = Photo.constructElements()
+    var viewerController: ViewerController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
+
+        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.ClearNotificationName, object: nil, queue: nil) { notification in
+            self.viewerController?.dismiss(nil)
+        }
+
+        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
+
+        }
+
+        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
+
+        }
+
+        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.DeleteNotificationName, object: nil, queue: nil) { notification in
+
+        }
     }
 
     override func viewWillLayoutSubviews() {
@@ -38,10 +55,10 @@ extension CollectionController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, headerViewClass: HeaderView.self, footerViewClass: FooterView.self)
-        viewerController.controllerDelegate = self
-        viewerController.controllerDataSource = self
-        self.presentViewController(viewerController, animated: false, completion: nil)
+        self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, headerViewClass: HeaderView.self, footerViewClass: FooterView.self)
+        self.viewerController!.controllerDelegate = self
+        self.viewerController!.controllerDataSource = self
+        self.presentViewController(self.viewerController!, animated: false, completion: nil)
     }
 }
 

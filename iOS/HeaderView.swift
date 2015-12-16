@@ -1,12 +1,15 @@
 import UIKit
 
 class HeaderView: UIView {
+    static let ClearNotificationName  = "ClearNotificationName"
+    static let MenuNotificationName  = "MenuNotificationName"
     static let ButtonSize = CGFloat(50.0)
 
     lazy var clearButton: UIButton = {
         let image = UIImage(named: "clear")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
+        button.addTarget(self, action: "clearAction", forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -15,6 +18,7 @@ class HeaderView: UIView {
         let image = UIImage(named: "menu")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
+        button.addTarget(self, action: "menuAction", forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -37,5 +41,13 @@ class HeaderView: UIView {
 
         let x = UIScreen.mainScreen().bounds.size.width - HeaderView.ButtonSize
         self.menuButton.frame = CGRect(x: x, y: 0, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
+    }
+
+    func clearAction() {
+        NSNotificationCenter.defaultCenter().postNotificationName(HeaderView.ClearNotificationName, object: nil)
+    }
+
+    func menuAction() {
+        NSNotificationCenter.defaultCenter().postNotificationName(HeaderView.MenuNotificationName, object: nil)
     }
 }

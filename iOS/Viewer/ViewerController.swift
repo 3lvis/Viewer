@@ -98,6 +98,10 @@ public class ViewerController: UIPageViewController {
      */
     var buttonsAreVisible = false
 
+    /**
+     Tracks the index for the current viewer item controller
+     */
+    var currentIndex = 0
 
     lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
@@ -123,7 +127,7 @@ public class ViewerController: UIPageViewController {
     public override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
-        self.present(self.initialIndexPath)
+        self.present(self.initialIndexPath, completion: nil)
     }
 
     public override func prefersStatusBarHidden() -> Bool {
@@ -137,22 +141,12 @@ public class ViewerController: UIPageViewController {
 
     // MARK: Private methods
 
-    func presentedViewCopy() -> UIImageView {
+    private func presentedViewCopy() -> UIImageView {
         let presentedView = UIImageView()
         presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         presentedView.contentMode = .ScaleAspectFill
         presentedView.clipsToBounds = true
         return presentedView
-    }
-
-    private func setInitialController(index: Int) {
-        let controller = self.findOrCreateViewerItemController(index)
-        controller.imageView.tag = controller.index
-        controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
-        self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
-            self.toggleButtons(true)
-            self.buttonsAreVisible = true
-        })
     }
 
     private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
@@ -174,14 +168,14 @@ public class ViewerController: UIPageViewController {
         return viewerItemController
     }
 
-    public func toggleButtons(shouldShow: Bool) {
+    private func toggleButtons(shouldShow: Bool) {
         UIView.animateWithDuration(0.3) {
             self.headerView.alpha = shouldShow ? 1 : 0
             self.footerView.alpha = shouldShow ? 1 : 0
         }
     }
 
-    public func fadeButtons(alpha: CGFloat) {
+    private func fadeButtons(alpha: CGFloat) {
         self.headerView.alpha = alpha
         self.footerView.alpha = alpha
     }
@@ -190,7 +184,7 @@ public class ViewerController: UIPageViewController {
 // MARK: Core Methods
 
 extension ViewerController {
-    func present(indexPath: NSIndexPath) {
+    private func present(indexPath: NSIndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
 
         let window = self.applicationWindow()
@@ -216,11 +210,25 @@ extension ViewerController {
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
 
-                self.setInitialController(indexPath.row)
+                let controller = self.findOrCreateViewerItemController(indexPath.row)
+                controller.imageView.tag = controller.index
+                controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
+                self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
+                    self.toggleButtons(true)
+                    self.buttonsAreVisible = true
+                    self.currentIndex = indexPath.row
+
+                    completion?()
+                })
         }
     }
 
-    func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
+    func dismiss(completion: (() -> Void)?) {
+        let controller = self.findOrCreateViewerItemController(self.currentIndex)
+        self.dismiss(controller, completion: completion)
+    }
+
+    private func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
 
@@ -349,6 +357,7 @@ extension ViewerController: UIPageViewControllerDelegate {
             let newIndexPath = NSIndexPath(forRow: controller.index, inSection: 0)
             if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
                 newCell.alpha = 0
+                self.currentIndex = newIndexPath.row
             }
         }
     }
