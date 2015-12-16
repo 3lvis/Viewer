@@ -24,25 +24,15 @@ public protocol ViewerControllerDelegate: class {
 }
 
 public class ViewerController: UIPageViewController {
+    static let HeaderFooterHeight = CGFloat(50)
+
     // MARK: Initializers
 
     init(initialIndexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
         self.initialIndexPath = initialIndexPath
         self.collectionView = collectionView
-
-        let height = CGFloat(50)
-        let headerClass = headerViewClass as! UIView.Type
-        self.headerView = headerClass.init()
-        let bounds = UIScreen.mainScreen().bounds
-        self.headerView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: height)
-        self.headerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
-        self.headerView.alpha = 0
-
-        let footerClass = footerViewClass as! UIView.Type
-        self.footerView = footerClass.init()
-        self.footerView.frame = CGRect(x: 0, y: bounds.size.height - height, width: bounds.width, height: height)
-        self.footerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
-        self.footerView.alpha = 0
+        self.headerViewClass = headerViewClass
+        self.footerViewClass = footerViewClass
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
 
@@ -112,8 +102,31 @@ public class ViewerController: UIPageViewController {
         return view
     }()
 
-    var headerView: UIView
-    var footerView: UIView
+    let headerViewClass: AnyClass
+
+    lazy var headerView: UIView = {
+        let headerClass = self.headerViewClass as! UIView.Type
+        let view = headerClass.init()
+        let bounds = UIScreen.mainScreen().bounds
+        view.frame = CGRect(x: 0, y: 0, width: bounds.width, height: ViewerController.HeaderFooterHeight)
+        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
+        view.alpha = 0
+
+        return view
+    }()
+
+    let footerViewClass: AnyClass
+
+    lazy var footerView: UIView = {
+        let bounds = UIScreen.mainScreen().bounds
+        let footerClass = self.footerViewClass as! UIView.Type
+        let view = footerClass.init()
+        view.frame = CGRect(x: 0, y: bounds.size.height - ViewerController.HeaderFooterHeight, width: bounds.width, height: ViewerController.HeaderFooterHeight)
+        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
+        view.alpha = 0
+
+        return view
+    }()
 
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
         let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
