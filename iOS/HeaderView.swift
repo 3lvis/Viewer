@@ -9,7 +9,7 @@ class HeaderView: UIView {
         let image = UIImage(named: "clear")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: "clearAction", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: "clearAction:", forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -18,7 +18,7 @@ class HeaderView: UIView {
         let image = UIImage(named: "menu")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: "menuAction", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: "menuAction:", forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -43,11 +43,11 @@ class HeaderView: UIView {
         self.menuButton.frame = CGRect(x: x, y: 0, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
     }
 
-    func clearAction() {
-        NSNotificationCenter.defaultCenter().postNotificationName(HeaderView.ClearNotificationName, object: nil)
+    func clearAction(button: UIButton) {
+        NSNotificationCenter.defaultCenter().postNotificationName(HeaderView.ClearNotificationName, object: button)
     }
 
-    func menuAction() {
-        NSNotificationCenter.defaultCenter().postNotificationName(HeaderView.MenuNotificationName, object: nil)
+    func menuAction(button: UIButton) {
+        NSNotificationCenter.defaultCenter().postNotificationName(HeaderView.MenuNotificationName, object: button)
     }
 }
