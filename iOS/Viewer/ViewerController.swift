@@ -93,6 +93,11 @@ public class ViewerController: UIPageViewController {
      */
     var currentIndex = 0
 
+    /**
+     Tracks the index to be, it will be ignored if the swiping transition is not finished
+     */
+    var proposedCurrentIndex = 0
+
     lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
         view.backgroundColor = UIColor.blackColor()
@@ -126,13 +131,6 @@ public class ViewerController: UIPageViewController {
         view.alpha = 0
 
         return view
-    }()
-
-    lazy var panGestureRecognizer: UIPanGestureRecognizer = {
-        let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
-        gesture.delegate = self
-
-        return gesture
     }()
 
     // MARK: View Lifecycle
@@ -172,6 +170,11 @@ public class ViewerController: UIPageViewController {
         } else {
             viewerItemController = ViewerItemController()
             viewerItemController.controllerDelegate = self
+
+            let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
+            gesture.delegate = self
+            viewerItemController.imageView.addGestureRecognizer(gesture)
+
             self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.id)
         }
 
@@ -226,7 +229,6 @@ extension ViewerController {
 
                 let controller = self.findOrCreateViewerItemController(indexPath.row)
                 controller.imageView.tag = controller.index
-                controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
                 self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
                     self.toggleButtons(true)
                     self.buttonsAreVisible = true
@@ -369,25 +371,14 @@ extension ViewerController: UIPageViewControllerDelegate {
         guard let controllers = pendingViewControllers as? [ViewerItemController] else { fatalError() }
 
         for controller in controllers {
-            controller.imageView.addGestureRecognizer(self.panGestureRecognizer)
-            controller.imageView.tag = controller.index
-            let newIndexPath = NSIndexPath(forRow: controller.index, inSection: 0)
-            if let newCell = self.collectionView.cellForItemAtIndexPath(newIndexPath) {
-                newCell.alpha = 0
-                self.currentIndex = newIndexPath.row
-            }
+            self.proposedCurrentIndex = controller.index
         }
     }
 
     public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        guard let controllers = previousViewControllers as? [ViewerItemController] else { fatalError() }
 
-        for controller in controllers {
-            controller.imageView.removeGestureRecognizer(self.panGestureRecognizer)
-            let indexPath = NSIndexPath(forRow: controller.index, inSection: 0)
-            if let currentCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-                currentCell.alpha = 1
-            }
+        if completed {
+            self.currentIndex = self.proposedCurrentIndex
         }
     }
 }
@@ -401,8 +392,9 @@ extension ViewerController: ViewerItemControllerDelegate {
 
 extension ViewerController: UIGestureRecognizerDelegate {
     public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer == self.panGestureRecognizer {
-            let velocity = self.panGestureRecognizer.velocityInView(panGestureRecognizer.view!)
+        if gestureRecognizer is UIPanGestureRecognizer {
+            let panGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
+            let velocity = panGestureRecognizer.velocityInView(panGestureRecognizer.view!)
             let allowOnlyVerticalScrolls = fabs(velocity.y) > fabs(velocity.x)
 
             return allowOnlyVerticalScrolls
