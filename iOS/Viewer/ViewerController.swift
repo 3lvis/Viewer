@@ -222,6 +222,7 @@ extension ViewerController {
             }) { completed in
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
+                self.view.backgroundColor = UIColor.blackColor()
 
                 let controller = self.findOrCreateViewerItemController(indexPath.row)
                 controller.imageView.tag = controller.index
@@ -292,6 +293,7 @@ extension ViewerController {
     }
 
     func panAction(gesture: UIPanGestureRecognizer) {
+        self.view.backgroundColor = UIColor.clearColor()
         let controller = self.findOrCreateViewerItemController(gesture.view!.tag)
 
         let viewHeight = controller.imageView.frame.size.height
@@ -330,7 +332,9 @@ extension ViewerController {
                     if self.buttonsAreVisible == true {
                         self.fadeButtons(1)
                     }
-                })
+                    }) { completed in
+                        self.view.backgroundColor = UIColor.blackColor()
+                }
             }
         }
     }
