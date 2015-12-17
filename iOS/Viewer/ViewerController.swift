@@ -2,10 +2,10 @@ import UIKit
 import CoreData
 
 /**
-The ViewerController takes care of displaying the user's photos/videos in full-screen.
+ The ViewerController takes care of displaying the user's photos/videos in full-screen.
 
-You can swipe right or left to navigate between photos.
-*/
+ You can swipe right or left to navigate between photos.
+ */
 
 public protocol ViewerControllerDataSource: class {
     func viewerItemsForViewerController(viewerController: ViewerController) -> [ViewerItem]
@@ -13,13 +13,13 @@ public protocol ViewerControllerDataSource: class {
 
 public protocol ViewerControllerDelegate: class {
     /**
-    When the ViewerController jumps between photos it triggers a call to the viewerController:didChangeIndexPath: delegate
-    */
+     When the ViewerController jumps between photos it triggers a call to the viewerController:didChangeIndexPath: delegate
+     */
     func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath)
 
     /**
-    When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate
-    */
+     When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate
+     */
     func viewerControllerDidDismiss(viewerController: ViewerController)
 }
 
@@ -59,8 +59,8 @@ public class ViewerController: UIPageViewController {
     private let viewerItemControllerCache = NSCache()
 
     /**
-    Temporary variable used to present the initial controller on viewDidAppear
-    */
+     Temporary variable used to present the initial controller on viewDidAppear
+     */
     private var initialIndexPath: NSIndexPath
 
     /**
@@ -222,6 +222,7 @@ extension ViewerController {
             }) { completed in
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
+                self.view.backgroundColor = UIColor.blackColor()
 
                 let controller = self.findOrCreateViewerItemController(indexPath.row)
                 controller.imageView.tag = controller.index
@@ -292,6 +293,7 @@ extension ViewerController {
     }
 
     func panAction(gesture: UIPanGestureRecognizer) {
+        self.view.backgroundColor = UIColor.clearColor()
         let controller = self.findOrCreateViewerItemController(gesture.view!.tag)
 
         let viewHeight = controller.imageView.frame.size.height
@@ -330,7 +332,9 @@ extension ViewerController {
                     if self.buttonsAreVisible == true {
                         self.fadeButtons(1)
                     }
-                })
+                    }) { completed in
+                        self.view.backgroundColor = UIColor.blackColor()
+                }
             }
         }
     }
