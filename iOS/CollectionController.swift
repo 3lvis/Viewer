@@ -76,10 +76,6 @@ extension CollectionController: ViewerControllerDataSource {
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
         return self.photos[indexPath.row]
     }
-
-    func viewerControllerElementsCount(viewerController: ViewerController) -> Int {
-        return self.photos.count
-    }
 }
 
 extension CollectionController: OptionsControllerDelegate {

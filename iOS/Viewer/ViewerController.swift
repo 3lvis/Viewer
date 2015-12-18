@@ -9,7 +9,6 @@ import CoreData
 
 public protocol ViewerControllerDataSource: class {
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem
-    func viewerControllerElementsCount(viewerController: ViewerController) -> Int
 }
 
 public protocol ViewerControllerDelegate: class {
@@ -360,32 +359,27 @@ extension ViewerController {
 
 extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        guard let viewerItemController = viewController as? ViewerItemController where viewerItemController.indexPath!.row > 0  else { return nil }
+        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
+            self.centerElementIfNotVisible(newIndexPath)
+            self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
+            let controller = self.findOrCreateViewerItemController(newIndexPath)
 
-        let newIndex = viewerItemController.indexPath!.row - 1
-        let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
-        self.centerElementIfNotVisible(newIndexPath)
-        self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
-        let controller = self.findOrCreateViewerItemController(newIndexPath)
+            return controller
+        }
 
-        return controller
+        return nil
     }
 
     public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        guard let viewerItemController = viewController as? ViewerItemController else { return nil }
+        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
+            self.centerElementIfNotVisible(newIndexPath)
+            self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
+            let controller = self.findOrCreateViewerItemController(newIndexPath)
 
-        let count = self.controllerDataSource!.viewerControllerElementsCount(self)
-        if viewerItemController.indexPath!.row < count - 1 {
-
+            return controller
         }
 
-        let newIndex = viewerItemController.indexPath!.row + 1
-        let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
-        self.centerElementIfNotVisible(newIndexPath)
-        self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
-        let controller = self.findOrCreateViewerItemController(newIndexPath)
-
-        return controller
+        return nil
     }
 }
 
