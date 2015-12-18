@@ -9,7 +9,7 @@ class ViewerItemController: UIViewController {
 
     var viewerItem: ViewerItem? {
         didSet {
-            if let photo = viewerItem as? Photo {
+            if let photo = viewerItem {
                 self.imageView.image = photo.image
             }
         }
