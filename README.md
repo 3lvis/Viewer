@@ -8,7 +8,7 @@ override func collectionView(collectionView: UICollectionView, didSelectItemAtIn
 
     let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, headerViewClass: HeaderView.self, footerViewClass: FooterView.self)
     viewerController.controllerDataSource = self
-    self.presentViewController(viewerController!, animated: false, completion: nil)
+    self.presentViewController(viewerController, animated: false, completion: nil)
 }
 
 extension CollectionController: ViewerControllerDataSource {
