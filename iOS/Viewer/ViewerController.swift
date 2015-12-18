@@ -32,6 +32,8 @@ public class ViewerController: UIPageViewController {
 
     public init(initialIndexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
         self.initialIndexPath = initialIndexPath
+        self.currentIndexPath = initialIndexPath
+        self.proposedCurrentIndexPath = initialIndexPath
         self.collectionView = collectionView
         self.headerViewClass = headerViewClass
         self.footerViewClass = footerViewClass
@@ -93,12 +95,12 @@ public class ViewerController: UIPageViewController {
     /**
      Tracks the index for the current viewer item controller
      */
-    private var currentIndex = 0
+    private var currentIndexPath: NSIndexPath
 
     /**
      Tracks the index to be, it will be ignored if the swiping transition is not finished
      */
-    private var proposedCurrentIndex = 0
+    private var proposedCurrentIndexPath: NSIndexPath
 
     private lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
@@ -162,8 +164,8 @@ public class ViewerController: UIPageViewController {
         return presentedView
     }
 
-    private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
-        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: NSIndexPath(forRow: index, inSection: 0))
+    private func findOrCreateViewerItemController(indexPath: NSIndexPath) -> ViewerItemController {
+        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
         var viewerItemController: ViewerItemController
 
         if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.remoteID!) as? ViewerItemController {
@@ -180,7 +182,7 @@ public class ViewerController: UIPageViewController {
         }
 
         viewerItemController.viewerItem = viewerItem
-        viewerItemController.index = index
+        viewerItemController.indexPath = indexPath
 
         return viewerItemController
     }
@@ -231,9 +233,9 @@ extension ViewerController {
                 self.view.backgroundColor = UIColor.blackColor()
                 self.toggleButtons(true)
                 self.buttonsAreVisible = true
-                self.currentIndex = indexPath.row
+                self.currentIndexPath = indexPath
 
-                let controller = self.findOrCreateViewerItemController(indexPath.row)
+                let controller = self.findOrCreateViewerItemController(indexPath)
                 self.setViewControllers([controller], direction: .Forward, animated: false, completion: nil)
 
                 completion?()
@@ -241,15 +243,14 @@ extension ViewerController {
     }
 
     public func dismiss(completion: (() -> Void)?) {
-        let controller = self.findOrCreateViewerItemController(self.currentIndex)
+        let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
         self.dismiss(controller, completion: completion)
     }
 
     private func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
-        let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
-        guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame else { fatalError() }
+        guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(viewerItemController.indexPath!)?.frame else { fatalError() }
 
-        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
+        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath!)
         let image = viewerItem.image!
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
@@ -257,7 +258,7 @@ extension ViewerController {
         self.fadeButtons(0)
         self.buttonsAreVisible = false
         self.shouldHideStatusBar = false
-        self.updateHiddenCellsUsingVisibleIndex(self.currentIndex)
+        self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
 
         self.overlayView.alpha = self.isDragging ? CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor) : 1.0
         self.overlayView.frame = UIScreen.mainScreen().bounds
@@ -278,7 +279,7 @@ extension ViewerController {
             self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
             }) { completed in
-                if let existingCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                if let existingCell = self.collectionView.cellForItemAtIndexPath(viewerItemController.indexPath!) {
                     existingCell.alpha = 1
                 }
 
@@ -297,7 +298,7 @@ extension ViewerController {
     Has to be internal since it's used as an action
     */
     func panAction(gesture: UIPanGestureRecognizer) {
-        let controller = self.findOrCreateViewerItemController(self.currentIndex)
+        let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
         let viewHeight = controller.imageView.frame.size.height
         let viewHalfHeight = viewHeight / 2
         var translatedPoint = gesture.translationInView(controller.imageView)
@@ -306,7 +307,7 @@ extension ViewerController {
             self.view.backgroundColor = UIColor.clearColor()
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
-            self.updateHiddenCellsUsingVisibleIndex(self.currentIndex)
+            self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
         }
 
         translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
@@ -343,15 +344,15 @@ extension ViewerController {
     }
 
     private func centerElementIfNotVisible(indexPath: NSIndexPath) {
-        if self.collectionView.cellForItemAtIndexPath(indexPath) == nil {
+        if !self.collectionView.indexPathsForVisibleItems().contains(indexPath) {
             self.collectionView.scrollToItemAtIndexPath(indexPath, atScrollPosition: .Top, animated: true)
         }
     }
 
-    private func updateHiddenCellsUsingVisibleIndex(visibleIndex: Int) {
-        for visibleIndexPath in self.collectionView.indexPathsForVisibleItems() {
-            if let cell = self.collectionView.cellForItemAtIndexPath(visibleIndexPath) {
-                cell.alpha = visibleIndexPath.row == visibleIndex ? 0 : 1
+    private func updateHiddenCellsUsingVisibleIndexPath(visibleIndexPath: NSIndexPath) {
+        for indexPath in self.collectionView.indexPathsForVisibleItems() {
+            if let cell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                cell.alpha = indexPath == visibleIndexPath ? 0 : 1
             }
         }
     }
@@ -359,13 +360,13 @@ extension ViewerController {
 
 extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        guard let viewerItemController = viewController as? ViewerItemController where viewerItemController.index > 0  else { return nil }
+        guard let viewerItemController = viewController as? ViewerItemController where viewerItemController.indexPath!.row > 0  else { return nil }
 
-        let newIndex = viewerItemController.index - 1
+        let newIndex = viewerItemController.indexPath!.row - 1
         let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
         self.centerElementIfNotVisible(newIndexPath)
         self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
-        let controller = self.findOrCreateViewerItemController(newIndex)
+        let controller = self.findOrCreateViewerItemController(newIndexPath)
 
         return controller
     }
@@ -374,15 +375,15 @@ extension ViewerController: UIPageViewControllerDataSource {
         guard let viewerItemController = viewController as? ViewerItemController else { return nil }
 
         let count = self.controllerDataSource!.viewerControllerElementsCount(self)
-        if viewerItemController.index < count - 1 {
+        if viewerItemController.indexPath!.row < count - 1 {
 
         }
 
-        let newIndex = viewerItemController.index + 1
+        let newIndex = viewerItemController.indexPath!.row + 1
         let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
         self.centerElementIfNotVisible(newIndexPath)
         self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
-        let controller = self.findOrCreateViewerItemController(newIndex)
+        let controller = self.findOrCreateViewerItemController(newIndexPath)
 
         return controller
     }
@@ -393,13 +394,13 @@ extension ViewerController: UIPageViewControllerDelegate {
         guard let controllers = pendingViewControllers as? [ViewerItemController] else { fatalError() }
 
         for controller in controllers {
-            self.proposedCurrentIndex = controller.index
+            self.proposedCurrentIndexPath = controller.indexPath!
         }
     }
 
     public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if completed {
-            self.currentIndex = self.proposedCurrentIndex
+            self.currentIndexPath = self.proposedCurrentIndexPath
         }
     }
 }
