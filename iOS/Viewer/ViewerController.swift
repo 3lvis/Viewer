@@ -24,11 +24,12 @@ public protocol ViewerControllerDelegate: class {
 }
 
 public class ViewerController: UIPageViewController {
-    static let HeaderFooterHeight = CGFloat(50)
+    private static let HeaderFooterHeight = CGFloat(50)
+    private static let DraggingMargin = CGFloat(60)
 
     // MARK: Initializers
 
-    init(initialIndexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
+    public init(initialIndexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
         self.initialIndexPath = initialIndexPath
         self.collectionView = collectionView
         self.headerViewClass = headerViewClass
@@ -36,11 +37,11 @@ public class ViewerController: UIPageViewController {
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
 
-        self.modalPresentationStyle = .OverCurrentContext
-        self.view.backgroundColor = UIColor.clearColor()
-        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.dataSource = self
         self.delegate = self
+        self.view.backgroundColor = UIColor.clearColor()
+        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        self.modalPresentationStyle = .OverCurrentContext
         self.presentingViewController?.modalPresentationCapturesStatusBarAppearance = true
     }
 
@@ -50,8 +51,8 @@ public class ViewerController: UIPageViewController {
 
     // MARK: Variables
 
-    weak var controllerDelegate: ViewerControllerDelegate?
-    weak var controllerDataSource: ViewerControllerDataSource?
+    public weak var controllerDelegate: ViewerControllerDelegate?
+    public weak var controllerDataSource: ViewerControllerDataSource?
 
     /**
      Cache for the reused ViewerItemControllers
@@ -66,39 +67,39 @@ public class ViewerController: UIPageViewController {
     /**
      The UICollectionView to be used when dismissing and presenting elements
      */
-    unowned var collectionView: UICollectionView
+    private unowned var collectionView: UICollectionView
 
     /**
      CGPoint used for diffing the panning on an image
      */
-    var originalDraggedCenter = CGPointZero
+    private var originalDraggedCenter = CGPointZero
 
     /**
      Used for doing a different animation when dismissing in the middle of a dragging gesture
      */
-    var isDragging = false
+    private var isDragging = false
 
     /**
      Keeps track of where the status bar should be hidden or not
      */
-    var shouldHideStatusBar = false
+    private var shouldHideStatusBar = false
 
     /**
      Critical button visibility state tracker, it's used to force the buttons to keep being hidden when they are toggled
      */
-    var buttonsAreVisible = false
+    private var buttonsAreVisible = false
 
     /**
      Tracks the index for the current viewer item controller
      */
-    var currentIndex = 0
+    private var currentIndex = 0
 
     /**
      Tracks the index to be, it will be ignored if the swiping transition is not finished
      */
-    var proposedCurrentIndex = 0
+    private var proposedCurrentIndex = 0
 
-    lazy var overlayView: UIView = {
+    private lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
         view.backgroundColor = UIColor.blackColor()
         view.alpha = 0
@@ -107,9 +108,9 @@ public class ViewerController: UIPageViewController {
         return view
     }()
 
-    let headerViewClass: AnyClass
+    private let headerViewClass: AnyClass
 
-    lazy var headerView: UIView = {
+    private lazy var headerView: UIView = {
         let headerClass = self.headerViewClass as! UIView.Type
         let view = headerClass.init()
         let bounds = UIScreen.mainScreen().bounds
@@ -120,9 +121,9 @@ public class ViewerController: UIPageViewController {
         return view
     }()
 
-    let footerViewClass: AnyClass
+    private let footerViewClass: AnyClass
 
-    lazy var footerView: UIView = {
+    private lazy var footerView: UIView = {
         let bounds = UIScreen.mainScreen().bounds
         let footerClass = self.footerViewClass as! UIView.Type
         let view = footerClass.init()
@@ -203,21 +204,21 @@ extension ViewerController {
     private func present(indexPath: NSIndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
 
-        let window = self.applicationWindow()
-        window.addSubview(self.overlayView)
         selectedCell.alpha = 0
+        self.shouldHideStatusBar = true
+
+        let window = self.applicationWindow()
 
         let presentedView = self.presentedViewCopy()
         presentedView.frame = window.convertRect(selectedCell.frame, fromView: self.collectionView)
-
         presentedView.image = image
-        window.addSubview(presentedView)
-        let centeredImageFrame = image.centeredFrame()
 
+        window.addSubview(self.overlayView)
+        window.addSubview(presentedView)
         window.addSubview(self.headerView)
         window.addSubview(self.footerView)
 
-        self.shouldHideStatusBar = true
+        let centeredImageFrame = image.centeredFrame()
         UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
             self.setNeedsStatusBarAppearanceUpdate()
@@ -226,20 +227,18 @@ extension ViewerController {
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
                 self.view.backgroundColor = UIColor.blackColor()
+                self.toggleButtons(true)
+                self.buttonsAreVisible = true
+                self.currentIndex = indexPath.row
 
                 let controller = self.findOrCreateViewerItemController(indexPath.row)
-                controller.imageView.tag = controller.index
-                self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
-                    self.toggleButtons(true)
-                    self.buttonsAreVisible = true
-                    self.currentIndex = indexPath.row
+                self.setViewControllers([controller], direction: .Forward, animated: false, completion: nil)
 
-                    completion?()
-                })
+                completion?()
         }
     }
 
-    func dismiss(completion: (() -> Void)?) {
+    public func dismiss(completion: (() -> Void)?) {
         let controller = self.findOrCreateViewerItemController(self.currentIndex)
         self.dismiss(controller, completion: completion)
     }
@@ -248,34 +247,27 @@ extension ViewerController {
         let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
 
-        for indexPath in self.collectionView.indexPathsForVisibleItems() {
-            if let cell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-                cell.alpha = indexPath.row == self.currentIndex ? 0 : 1
-            }
-        }
-
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
         self.view.backgroundColor = UIColor.clearColor()
         self.fadeButtons(0)
         self.buttonsAreVisible = false
+        self.shouldHideStatusBar = false
+        self.updateHiddenCellsUsingVisibleIndex(self.currentIndex)
+
+        self.overlayView.alpha = self.isDragging ? CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor) : 1.0
+        self.overlayView.frame = UIScreen.mainScreen().bounds
 
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
         presentedView.image = image
-
         if self.isDragging {
             presentedView.center = viewerItemController.imageView.center
-            self.overlayView.alpha = CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor)
-        } else {
-            self.overlayView.alpha = 1.0
         }
 
-        self.overlayView.frame = UIScreen.mainScreen().bounds
         let window = self.applicationWindow()
         window.addSubview(self.overlayView)
         window.addSubview(presentedView)
-        self.shouldHideStatusBar = false
 
         UIView.animateWithDuration(0.30, animations: {
             self.overlayView.alpha = 0.0
@@ -297,23 +289,20 @@ extension ViewerController {
         }
     }
 
+    /*
+    Has to be internal since it's used as an action
+    */
     func panAction(gesture: UIPanGestureRecognizer) {
-        self.view.backgroundColor = UIColor.clearColor()
         let controller = self.findOrCreateViewerItemController(self.currentIndex)
-
         let viewHeight = controller.imageView.frame.size.height
         let viewHalfHeight = viewHeight / 2
         var translatedPoint = gesture.translationInView(controller.imageView)
 
         if gesture.state == .Began {
+            self.view.backgroundColor = UIColor.clearColor()
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
-
-            for indexPath in self.collectionView.indexPathsForVisibleItems() {
-                if let cell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-                    cell.alpha = indexPath.row == self.currentIndex ? 0 : 1
-                }
-            }
+            self.updateHiddenCellsUsingVisibleIndex(self.currentIndex)
         }
 
         translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
@@ -329,9 +318,8 @@ extension ViewerController {
         }
 
         if gesture.state == .Ended {
-            let draggingMargin = CGFloat(60)
-            let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - draggingMargin
-            let centerBellowDraggingArea = controller.imageView.center.y > viewHalfHeight + draggingMargin
+            let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - ViewerController.DraggingMargin
+            let centerBellowDraggingArea = controller.imageView.center.y > viewHalfHeight + ViewerController.DraggingMargin
             if centerAboveDraggingArea || centerBellowDraggingArea {
                 self.dismiss(controller, completion: nil)
             } else {
@@ -350,9 +338,17 @@ extension ViewerController {
         }
     }
 
-    func centerElementIfNotVisible(indexPath: NSIndexPath) {
+    private func centerElementIfNotVisible(indexPath: NSIndexPath) {
         if self.collectionView.cellForItemAtIndexPath(indexPath) == nil {
             self.collectionView.scrollToItemAtIndexPath(indexPath, atScrollPosition: .Top, animated: true)
+        }
+    }
+
+    private func updateHiddenCellsUsingVisibleIndex(visibleIndex: Int) {
+        for visibleIndexPath in self.collectionView.indexPathsForVisibleItems() {
+            if let cell = self.collectionView.cellForItemAtIndexPath(visibleIndexPath) {
+                cell.alpha = visibleIndexPath.row == visibleIndex ? 0 : 1
+            }
         }
     }
 }
