@@ -296,7 +296,7 @@ extension ViewerController {
 
     func panAction(gesture: UIPanGestureRecognizer) {
         self.view.backgroundColor = UIColor.clearColor()
-        let controller = self.findOrCreateViewerItemController(gesture.view!.tag)
+        let controller = self.findOrCreateViewerItemController(self.currentIndex)
 
         let viewHeight = controller.imageView.frame.size.height
         let viewHalfHeight = viewHeight / 2
