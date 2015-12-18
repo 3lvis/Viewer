@@ -1,3 +1,3 @@
-GitHub Issues is for reporting bugs, discussing features and general feedback in **PhotoViewer**. Be sure to check our [documentation](http://cocoadocs.org/docsets/PhotoViewer), [FAQ](https://github.com/3lvis/PhotoViewer/wiki/FAQ) and [past issues](https://github.com/3lvis/PhotoViewer/issues?state=closed) before opening any new issues.
+GitHub Issues is for reporting bugs, discussing features and general feedback in **Picasso**. Be sure to check our [documentation](http://cocoadocs.org/docsets/Picasso), [FAQ](https://github.com/3lvis/Picasso/wiki/FAQ) and [past issues](https://github.com/3lvis/Picasso/issues?state=closed) before opening any new issues.
 
 If you are posting about a crash in your application, a stack trace is helpful, but additional context, in the form of code and explanation, is necessary to be of any use.

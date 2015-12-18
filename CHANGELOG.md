@@ -1,1 +1,1 @@
-Check https://github.com/3lvis/PhotoViewer/releases for more information.
+Check https://github.com/3lvis/Picasso/releases for more information.
