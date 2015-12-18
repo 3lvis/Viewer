@@ -68,7 +68,6 @@ extension CollectionController {
         guard let collectionView = self.collectionView else { return }
 
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, headerViewClass: HeaderView.self, footerViewClass: FooterView.self)
-        self.viewerController!.controllerDelegate = self
         self.viewerController!.controllerDataSource = self
         self.presentViewController(self.viewerController!, animated: false, completion: nil)
     }
@@ -77,17 +76,6 @@ extension CollectionController {
 extension CollectionController: ViewerControllerDataSource {
     func viewerItemsForViewerController(viewerController: ViewerController) -> [ViewerItem] {
         return self.photos
-    }
-}
-
-extension CollectionController: ViewerControllerDelegate {
-    func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath) {
-        if self.collectionView?.cellForItemAtIndexPath(indexPath) == nil {
-            self.collectionView?.scrollToItemAtIndexPath(indexPath, atScrollPosition: .CenteredVertically, animated: true)
-        }
-    }
-
-    func viewerControllerDidDismiss(viewerController: ViewerController) {
     }
 }
 

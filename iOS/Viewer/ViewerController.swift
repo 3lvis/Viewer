@@ -248,12 +248,15 @@ extension ViewerController {
         let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
 
-        if let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-            selectedCell.alpha = 0
+        for indexPath in self.collectionView.indexPathsForVisibleItems() {
+            if let cell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                cell.alpha = indexPath.row == self.currentIndex ? 0 : 1
+            }
         }
 
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
+        self.view.backgroundColor = UIColor.clearColor()
         self.fadeButtons(0)
         self.buttonsAreVisible = false
 
@@ -305,6 +308,12 @@ extension ViewerController {
         if gesture.state == .Began {
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
+
+            for indexPath in self.collectionView.indexPathsForVisibleItems() {
+                if let cell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                    cell.alpha = indexPath.row == self.currentIndex ? 0 : 1
+                }
+            }
         }
 
         translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
@@ -340,6 +349,12 @@ extension ViewerController {
             }
         }
     }
+
+    func centerElementIfNotVisible(indexPath: NSIndexPath) {
+        if self.collectionView.cellForItemAtIndexPath(indexPath) == nil {
+            self.collectionView.scrollToItemAtIndexPath(indexPath, atScrollPosition: .Top, animated: true)
+        }
+    }
 }
 
 extension ViewerController: UIPageViewControllerDataSource {
@@ -348,6 +363,7 @@ extension ViewerController: UIPageViewControllerDataSource {
 
         let newIndex = viewerItemController.index - 1
         let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
+        self.centerElementIfNotVisible(newIndexPath)
         self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
         let controller = self.findOrCreateViewerItemController(newIndex)
 
@@ -359,6 +375,7 @@ extension ViewerController: UIPageViewControllerDataSource {
 
         let newIndex = viewerItemController.index + 1
         let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
+        self.centerElementIfNotVisible(newIndexPath)
         self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
         let controller = self.findOrCreateViewerItemController(newIndex)
 
@@ -379,12 +396,6 @@ extension ViewerController: UIPageViewControllerDelegate {
 
         if completed {
             self.currentIndex = self.proposedCurrentIndex
-
-            for indexPath in self.collectionView.indexPathsForVisibleItems() {
-                if let cell = self.collectionView.cellForItemAtIndexPath(indexPath) {
-                    cell.alpha = indexPath.row == self.currentIndex ? 0 : 1
-                }
-            }
         }
     }
 }
