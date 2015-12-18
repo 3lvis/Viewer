@@ -1,7 +1,5 @@
 # Picasso
 
-## Usage
-
 From your UICollectionView:
 
 ```swift
