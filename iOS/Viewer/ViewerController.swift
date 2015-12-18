@@ -379,6 +379,12 @@ extension ViewerController: UIPageViewControllerDelegate {
 
         if completed {
             self.currentIndex = self.proposedCurrentIndex
+
+            for indexPath in self.collectionView.indexPathsForVisibleItems() {
+                if let cell = self.collectionView.cellForItemAtIndexPath(indexPath) {
+                    cell.alpha = indexPath.row == self.currentIndex ? 0 : 1
+                }
+            }
         }
     }
 }
