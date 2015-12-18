@@ -9,8 +9,12 @@ class ViewerItemController: UIViewController {
 
     var viewerItem: ViewerItem? {
         didSet {
-            if let photo = viewerItem {
-                self.imageView.image = photo.image
+            if let viewerItem = self.viewerItem {
+                viewerItem.media({ image in
+                    if let image = image {
+                        self.imageView.image = image
+                    }
+                })
             }
         }
     }

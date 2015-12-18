@@ -206,7 +206,7 @@ extension ViewerController {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) else { fatalError("Data source not implemented") }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
-        let image = viewerItem.image!
+        let image = viewerItem.placeholder!
         selectedCell.alpha = 0
         self.shouldHideStatusBar = true
 
@@ -250,7 +250,7 @@ extension ViewerController {
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(viewerItemController.indexPath!)?.frame else { fatalError() }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath!)
-        let image = viewerItem.image!
+        let image = viewerItem.placeholder!
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
         self.view.backgroundColor = UIColor.clearColor()
@@ -412,10 +412,10 @@ extension ViewerController: UIGestureRecognizerDelegate {
             let panGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
             let velocity = panGestureRecognizer.velocityInView(panGestureRecognizer.view!)
             let allowOnlyVerticalScrolls = fabs(velocity.y) > fabs(velocity.x)
-
+            
             return allowOnlyVerticalScrolls
         }
-
+        
         return true
     }
 }
