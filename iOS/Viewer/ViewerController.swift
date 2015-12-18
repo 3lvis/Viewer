@@ -8,7 +8,8 @@ import CoreData
  */
 
 public protocol ViewerControllerDataSource: class {
-    func viewerItemsForViewerController(viewerController: ViewerController) -> [ViewerItem]
+    func viewerController(viewerController: ViewerController, itemAtIndex index: Int) -> ViewerItem
+    func viewerControllerElementsCount(viewerController: ViewerController) -> Int
 }
 
 public protocol ViewerControllerDelegate: class {
@@ -162,11 +163,10 @@ public class ViewerController: UIPageViewController {
     }
 
     private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
-        let viewerItems = self.controllerDataSource!.viewerItemsForViewerController(self)
-        let viewerItem = viewerItems[index]
+        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndex: index)
         var viewerItemController: ViewerItemController
 
-        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.id) as? ViewerItemController {
+        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.remoteID!) as? ViewerItemController {
             viewerItemController = cachedController
         } else {
             viewerItemController = ViewerItemController()
@@ -176,7 +176,7 @@ public class ViewerController: UIPageViewController {
             gesture.delegate = self
             viewerItemController.imageView.addGestureRecognizer(gesture)
 
-            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.id)
+            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.remoteID!)
         }
 
         viewerItemController.viewerItem = viewerItem
@@ -202,8 +202,10 @@ public class ViewerController: UIPageViewController {
 
 extension ViewerController {
     private func present(indexPath: NSIndexPath, completion: (() -> Void)?) {
-        guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath), items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError("Data source not implemented") }
+        guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) else { fatalError("Data source not implemented") }
 
+        let item = self.controllerDataSource!.viewerController(self, itemAtIndex: indexPath.row)
+        let image = item.image!
         selectedCell.alpha = 0
         self.shouldHideStatusBar = true
 
@@ -245,8 +247,10 @@ extension ViewerController {
 
     private func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
-        guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame, items = self.controllerDataSource?.viewerItemsForViewerController(self), image = items[indexPath.row].image else { fatalError() }
+        guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame else { fatalError() }
 
+        let item = self.controllerDataSource!.viewerController(self, itemAtIndex: indexPath.row)
+        let image = item.image!
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
         self.view.backgroundColor = UIColor.clearColor()
@@ -367,7 +371,12 @@ extension ViewerController: UIPageViewControllerDataSource {
     }
 
     public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        guard let viewerItemController = viewController as? ViewerItemController, viewerItems = self.controllerDataSource?.viewerItemsForViewerController(self) where viewerItemController.index < viewerItems.count - 1 else { return nil }
+        guard let viewerItemController = viewController as? ViewerItemController else { return nil }
+
+        let count = self.controllerDataSource!.viewerControllerElementsCount(self)
+        if viewerItemController.index < count - 1 {
+
+        }
 
         let newIndex = viewerItemController.index + 1
         let newIndexPath = NSIndexPath(forRow: newIndex, inSection: 0)
@@ -389,7 +398,6 @@ extension ViewerController: UIPageViewControllerDelegate {
     }
 
     public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-
         if completed {
             self.currentIndex = self.proposedCurrentIndex
         }
