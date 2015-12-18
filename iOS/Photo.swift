@@ -1,18 +1,18 @@
 import UIKit
 
 struct Photo: ViewerItem {
-    var id: Int
+    var remoteID: String?
     var image: UIImage?
 
-    init(id: Int) {
-        self.id = id
+    init(remoteID: String) {
+        self.remoteID = remoteID
     }
 
     static func constructElements() -> [ViewerItem] {
         var elements = [ViewerItem]()
 
         for i in 1..<60 {
-            var photo = Photo(id: i)
+            var photo = Photo(remoteID: "\(i)")
 
             let index = Int(arc4random_uniform(5))
             switch index {

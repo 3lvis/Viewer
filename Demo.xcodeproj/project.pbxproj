@@ -27,6 +27,7 @@
 		14D081371C18579700E3FFC3 /* 0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081341C18579700E3FFC3 /* 0.jpg */; };
 		14D081381C18579700E3FFC3 /* 1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081351C18579700E3FFC3 /* 1.jpg */; };
 		14D081391C18579700E3FFC3 /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081361C18579700E3FFC3 /* 2.jpg */; };
+		14FA9A131C24399F00C98964 /* NSIndexPath+Contiguous.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FA9A121C24399F00C98964 /* NSIndexPath+Contiguous.swift */; };
 		14FBFA961C1F1313001B0B84 /* FixedHeightNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FBFA951C1F1313001B0B84 /* FixedHeightNavigationBar.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +62,7 @@
 		14D081341C18579700E3FFC3 /* 0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 0.jpg; sourceTree = "<group>"; };
 		14D081351C18579700E3FFC3 /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
 		14D081361C18579700E3FFC3 /* 2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2.jpg; sourceTree = "<group>"; };
+		14FA9A121C24399F00C98964 /* NSIndexPath+Contiguous.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSIndexPath+Contiguous.swift"; sourceTree = "<group>"; };
 		14FBFA951C1F1313001B0B84 /* FixedHeightNavigationBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FixedHeightNavigationBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -173,6 +175,7 @@
 				1421DD6B1C19798E00E17EF9 /* UIImage+CenteredFrame.swift */,
 				14C552AB1C1EC25C00F30E01 /* UIViewController+Window.swift */,
 				14FBFA951C1F1313001B0B84 /* FixedHeightNavigationBar.swift */,
+				14FA9A121C24399F00C98964 /* NSIndexPath+Contiguous.swift */,
 			);
 			path = Viewer;
 			sourceTree = "<group>";
@@ -301,6 +304,7 @@
 				14B9C1001C2020CB00FDE58B /* FooterView.swift in Sources */,
 				14C9840B1C0DE7B300B5E515 /* CollectionController.swift in Sources */,
 				14A4EDBC1C216E3F00411FC6 /* PopupController.swift in Sources */,
+				14FA9A131C24399F00C98964 /* NSIndexPath+Contiguous.swift in Sources */,
 				1421DD6C1C19798E00E17EF9 /* UIImage+CenteredFrame.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

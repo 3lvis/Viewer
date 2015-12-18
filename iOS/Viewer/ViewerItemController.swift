@@ -15,7 +15,7 @@ class ViewerItemController: UIViewController {
         }
     }
 
-    var index = 0
+    var indexPath: NSIndexPath?
 
     lazy var imageView: UIImageView = {
         let view = UIImageView(frame: UIScreen.mainScreen().bounds)

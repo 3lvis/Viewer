@@ -57,9 +57,8 @@ extension CollectionController {
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
-        if let photo = self.photos[indexPath.row] as? Photo {
-            cell.image = photo.image
-        }
+        let photo = self.photos[indexPath.row]
+        cell.image = photo.image
 
         return cell
     }
@@ -74,8 +73,8 @@ extension CollectionController {
 }
 
 extension CollectionController: ViewerControllerDataSource {
-    func viewerItemsForViewerController(viewerController: ViewerController) -> [ViewerItem] {
-        return self.photos
+    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
+        return self.photos[indexPath.row]
     }
 }
 
