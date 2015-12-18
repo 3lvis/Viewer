@@ -8,7 +8,7 @@ import CoreData
  */
 
 public protocol ViewerControllerDataSource: class {
-    func viewerController(viewerController: ViewerController, itemAtIndex index: Int) -> ViewerItem
+    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem
     func viewerControllerElementsCount(viewerController: ViewerController) -> Int
 }
 
@@ -163,7 +163,7 @@ public class ViewerController: UIPageViewController {
     }
 
     private func findOrCreateViewerItemController(index: Int) -> ViewerItemController {
-        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndex: index)
+        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: NSIndexPath(forRow: index, inSection: 0))
         var viewerItemController: ViewerItemController
 
         if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.remoteID!) as? ViewerItemController {
@@ -204,8 +204,8 @@ extension ViewerController {
     private func present(indexPath: NSIndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) else { fatalError("Data source not implemented") }
 
-        let item = self.controllerDataSource!.viewerController(self, itemAtIndex: indexPath.row)
-        let image = item.image!
+        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
+        let image = viewerItem.image!
         selectedCell.alpha = 0
         self.shouldHideStatusBar = true
 
@@ -249,8 +249,8 @@ extension ViewerController {
         let indexPath = NSIndexPath(forRow: viewerItemController.index, inSection: 0)
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(indexPath)?.frame else { fatalError() }
 
-        let item = self.controllerDataSource!.viewerController(self, itemAtIndex: indexPath.row)
-        let image = item.image!
+        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
+        let image = viewerItem.image!
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
         self.view.backgroundColor = UIColor.clearColor()

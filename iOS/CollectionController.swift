@@ -73,8 +73,8 @@ extension CollectionController {
 }
 
 extension CollectionController: ViewerControllerDataSource {
-    func viewerController(viewerController: ViewerController, itemAtIndex index: Int) -> ViewerItem {
-        return self.photos[index]
+    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
+        return self.photos[indexPath.row]
     }
 
     func viewerControllerElementsCount(viewerController: ViewerController) -> Int {
