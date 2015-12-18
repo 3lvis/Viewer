@@ -1,10 +1,10 @@
 import UIKit
 
-public protocol ViewerItemControllerDelegate: class {
+protocol ViewerItemControllerDelegate: class {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?)
 }
 
-public class ViewerItemController: UIViewController {
+class ViewerItemController: UIViewController {
     weak var controllerDelegate: ViewerItemControllerDelegate?
 
     var viewerItem: ViewerItem? {
@@ -27,7 +27,7 @@ public class ViewerItemController: UIViewController {
         return view
     }()
 
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         self.view.backgroundColor = UIColor.blackColor()
