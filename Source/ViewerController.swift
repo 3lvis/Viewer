@@ -227,17 +227,17 @@ extension ViewerController {
             self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = centeredImageFrame
             }) { completed in
-                presentedView.removeFromSuperview()
-                self.overlayView.removeFromSuperview()
-                self.view.backgroundColor = UIColor.blackColor()
-                self.toggleButtons(true)
-                self.buttonsAreVisible = true
-                self.currentIndexPath = indexPath
-
                 let controller = self.findOrCreateViewerItemController(indexPath)
-                self.setViewControllers([controller], direction: .Forward, animated: false, completion: nil)
+                self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
+                    self.toggleButtons(true)
+                    self.buttonsAreVisible = true
+                    self.currentIndexPath = indexPath
+                    presentedView.removeFromSuperview()
+                    self.overlayView.removeFromSuperview()
+                    self.view.backgroundColor = UIColor.blackColor()
 
-                completion?()
+                    completion?()
+                })
         }
     }
 
