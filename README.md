@@ -1,4 +1,4 @@
-# Picasso
+# Viewer
 
 From your UICollectionView:
 
