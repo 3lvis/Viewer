@@ -10,6 +10,7 @@ class ViewerItemController: UIViewController {
     var viewerItem: ViewerItem? {
         didSet {
             if let viewerItem = self.viewerItem {
+                self.imageView.image = viewerItem.placeholder
                 viewerItem.media({ image in
                     if let image = image {
                         self.imageView.image = image
