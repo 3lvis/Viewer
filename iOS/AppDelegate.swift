@@ -16,10 +16,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let size = (bounds.width - numberOfColumns) / numberOfColumns
         layout.itemSize = CGSize(width: size, height: size)
         let controller = CollectionController(collectionViewLayout: layout)
+
         let navigationController = UINavigationController(navigationBarClass: FixedHeightNavigationBar.self, toolbarClass: UIToolbar.self)
         navigationController.viewControllers = [controller]
-        self.window?.rootViewController = navigationController
 
+        let tabBarController = UITabBarController()
+        tabBarController.viewControllers = [navigationController]
+
+        self.window?.rootViewController = tabBarController
         self.window!.makeKeyAndVisible()
 
         return true
