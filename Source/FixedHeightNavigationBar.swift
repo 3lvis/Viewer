@@ -1,7 +1,7 @@
 import UIKit
 
 public class FixedHeightNavigationBar: UINavigationBar {
-    override func sizeThatFits(size: CGSize) -> CGSize {
+    public override func sizeThatFits(size: CGSize) -> CGSize {
         var size = super.sizeThatFits(size)
         let orientation = UIApplication.sharedApplication().statusBarOrientation
         if UIApplication.sharedApplication().statusBarHidden && UIInterfaceOrientationIsPortrait(orientation) {
