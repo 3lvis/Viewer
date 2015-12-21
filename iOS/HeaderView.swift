@@ -4,6 +4,7 @@ class HeaderView: UIView {
     static let ClearNotificationName  = "ClearNotificationName"
     static let MenuNotificationName  = "MenuNotificationName"
     static let ButtonSize = CGFloat(50.0)
+    static let TopMargin = CGFloat(15.0)
 
     lazy var clearButton: UIButton = {
         let image = UIImage(named: "clear")!
@@ -37,10 +38,10 @@ class HeaderView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        self.clearButton.frame = CGRect(x: 0, y: 0, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
+        self.clearButton.frame = CGRect(x: 0, y: HeaderView.TopMargin, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
 
         let x = UIScreen.mainScreen().bounds.size.width - HeaderView.ButtonSize
-        self.menuButton.frame = CGRect(x: x, y: 0, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
+        self.menuButton.frame = CGRect(x: x, y: HeaderView.TopMargin, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
     }
 
     func clearAction(button: UIButton) {
