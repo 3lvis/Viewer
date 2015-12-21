@@ -227,6 +227,7 @@ extension ViewerController {
             self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = centeredImageFrame
             }) { completed in
+                self.presentingViewController?.tabBarController?.tabBar.alpha = 0
                 let controller = self.findOrCreateViewerItemController(indexPath)
                 self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
                     self.toggleButtons(true)
@@ -274,6 +275,7 @@ extension ViewerController {
         window.addSubview(presentedView)
 
         UIView.animateWithDuration(0.30, animations: {
+            self.presentingViewController?.tabBarController?.tabBar.alpha = 1
             self.overlayView.alpha = 0.0
             self.setNeedsStatusBarAppearanceUpdate()
             presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
