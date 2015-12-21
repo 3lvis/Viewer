@@ -18,8 +18,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let controller = CollectionController(collectionViewLayout: layout)
         let navigationController = UINavigationController(navigationBarClass: FixedHeightNavigationBar.self, toolbarClass: UIToolbar.self)
         navigationController.viewControllers = [controller]
-        self.window?.rootViewController = navigationController
 
+        let tabBarController = UITabBarController()
+        tabBarController.setViewControllers([navigationController], animated: false)
+
+        self.window?.rootViewController = tabBarController
         self.window!.makeKeyAndVisible()
 
         return true
