@@ -24,7 +24,7 @@ public protocol ViewerControllerDelegate: class {
 }
 
 public class ViewerController: UIPageViewController {
-    private static let HeaderFooterHeight = CGFloat(50)
+    private static let HeaderFooterHeight = CGFloat(60)
     private static let DraggingMargin = CGFloat(60)
 
     // MARK: Initializers
@@ -85,6 +85,11 @@ public class ViewerController: UIPageViewController {
      Keeps track of where the status bar should be hidden or not
      */
     private var shouldHideStatusBar = false
+
+    /**
+     Keeps track of where the status bar should be light or not
+     */
+    private var shouldUseLightStatusBar = true
 
     /**
      Critical button visibility state tracker, it's used to force the buttons to keep being hidden when they are toggled
@@ -153,6 +158,14 @@ public class ViewerController: UIPageViewController {
         return self.shouldHideStatusBar
     }
 
+    public override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        if self.shouldUseLightStatusBar {
+            return .LightContent
+        } else {
+            return self.presentingViewController?.preferredStatusBarStyle() ?? .Default
+        }
+    }
+
     // MARK: Private methods
 
     private func presentedViewCopy() -> UIImageView {
@@ -188,6 +201,7 @@ public class ViewerController: UIPageViewController {
 
     private func toggleButtons(shouldShow: Bool) {
         UIView.animateWithDuration(0.3) {
+            self.setNeedsStatusBarAppearanceUpdate()
             self.headerView.alpha = shouldShow ? 1 : 0
             self.footerView.alpha = shouldShow ? 1 : 0
         }
@@ -208,7 +222,6 @@ extension ViewerController {
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
         let image = viewerItem.placeholder!
         selectedCell.alpha = 0
-        self.shouldHideStatusBar = true
 
         let window = self.applicationWindow()
 
@@ -257,8 +270,10 @@ extension ViewerController {
         self.view.backgroundColor = UIColor.clearColor()
         self.fadeButtons(0)
         self.buttonsAreVisible = false
-        self.shouldHideStatusBar = false
         self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
+
+        self.shouldHideStatusBar = false
+        self.setNeedsStatusBarAppearanceUpdate()
 
         self.overlayView.alpha = self.isDragging ? CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor) : 1.0
         self.overlayView.frame = UIScreen.mainScreen().bounds
@@ -273,6 +288,7 @@ extension ViewerController {
         let window = self.applicationWindow()
         window.addSubview(self.overlayView)
         window.addSubview(presentedView)
+        self.shouldUseLightStatusBar = false
 
         UIView.animateWithDuration(0.30, animations: {
             self.presentingViewController?.tabBarController?.tabBar.alpha = 1
@@ -305,6 +321,8 @@ extension ViewerController {
         var translatedPoint = gesture.translationInView(controller.imageView)
 
         if gesture.state == .Began {
+            self.shouldHideStatusBar = false
+            self.setNeedsStatusBarAppearanceUpdate()
             self.view.backgroundColor = UIColor.clearColor()
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
@@ -338,6 +356,9 @@ extension ViewerController {
                         self.fadeButtons(1)
                     }
                     }) { completed in
+                        self.shouldHideStatusBar = false
+                        self.shouldUseLightStatusBar = true
+                        self.setNeedsStatusBarAppearanceUpdate()
                         self.view.backgroundColor = UIColor.blackColor()
                 }
             }
@@ -403,6 +424,7 @@ extension ViewerController: UIPageViewControllerDelegate {
 
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
+        self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
         self.toggleButtons(self.buttonsAreVisible)
     }

@@ -2,6 +2,7 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    static let IsLightStatusBar = false
 
     var window: UIWindow?
 
@@ -16,8 +17,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let size = (bounds.width - numberOfColumns) / numberOfColumns
         layout.itemSize = CGSize(width: size, height: size)
         let controller = CollectionController(collectionViewLayout: layout)
-        let navigationController = UINavigationController(navigationBarClass: FixedHeightNavigationBar.self, toolbarClass: UIToolbar.self)
-        navigationController.viewControllers = [controller]
+        controller.title = "Images"
+        let navigationController = UINavigationController(rootViewController: controller)
+
+        if AppDelegate.IsLightStatusBar {
+            UINavigationBar.appearance().barTintColor = UIColor.orangeColor()
+            UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName : UIColor.whiteColor()]
+            navigationController.navigationBar.barStyle = .Black
+        }
 
         let tabBarController = UITabBarController()
         tabBarController.setViewControllers([navigationController], animated: false)
