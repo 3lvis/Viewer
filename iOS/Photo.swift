@@ -2,7 +2,7 @@ import UIKit
 
 struct Photo: ViewerItem {
     var remoteID: String?
-    var placeholder: UIImage?
+    var placeholder = UIImage(named: "clear.png")!
 
     init(remoteID: String) {
         self.remoteID = remoteID
@@ -21,19 +21,19 @@ struct Photo: ViewerItem {
             let index = Int(arc4random_uniform(5))
             switch index {
             case 0:
-                photo.placeholder = UIImage(named: "0.jpg")
+                photo.placeholder = UIImage(named: "0.jpg")!
                 break
             case 1:
-                photo.placeholder = UIImage(named: "1.jpg")
+                photo.placeholder = UIImage(named: "1.jpg")!
                 break
             case 2:
-                photo.placeholder = UIImage(named: "2.jpg")
+                photo.placeholder = UIImage(named: "2.jpg")!
                 break
             case 3:
-                photo.placeholder = UIImage(named: "3.jpg")
+                photo.placeholder = UIImage(named: "3.jpg")!
                 break
             case 4:
-                photo.placeholder = UIImage(named: "4.jpg")
+                photo.placeholder = UIImage(named: "4.jpg")!
                 break
             default: break
             }
