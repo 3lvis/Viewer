@@ -220,7 +220,7 @@ extension ViewerController {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) else { fatalError("Data source not implemented") }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
-        let image = viewerItem.placeholder!
+        let image = viewerItem.placeholder
         selectedCell.alpha = 0
 
         let window = self.applicationWindow()
@@ -264,7 +264,7 @@ extension ViewerController {
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(viewerItemController.indexPath!)?.frame else { fatalError() }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath!)
-        let image = viewerItem.placeholder!
+        let image = viewerItem.placeholder
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
         self.view.backgroundColor = UIColor.clearColor()
