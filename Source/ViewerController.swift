@@ -24,7 +24,8 @@ public protocol ViewerControllerDelegate: class {
 }
 
 public class ViewerController: UIPageViewController {
-    private static let HeaderFooterHeight = CGFloat(60)
+    private static let HeaderHeight = CGFloat(64)
+    private static let FooterHeight = CGFloat(50)
     private static let DraggingMargin = CGFloat(60)
 
     // MARK: Initializers
@@ -121,7 +122,7 @@ public class ViewerController: UIPageViewController {
         let headerClass = self.headerViewClass as! UIView.Type
         let view = headerClass.init()
         let bounds = UIScreen.mainScreen().bounds
-        view.frame = CGRect(x: 0, y: 0, width: bounds.width, height: ViewerController.HeaderFooterHeight)
+        view.frame = CGRect(x: 0, y: 0, width: bounds.width, height: ViewerController.HeaderHeight)
         view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
         view.alpha = 0
 
@@ -134,7 +135,7 @@ public class ViewerController: UIPageViewController {
         let bounds = UIScreen.mainScreen().bounds
         let footerClass = self.footerViewClass as! UIView.Type
         let view = footerClass.init()
-        view.frame = CGRect(x: 0, y: bounds.size.height - ViewerController.HeaderFooterHeight, width: bounds.width, height: ViewerController.HeaderFooterHeight)
+        view.frame = CGRect(x: 0, y: bounds.size.height - ViewerController.FooterHeight, width: bounds.width, height: ViewerController.FooterHeight)
         view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
         view.alpha = 0
 
