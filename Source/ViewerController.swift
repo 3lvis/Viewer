@@ -268,7 +268,7 @@ extension ViewerController {
         let image = viewerItem.placeholder
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
-        self.view.backgroundColor = UIColor.clearColor()
+        self.view.alpha = 0
         self.fadeButtons(0)
         self.buttonsAreVisible = false
         self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
