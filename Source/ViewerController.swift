@@ -45,7 +45,9 @@ public class ViewerController: UIPageViewController {
         self.view.backgroundColor = UIColor.clearColor()
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.modalPresentationStyle = .OverCurrentContext
-        self.presentingViewController?.modalPresentationCapturesStatusBarAppearance = true
+        #if os(iOS)
+            self.presentingViewController?.modalPresentationCapturesStatusBarAppearance = true
+        #endif
     }
 
     public required init?(coder aDecoder: NSCoder) {
