@@ -150,6 +150,7 @@ public class ViewerController: UIPageViewController {
         self.present(self.initialIndexPath, completion: nil)
     }
 
+    #if os(iOS)
     public override func prefersStatusBarHidden() -> Bool {
         let orientation = UIApplication.sharedApplication().statusBarOrientation
         if UIInterfaceOrientationIsLandscape(orientation) {
@@ -166,6 +167,7 @@ public class ViewerController: UIPageViewController {
             return self.presentingViewController?.preferredStatusBarStyle() ?? .Default
         }
     }
+    #endif
 
     // MARK: Private methods
 
@@ -202,7 +204,9 @@ public class ViewerController: UIPageViewController {
 
     private func toggleButtons(shouldShow: Bool) {
         UIView.animateWithDuration(0.3) {
-            self.setNeedsStatusBarAppearanceUpdate()
+            #if os(iOS)
+                self.setNeedsStatusBarAppearanceUpdate()
+            #endif
             self.headerView.alpha = shouldShow ? 1 : 0
             self.footerView.alpha = shouldShow ? 1 : 0
         }
@@ -238,7 +242,9 @@ extension ViewerController {
         let centeredImageFrame = image.centeredFrame()
         UIView.animateWithDuration(0.25, animations: {
             self.overlayView.alpha = 1.0
-            self.setNeedsStatusBarAppearanceUpdate()
+            #if os(iOS)
+                self.setNeedsStatusBarAppearanceUpdate()
+            #endif
             presentedView.frame = centeredImageFrame
             }) { completed in
                 self.presentingViewController?.tabBarController?.tabBar.alpha = 0
@@ -274,8 +280,9 @@ extension ViewerController {
         self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
 
         self.shouldHideStatusBar = false
-        self.setNeedsStatusBarAppearanceUpdate()
-
+        #if os(iOS)
+            self.setNeedsStatusBarAppearanceUpdate()
+        #endif
         self.overlayView.alpha = self.isDragging ? CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor) : 1.0
         self.overlayView.frame = UIScreen.mainScreen().bounds
 
@@ -294,7 +301,9 @@ extension ViewerController {
         UIView.animateWithDuration(0.30, animations: {
             self.presentingViewController?.tabBarController?.tabBar.alpha = 1
             self.overlayView.alpha = 0.0
-            self.setNeedsStatusBarAppearanceUpdate()
+            #if os(iOS)
+                self.setNeedsStatusBarAppearanceUpdate()
+            #endif
             presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(viewerItemController.indexPath!) {
@@ -323,7 +332,9 @@ extension ViewerController {
 
         if gesture.state == .Began {
             self.shouldHideStatusBar = false
-            self.setNeedsStatusBarAppearanceUpdate()
+            #if os(iOS)
+                self.setNeedsStatusBarAppearanceUpdate()
+            #endif
             self.view.backgroundColor = UIColor.clearColor()
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
@@ -359,7 +370,9 @@ extension ViewerController {
                     }) { completed in
                         self.shouldHideStatusBar = false
                         self.shouldUseLightStatusBar = true
-                        self.setNeedsStatusBarAppearanceUpdate()
+                        #if os(iOS)
+                            self.setNeedsStatusBarAppearanceUpdate()
+                        #endif
                         self.view.backgroundColor = UIColor.blackColor()
                 }
             }
