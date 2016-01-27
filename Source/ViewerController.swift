@@ -342,6 +342,7 @@ extension ViewerController {
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
             self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
+            controller.willDismiss()
         }
 
         translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
