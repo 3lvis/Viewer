@@ -2,12 +2,11 @@ import UIKit
 import AVFoundation
 import AVKit
 
-class MovieContainer: UIImageView {
+class MovieContainer: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
         self.userInteractionEnabled = false
-        self.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.4)
     }
 
     lazy var playerLayer: AVPlayerLayer = {
@@ -16,6 +15,8 @@ class MovieContainer: UIImageView {
 
         return playerLayer
     }()
+
+    var image: UIImage?
 
     lazy var loadingIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(activityIndicatorStyle: .White)
