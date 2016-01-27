@@ -13,6 +13,8 @@ class ViewerItemController: UIViewController {
     var player: AVPlayer? {
         didSet {
             if self.shouldRegisterForNotifications {
+                self.view.layer.addSublayer(self.playerLayer)
+                self.view.addSubview(self.loadingIndicator)
                 self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
                 self.shouldRegisterForNotifications = false
             }
@@ -34,13 +36,13 @@ class ViewerItemController: UIViewController {
     lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
         playerLayer.frame = self.view.frame
-        self.view.layer.addSublayer(playerLayer)
 
         return playerLayer
     }()
 
     lazy var loadingIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(activityIndicatorStyle: .White)
+        view.center = self.view.center
 
         return view
     }()
@@ -83,9 +85,6 @@ class ViewerItemController: UIViewController {
         self.view.addSubview(self.imageView)
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 
-        self.loadingIndicator.center = self.view.center
-        self.view.addSubview(self.loadingIndicator)
-
         let tapRecognizer = UITapGestureRecognizer(target: self, action: "tapAction")
         self.view.addGestureRecognizer(tapRecognizer)
     }
@@ -111,6 +110,8 @@ class ViewerItemController: UIViewController {
 
     func willDismiss() {
         self.stopPlayerAndRemoveObserverIfNecessary()
+        self.loadingIndicator.removeFromSuperview()
+        self.playerLayer.removeFromSuperlayer()
     }
 
     func stopPlayerAndRemoveObserverIfNecessary() {
