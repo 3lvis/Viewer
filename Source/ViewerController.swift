@@ -266,6 +266,7 @@ extension ViewerController {
 
     public func dismiss(completion: (() -> Void)?) {
         let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
+        controller.willDismiss()
         self.dismiss(controller, completion: completion)
     }
 

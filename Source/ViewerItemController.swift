@@ -9,24 +9,13 @@ protocol ViewerItemControllerDelegate: class {
 class ViewerItemController: UIViewController {
     weak var controllerDelegate: ViewerItemControllerDelegate?
 
-    var viewerItem: ViewerItem? {
+    private var shouldRegisterForNotifications = true
+    var player: AVPlayer? {
         didSet {
-            if let viewerItem = self.viewerItem {
-                self.imageView.image = viewerItem.placeholder
-
-                if let url = viewerItem.url {
-                    self.loadingIndicator.startAnimating()
-                    let steamingURL = NSURL(string: url)!
-                    let player = AVPlayer(URL: steamingURL)
-                    player.addObserver(self, forKeyPath: "status", options: [], context: nil)
-                    self.playerLayer.player = player
-                } else {
-                    viewerItem.media({ image in
-                        if let image = image {
-                            self.imageView.image = image
-                        }
-                    })
-                }
+            if self.shouldRegisterForNotifications {
+                print("registering")
+                self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
+                self.shouldRegisterForNotifications = false
             }
         }
     }
@@ -46,7 +35,6 @@ class ViewerItemController: UIViewController {
     lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
         playerLayer.frame = self.view.frame
-        playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
         self.view.layer.addSublayer(playerLayer)
 
         return playerLayer
@@ -57,6 +45,37 @@ class ViewerItemController: UIViewController {
 
         return view
     }()
+
+    var changed = false
+    var viewerItem: ViewerItem? {
+        willSet {
+            if self.viewerItem?.remoteID != newValue?.remoteID {
+                self.changed = true
+            }
+        }
+
+        didSet {
+            guard let viewerItem = self.viewerItem else { return }
+
+            if self.changed {
+                self.imageView.image = viewerItem.placeholder
+
+                if let url = viewerItem.url {
+                    self.loadingIndicator.startAnimating()
+                    let steamingURL = NSURL(string: url)!
+                    self.player = AVPlayer(URL: steamingURL)
+                    self.playerLayer.player = player
+                } else {
+                    viewerItem.media({ image in
+                        if let image = image {
+                            self.imageView.image = image
+                        }
+                    })
+                }
+                self.changed = false
+            }
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,9 +100,23 @@ class ViewerItemController: UIViewController {
 
         if player.status == .ReadyToPlay {
             self.loadingIndicator.stopAnimating()
+            self.removeObserverIfNecessary()
             player.play()
         } else {
             print("BURNING BURNING")
+        }
+    }
+
+    func willDismiss() {
+        self.player?.pause()
+        self.removeObserverIfNecessary()
+    }
+
+    func removeObserverIfNecessary() {
+        if self.shouldRegisterForNotifications == false {
+            print("removing")
+            self.player?.removeObserver(self, forKeyPath: "status")
+            self.shouldRegisterForNotifications = true
         }
     }
 }
