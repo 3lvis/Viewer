@@ -32,17 +32,7 @@ class MovieContainer: UIView {
     var shouldRegisterForNotifications = true
     var player: AVPlayer? {
         didSet {
-            if self.shouldRegisterForNotifications {
-                self.layer.addSublayer(self.playerLayer)
-                self.addSubview(self.loadingIndicator)
-
-                let loadingHeight = self.loadingIndicator.frame.size.height
-                let loadingWidth = self.loadingIndicator.frame.size.width
-                self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
-
-                self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
-                self.shouldRegisterForNotifications = false
-            }
+            self.start()
         }
     }
 
@@ -73,6 +63,26 @@ class MovieContainer: UIView {
             self.player?.pause()
             self.player?.removeObserver(self, forKeyPath: "status")
             self.shouldRegisterForNotifications = true
+        }
+    }
+
+    func start() {
+        if self.shouldRegisterForNotifications {
+            self.loadingIndicator.startAnimating()
+
+            if self.playerLayer.superlayer == nil {
+                self.layer.addSublayer(self.playerLayer)
+            }
+            if self.loadingIndicator.superview == nil {
+                self.addSubview(self.loadingIndicator)
+            }
+
+            let loadingHeight = self.loadingIndicator.frame.size.height
+            let loadingWidth = self.loadingIndicator.frame.size.width
+            self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
+
+            self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
+            self.shouldRegisterForNotifications = false
         }
     }
 }

@@ -372,6 +372,7 @@ extension ViewerController {
                         self.fadeButtons(1)
                     }
                     }) { completed in
+                        controller.didCentered()
                         self.shouldHideStatusBar = false
                         self.shouldUseLightStatusBar = true
                         #if os(iOS)

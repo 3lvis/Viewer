@@ -87,4 +87,9 @@ class ViewerItemController: UIViewController {
         self.movieContainer.loadingIndicator.removeFromSuperview()
         self.movieContainer.playerLayer.removeFromSuperlayer()
     }
+
+    func didCentered() {
+        // If it has already started then it will not play :(
+        self.movieContainer.start()
+    }
 }
