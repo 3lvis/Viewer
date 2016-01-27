@@ -13,7 +13,6 @@ class ViewerItemController: UIViewController {
     var player: AVPlayer? {
         didSet {
             if self.shouldRegisterForNotifications {
-                print("registering")
                 self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
                 self.shouldRegisterForNotifications = false
             }
@@ -91,6 +90,12 @@ class ViewerItemController: UIViewController {
         self.view.addGestureRecognizer(tapRecognizer)
     }
 
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        self.stopPlayerAndRemoveObserverIfNecessary()
+    }
+
     func tapAction() {
         self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
     }
@@ -99,22 +104,19 @@ class ViewerItemController: UIViewController {
         guard let player = object as? AVPlayer else { return }
 
         if player.status == .ReadyToPlay {
-            self.loadingIndicator.stopAnimating()
-            self.removeObserverIfNecessary()
+            self.stopPlayerAndRemoveObserverIfNecessary()
             player.play()
-        } else {
-            print("BURNING BURNING")
         }
     }
 
     func willDismiss() {
-        self.player?.pause()
-        self.removeObserverIfNecessary()
+        self.stopPlayerAndRemoveObserverIfNecessary()
     }
 
-    func removeObserverIfNecessary() {
+    func stopPlayerAndRemoveObserverIfNecessary() {
         if self.shouldRegisterForNotifications == false {
-            print("removing")
+            self.loadingIndicator.stopAnimating()
+            self.player?.pause()
             self.player?.removeObserver(self, forKeyPath: "status")
             self.shouldRegisterForNotifications = true
         }
