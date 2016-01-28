@@ -2,12 +2,12 @@ import UIKit
 import AVFoundation
 import AVKit
 
-protocol ViewerItemControllerDelegate: class {
-    func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?)
+protocol VideoViewerItemControllerDelegate: class {
+    func videoViewerItemControllerDidTapItem(videoViewerItemController: VideoViewerItemController, completion: (() -> Void)?)
 }
 
-class ViewerItemController: UIViewController {
-    weak var controllerDelegate: ViewerItemControllerDelegate?
+class VideoViewerItemController: UIViewController, ViewerItemControllable {
+    weak var controllerDelegate: VideoViewerItemControllerDelegate?
 
     var indexPath: NSIndexPath?
 
@@ -79,7 +79,7 @@ class ViewerItemController: UIViewController {
     }
 
     func tapAction() {
-        self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
+        self.controllerDelegate?.videoViewerItemControllerDidTapItem(self, completion: nil)
     }
 
     func willDismiss() {
