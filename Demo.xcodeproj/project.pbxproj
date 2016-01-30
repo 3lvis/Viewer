@@ -7,16 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		141D8AF51C5A0FCF00DC24CB /* VideoViewerItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141D8AF41C5A0FCF00DC24CB /* VideoViewerItemController.swift */; };
-		141D8AF61C5A0FCF00DC24CB /* VideoViewerItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141D8AF41C5A0FCF00DC24CB /* VideoViewerItemController.swift */; };
-		141D8AF81C5A5E7400DC24CB /* ViewerItemControllable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141D8AF71C5A5E7400DC24CB /* ViewerItemControllable.swift */; };
-		141D8AF91C5A5E7400DC24CB /* ViewerItemControllable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141D8AF71C5A5E7400DC24CB /* ViewerItemControllable.swift */; };
 		1438033E1C2452A1003CA252 /* NSIndexPath+Contiguous.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143803351C2452A1003CA252 /* NSIndexPath+Contiguous.swift */; };
 		143803401C2452A1003CA252 /* UIImage+CenteredFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143803361C2452A1003CA252 /* UIImage+CenteredFrame.swift */; };
 		143803421C2452A1003CA252 /* UIViewController+Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143803371C2452A1003CA252 /* UIViewController+Window.swift */; };
 		143803441C2452A1003CA252 /* ViewerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143803381C2452A1003CA252 /* ViewerController.swift */; };
 		143803461C2452A1003CA252 /* ViewerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143803391C2452A1003CA252 /* ViewerItem.swift */; };
-		143803481C2452A1003CA252 /* PhotoViewerItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1438033A1C2452A1003CA252 /* PhotoViewerItemController.swift */; };
+		143803481C2452A1003CA252 /* ViewerItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1438033A1C2452A1003CA252 /* ViewerItemController.swift */; };
 		143B5C3B1C0EED51000B6A18 /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B5C3A1C0EED51000B6A18 /* PhotoCell.swift */; };
 		143B5C3F1C0EF76E000B6A18 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B5C3E1C0EF76E000B6A18 /* Photo.swift */; };
 		147315251C28415800B41939 /* clear.png in Resources */ = {isa = PBXBuildFile; fileRef = 147315241C28415800B41939 /* clear.png */; };
@@ -39,14 +35,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		141D8AF41C5A0FCF00DC24CB /* VideoViewerItemController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoViewerItemController.swift; sourceTree = "<group>"; };
-		141D8AF71C5A5E7400DC24CB /* ViewerItemControllable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewerItemControllable.swift; sourceTree = "<group>"; };
 		143803351C2452A1003CA252 /* NSIndexPath+Contiguous.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSIndexPath+Contiguous.swift"; sourceTree = "<group>"; };
 		143803361C2452A1003CA252 /* UIImage+CenteredFrame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+CenteredFrame.swift"; sourceTree = "<group>"; };
 		143803371C2452A1003CA252 /* UIViewController+Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Window.swift"; sourceTree = "<group>"; };
 		143803381C2452A1003CA252 /* ViewerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewerController.swift; sourceTree = "<group>"; };
 		143803391C2452A1003CA252 /* ViewerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewerItem.swift; sourceTree = "<group>"; };
-		1438033A1C2452A1003CA252 /* PhotoViewerItemController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewerItemController.swift; sourceTree = "<group>"; };
+		1438033A1C2452A1003CA252 /* ViewerItemController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewerItemController.swift; sourceTree = "<group>"; };
 		143B5C3A1C0EED51000B6A18 /* PhotoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
 		143B5C3E1C0EF76E000B6A18 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		146D72AC1AB782920058798C /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -141,9 +135,7 @@
 				143803371C2452A1003CA252 /* UIViewController+Window.swift */,
 				143803381C2452A1003CA252 /* ViewerController.swift */,
 				143803391C2452A1003CA252 /* ViewerItem.swift */,
-				141D8AF71C5A5E7400DC24CB /* ViewerItemControllable.swift */,
-				1438033A1C2452A1003CA252 /* PhotoViewerItemController.swift */,
-				141D8AF41C5A0FCF00DC24CB /* VideoViewerItemController.swift */,
+				1438033A1C2452A1003CA252 /* ViewerItemController.swift */,
 				14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */,
 			);
 			path = Source;
@@ -291,10 +283,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				141D8AF81C5A5E7400DC24CB /* ViewerItemControllable.swift in Sources */,
 				14EC47B81C58F6BC0028A0CD /* MovieContainer.swift in Sources */,
 				14A139B41AEFC72B00AD732F /* Tests.swift in Sources */,
-				141D8AF51C5A0FCF00DC24CB /* VideoViewerItemController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,11 +292,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				143803481C2452A1003CA252 /* PhotoViewerItemController.swift in Sources */,
+				143803481C2452A1003CA252 /* ViewerItemController.swift in Sources */,
 				143803461C2452A1003CA252 /* ViewerItem.swift in Sources */,
 				143803441C2452A1003CA252 /* ViewerController.swift in Sources */,
 				143803421C2452A1003CA252 /* UIViewController+Window.swift in Sources */,
-				141D8AF91C5A5E7400DC24CB /* ViewerItemControllable.swift in Sources */,
 				143B5C3F1C0EF76E000B6A18 /* Photo.swift in Sources */,
 				14C984001C0DE79200B5E515 /* AppDelegate.swift in Sources */,
 				14EC47B91C58F6C00028A0CD /* MovieContainer.swift in Sources */,
@@ -314,7 +303,6 @@
 				1438033E1C2452A1003CA252 /* NSIndexPath+Contiguous.swift in Sources */,
 				14B9C0FE1C2020C600FDE58B /* HeaderView.swift in Sources */,
 				14B9C1001C2020CB00FDE58B /* FooterView.swift in Sources */,
-				141D8AF61C5A0FCF00DC24CB /* VideoViewerItemController.swift in Sources */,
 				14C9840B1C0DE7B300B5E515 /* CollectionController.swift in Sources */,
 				14A4EDBC1C216E3F00411FC6 /* PopupController.swift in Sources */,
 				143803401C2452A1003CA252 /* UIImage+CenteredFrame.swift in Sources */,

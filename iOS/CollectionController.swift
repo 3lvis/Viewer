@@ -1,7 +1,7 @@
 import UIKit
 
 class CollectionController: UICollectionViewController {
-    var items = Item.constructElements()
+    var photos = Photo.constructElements()
     var viewerController: ViewerController?
 
     override func viewDidLoad() {
@@ -52,12 +52,12 @@ class CollectionController: UICollectionViewController {
 
 extension CollectionController {
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.items.count
+        return self.photos.count
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
-        let photo = self.items[indexPath.row]
+        let photo = self.photos[indexPath.row]
         cell.image = photo.placeholder
 
         return cell
@@ -74,7 +74,7 @@ extension CollectionController {
 
 extension CollectionController: ViewerControllerDataSource {
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
-        return self.items[indexPath.row]
+        return self.photos[indexPath.row]
     }
 }
 

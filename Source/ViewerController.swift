@@ -60,14 +60,9 @@ public class ViewerController: UIPageViewController {
     public weak var controllerDataSource: ViewerControllerDataSource?
 
     /**
-     Cache for the reused PhotoViewerItemControllers
+     Cache for the reused ViewerItemControllers
      */
-    private let photoViewerItemControllerCache = NSCache()
-
-    /**
-     Cache for the reused VideoViewerItemControllers
-     */
-    private let videoViewerItemControllerCache = NSCache()
+    private let viewerItemControllerCache = NSCache()
 
     /**
      Temporary variable used to present the initial controller on viewDidAppear
@@ -186,47 +181,27 @@ public class ViewerController: UIPageViewController {
         return presentedView
     }
 
-    private func findOrCreateViewerItemController(indexPath: NSIndexPath) -> ViewerItemControllable {
+    private func findOrCreateViewerItemController(indexPath: NSIndexPath) -> ViewerItemController {
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
-        if viewerItem.type == .Photo {
-            var viewerItemController: PhotoViewerItemController
+        var viewerItemController: ViewerItemController
 
-            if let cachedController = self.photoViewerItemControllerCache.objectForKey(viewerItem.remoteID!) as? PhotoViewerItemController {
-                viewerItemController = cachedController
-            } else {
-                viewerItemController = PhotoViewerItemController()
-                viewerItemController.controllerDelegate = self
-
-                let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
-                gesture.delegate = self
-                viewerItemController.imageView.addGestureRecognizer(gesture)
-
-                self.photoViewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.remoteID!)
-            }
-
-            viewerItemController.viewerItem = viewerItem
-            viewerItemController.indexPath = indexPath
-            return viewerItemController
+        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.remoteID!) as? ViewerItemController {
+            viewerItemController = cachedController
         } else {
-            var viewerItemController: VideoViewerItemController
+            viewerItemController = ViewerItemController()
+            viewerItemController.controllerDelegate = self
 
-            if let cachedController = self.videoViewerItemControllerCache.objectForKey(viewerItem.remoteID!) as? VideoViewerItemController {
-                viewerItemController = cachedController
-            } else {
-                viewerItemController = VideoViewerItemController()
-                viewerItemController.controllerDelegate = self
+            let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
+            gesture.delegate = self
+            viewerItemController.imageView.addGestureRecognizer(gesture)
 
-                let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
-                gesture.delegate = self
-                viewerItemController.imageView.addGestureRecognizer(gesture)
-
-                self.photoViewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.remoteID!)
-            }
-
-            viewerItemController.viewerItem = viewerItem
-            viewerItemController.indexPath = indexPath
-            return viewerItemController
+            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.remoteID!)
         }
+
+        viewerItemController.viewerItem = viewerItem
+        viewerItemController.indexPath = indexPath
+
+        return viewerItemController
     }
 
     private func toggleButtons(shouldShow: Bool) {
@@ -276,7 +251,7 @@ extension ViewerController {
             }) { completed in
                 self.presentingViewController?.tabBarController?.tabBar.alpha = 0
                 let controller = self.findOrCreateViewerItemController(indexPath)
-                self.setViewControllers([controller as! UIViewController], direction: .Forward, animated: false, completion: { finished in
+                self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
                     self.toggleButtons(true)
                     self.buttonsAreVisible = true
                     self.currentIndexPath = indexPath
@@ -291,11 +266,11 @@ extension ViewerController {
 
     public func dismiss(completion: (() -> Void)?) {
         let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
-        // controller.willDismiss()
+        controller.willDismiss()
         self.dismiss(controller, completion: completion)
     }
 
-    private func dismiss(viewerItemController: ViewerItemControllable, completion: (() -> Void)?) {
+    private func dismiss(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(viewerItemController.indexPath!)?.frame else { fatalError() }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath!)
@@ -367,7 +342,7 @@ extension ViewerController {
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
             self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
-            // controller.willDismiss()
+            controller.willDismiss()
         }
 
         translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
@@ -397,7 +372,7 @@ extension ViewerController {
                         self.fadeButtons(1)
                     }
                     }) { completed in
-                        // controller.didCentered()
+                        controller.didCentered()
                         self.shouldHideStatusBar = false
                         self.shouldUseLightStatusBar = true
                         #if os(iOS)
@@ -426,24 +401,24 @@ extension ViewerController {
 
 extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? PhotoViewerItemController, newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
+        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
             self.centerElementIfNotVisible(newIndexPath)
             self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
-            return (controller as! UIViewController)
+            return controller
         }
 
         return nil
     }
 
     public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? PhotoViewerItemController, newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
+        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
             self.centerElementIfNotVisible(newIndexPath)
             self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
-            return (controller as! UIViewController)
+            return controller
         }
 
         return nil
@@ -452,7 +427,7 @@ extension ViewerController: UIPageViewControllerDataSource {
 
 extension ViewerController: UIPageViewControllerDelegate {
     public func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
-        guard let controllers = pendingViewControllers as? [PhotoViewerItemController] else { fatalError() }
+        guard let controllers = pendingViewControllers as? [ViewerItemController] else { fatalError() }
 
         for controller in controllers {
             self.proposedCurrentIndexPath = controller.indexPath!
@@ -466,20 +441,13 @@ extension ViewerController: UIPageViewControllerDelegate {
     }
 }
 
-extension ViewerController: PhotoViewerItemControllerDelegate {
-    func photoViewerItemControllerDidTapItem(photoViewerItemController: PhotoViewerItemController, completion: (() -> Void)?) {
+extension ViewerController: ViewerItemControllerDelegate {
+    func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
         self.toggleButtons(self.buttonsAreVisible)
     }
 }
-
-extension ViewerController: VideoViewerItemControllerDelegate {
-    func videoViewerItemControllerDidTapItem(videoViewerItemController: VideoViewerItemController, completion: (() -> Void)?) {
-
-    }
-}
-
 
 extension ViewerController: UIGestureRecognizerDelegate {
     public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
