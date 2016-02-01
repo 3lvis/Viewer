@@ -266,6 +266,7 @@ extension ViewerController {
 
     public func dismiss(completion: (() -> Void)?) {
         let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
+        controller.willDismiss()
         self.dismiss(controller, completion: completion)
     }
 
@@ -341,6 +342,7 @@ extension ViewerController {
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
             self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
+            controller.willDismiss()
         }
 
         translatedPoint = CGPoint(x: self.originalDraggedCenter.x, y: self.originalDraggedCenter.y + translatedPoint.y)
@@ -370,6 +372,7 @@ extension ViewerController {
                         self.fadeButtons(1)
                     }
                     }) { completed in
+                        controller.didCentered()
                         self.shouldHideStatusBar = false
                         self.shouldUseLightStatusBar = true
                         #if os(iOS)
