@@ -17,11 +17,21 @@ class PhotoCell: UICollectionViewCell {
         self.clipsToBounds = true
         self.backgroundColor = UIColor.blackColor()
         self.addSubview(self.imageView)
+        self.addSubview(self.videoIndicator)
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    lazy var videoIndicator: UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(named: "video-indicator")!
+        view.hidden = true
+        view.contentMode = .Center
+
+        return view
+    }()
 
     var image: UIImage? {
         didSet {
@@ -31,6 +41,7 @@ class PhotoCell: UICollectionViewCell {
 
     func display(photo: ViewerItem) {
         self.image = photo.placeholder
+        self.videoIndicator.hidden = photo.type == .Image
 
         if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([photo.remoteID!], options: nil).firstObject {
             Photo.resolveAsset(asset as! PHAsset, size: .Small, completion: { image in
@@ -42,6 +53,7 @@ class PhotoCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
 
+        self.videoIndicator.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.width)
         self.imageView.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
     }
 }
