@@ -4,6 +4,7 @@ struct Photo: ViewerItem {
     var remoteID: String?
     var placeholder = UIImage(named: "clear.png")!
     var url: String?
+    var local: Bool = false
 
     init(remoteID: String) {
         self.remoteID = remoteID
