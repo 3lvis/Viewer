@@ -6,6 +6,7 @@ struct Photo: ViewerItem {
         case Small, Large
     }
 
+    var type: ViewerItemType = .Image
     var remoteID: String?
     var placeholder = UIImage(named: "clear.png")!
     var url: String?
@@ -78,6 +79,11 @@ struct Photo: ViewerItem {
             fetchResult?.enumerateObjectsUsingBlock { object, index, stop in
                 if let asset = object as? PHAsset {
                     var photo = Photo(remoteID: asset.localIdentifier)
+
+                    if asset.duration > 0 {
+                        photo.type = .Video
+                    }
+
                     photo.local = true
                     elements.append(photo)
                 }

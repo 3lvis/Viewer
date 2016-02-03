@@ -46,13 +46,7 @@ extension LocalCollectionController {
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
         let photo = self.photos[indexPath.row]
-        cell.image = photo.placeholder
-
-        if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([photo.remoteID!], options: nil).firstObject {
-            Photo.resolveAsset(asset as! PHAsset, size: .Small, completion: { image in
-                cell.image = image
-            })
-        }
+        cell.display(photo)
 
         return cell
     }
