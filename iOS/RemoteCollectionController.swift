@@ -58,7 +58,7 @@ extension RemoteCollectionController {
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
         let photo = self.photos[indexPath.row]
-        cell.image = photo.placeholder
+        cell.display(photo)
 
         return cell
     }

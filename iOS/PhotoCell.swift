@@ -33,20 +33,17 @@ class PhotoCell: UICollectionViewCell {
         return view
     }()
 
-    var image: UIImage? {
-        didSet {
-            self.imageView.image = image
-        }
-    }
-
     func display(photo: ViewerItem) {
-        self.image = photo.placeholder
         self.videoIndicator.hidden = photo.type == .Image
 
-        if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([photo.remoteID!], options: nil).firstObject {
-            Photo.resolveAsset(asset as! PHAsset, size: .Small, completion: { image in
-                self.image = image
-            })
+        if photo.local {
+            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([photo.remoteID!], options: nil).firstObject {
+                Photo.resolveAsset(asset as! PHAsset, size: .Small, completion: { image in
+                    self.imageView.image = image
+                })
+            }
+        } else {
+            self.imageView.image = photo.placeholder
         }
     }
 
