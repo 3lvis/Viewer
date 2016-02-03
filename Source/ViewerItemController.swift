@@ -1,6 +1,7 @@
 import UIKit
 import AVFoundation
 import AVKit
+import Photos
 
 protocol ViewerItemControllerDelegate: class {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?)
@@ -43,11 +44,27 @@ class ViewerItemController: UIViewController {
                 self.imageView.image = viewerItem.placeholder
                 self.movieContainer.frame = viewerItem.placeholder.centeredFrame()
 
-                if let url = viewerItem.url {
+                if viewerItem.type == .Video {
                     self.movieContainer.loadingIndicator.startAnimating()
-                    let steamingURL = NSURL(string: url)!
-                    self.movieContainer.player = AVPlayer(URL: steamingURL)
-                    self.movieContainer.playerLayer.player = self.movieContainer.player
+
+                    if let url = viewerItem.url {
+                        let steamingURL = NSURL(string: url)!
+                        self.movieContainer.player = AVPlayer(URL: steamingURL)
+                        self.movieContainer.playerLayer.player = self.movieContainer.player
+                    } else if let remoteID = viewerItem.remoteID where viewerItem.local == true {
+                        let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([remoteID], options: nil)
+                        if let object = fechResult.firstObject as? PHAsset {
+                            PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: nil, resultHandler: { playerItem, _ in
+                                if let playerItem = playerItem {
+                                    dispatch_async(dispatch_get_main_queue(), {
+                                        self.movieContainer.player = AVPlayer(playerItem: playerItem)
+                                        self.movieContainer.playerLayer.player = self.movieContainer.player
+                                        self.movieContainer.start()
+                                    })
+                                }
+                            })
+                        }
+                    }
                 } else {
                     viewerItem.media({ image in
                         if let image = image {
@@ -89,7 +106,7 @@ class ViewerItemController: UIViewController {
     }
 
     func didCentered() {
-        // If it has already started then it will not play :(
+        // WARNING: If it has already started then it will not play :(
         self.movieContainer.start()
     }
 }

@@ -30,11 +30,7 @@ class MovieContainer: UIView {
     }
 
     var shouldRegisterForNotifications = true
-    var player: AVPlayer? {
-        didSet {
-            self.start()
-        }
-    }
+    var player: AVPlayer?
 
     override func layoutSubviews() {
         super.layoutSubviews()

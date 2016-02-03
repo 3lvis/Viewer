@@ -1,7 +1,8 @@
 import UIKit
+import Photos
 
-class CollectionController: UICollectionViewController {
-    var photos = Photo.constructElements()
+class LocalCollectionController: UICollectionViewController {
+    var photos = [ViewerItem]()
     var viewerController: ViewerController?
 
     override func viewDidLoad() {
@@ -9,27 +10,14 @@ class CollectionController: UICollectionViewController {
 
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
+    }
 
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.ClearNotificationName, object: nil, queue: nil) { notification in
-            self.viewerController?.dismiss(nil)
-        }
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
 
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
-            let button = notification.object as! UIButton
-            let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
-            let optionsController = OptionsController(sourceView: button, sourceRect: rect)
-            optionsController.controllerDelegate = self
-            self.viewerController?.presentViewController(optionsController, animated: true, completion: nil)
-        }
-
-        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
-            let alertController = self.alertControllerWithTitle("Favorite pressed")
-            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
-        }
-
-        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.DeleteNotificationName, object: nil, queue: nil) { notification in
-            let alertController = self.alertControllerWithTitle("Delete pressed")
-            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+        Photo.checkAuthorizationStatus { success in
+            self.photos = Photo.constructLocalElements()
+            self.collectionView?.reloadData()
         }
     }
 
@@ -50,7 +38,7 @@ class CollectionController: UICollectionViewController {
     }
 }
 
-extension CollectionController {
+extension LocalCollectionController {
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.photos.count
     }
@@ -58,7 +46,7 @@ extension CollectionController {
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
         let photo = self.photos[indexPath.row]
-        cell.image = photo.placeholder
+        cell.display(photo)
 
         return cell
     }
@@ -72,14 +60,14 @@ extension CollectionController {
     }
 }
 
-extension CollectionController: ViewerControllerDataSource {
+extension LocalCollectionController: ViewerControllerDataSource {
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
-        return self.photos[indexPath.row]
-    }
-}
+        var item = self.photos[indexPath.row]
+        if let cell = self.collectionView?.cellForItemAtIndexPath(indexPath) as? PhotoCell, placeholder = cell.imageView.image {
+            item.placeholder = placeholder
+        }
+        self.photos[indexPath.row] = item
 
-extension CollectionController: OptionsControllerDelegate {
-    func optionsController(optionsController: OptionsController, didSelectOption option: String) {
-        self.viewerController?.dismissViewControllerAnimated(true, completion: nil)
+        return self.photos[indexPath.row]
     }
 }
