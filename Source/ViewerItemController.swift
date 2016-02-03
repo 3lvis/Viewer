@@ -107,7 +107,8 @@ class ViewerItemController: UIViewController {
     }
 
     func didCentered() {
-        // WARNING: If it has already started then it will not play :(
         self.movieContainer.start()
+        self.movieContainer.loadingIndicator.stopAnimating()
+        self.movieContainer.player?.play()
     }
 }

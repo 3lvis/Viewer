@@ -54,9 +54,10 @@ class MovieContainer: UIView {
     }
 
     func stopPlayerAndRemoveObserverIfNecessary() {
+        self.loadingIndicator.stopAnimating()
+        self.player?.pause()
+
         if self.shouldRegisterForNotifications == false {
-            self.loadingIndicator.stopAnimating()
-            self.player?.pause()
             self.player?.removeObserver(self, forKeyPath: "status")
             self.shouldRegisterForNotifications = true
         }
