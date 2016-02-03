@@ -16,18 +16,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         layout.minimumInteritemSpacing = 1
         let size = (bounds.width - numberOfColumns) / numberOfColumns
         layout.itemSize = CGSize(width: size, height: size)
-        let controller = RemoteCollectionController(collectionViewLayout: layout)
-        controller.title = "Images"
-        let navigationController = UINavigationController(rootViewController: controller)
+
+        let remoteController = RemoteCollectionController(collectionViewLayout: layout)
+        remoteController.title = "Remote"
+        let remoteNavigationController = UINavigationController(rootViewController: remoteController)
+
+        let localController = LocalCollectionController(collectionViewLayout: layout)
+        localController.title = "Local"
+        let localNavigationController = UINavigationController(rootViewController: localController)
 
         if AppDelegate.IsLightStatusBar {
             UINavigationBar.appearance().barTintColor = UIColor.orangeColor()
             UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName : UIColor.whiteColor()]
-            navigationController.navigationBar.barStyle = .Black
+            remoteNavigationController.navigationBar.barStyle = .Black
+            localNavigationController.navigationBar.barStyle = .Black
         }
 
         let tabBarController = UITabBarController()
-        tabBarController.setViewControllers([navigationController], animated: false)
+        tabBarController.setViewControllers([remoteNavigationController, localNavigationController], animated: false)
 
         self.window?.rootViewController = tabBarController
         self.window!.makeKeyAndVisible()

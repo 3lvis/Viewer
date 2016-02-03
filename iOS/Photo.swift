@@ -1,6 +1,11 @@
 import UIKit
+import Photos
 
 struct Photo: ViewerItem {
+    enum Size {
+        case Small, Large
+    }
+
     var remoteID: String?
     var placeholder = UIImage(named: "clear.png")!
     var url: String?
@@ -11,10 +16,18 @@ struct Photo: ViewerItem {
     }
 
     func media(completion: (image: UIImage?) -> ()) {
-        completion(image: self.placeholder)
+        if self.local {
+            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([self.remoteID!], options: nil).firstObject {
+                Photo.resolveAsset(asset as! PHAsset, size: .Large, completion: { image in
+                    completion(image: image)
+                })
+            }
+        } else {
+            completion(image: self.placeholder)
+        }
     }
 
-    static func constructElements() -> [ViewerItem] {
+    static func constructRemoteElements() -> [ViewerItem] {
         var elements = [ViewerItem]()
 
         for i in 1..<60 {
@@ -46,5 +59,80 @@ struct Photo: ViewerItem {
         }
 
         return elements
+    }
+
+    static func constructLocalElements() -> [ViewerItem] {
+        var elements = [ViewerItem]()
+
+        let fetchOptions = PHFetchOptions()
+        let authorizationStatus = PHPhotoLibrary.authorizationStatus()
+        var fetchResult: PHFetchResult?
+
+        guard authorizationStatus == .Authorized else { abort() }
+
+        if fetchResult == nil {
+            fetchResult = PHAsset.fetchAssetsWithOptions(fetchOptions)
+        }
+
+        if fetchResult?.count > 0 {
+            fetchResult?.enumerateObjectsUsingBlock { object, index, stop in
+                if let asset = object as? PHAsset {
+                    var photo = Photo(remoteID: asset.localIdentifier)
+                    photo.local = true
+                    elements.append(photo)
+                }
+            }
+        }
+
+        return elements
+    }
+
+    static func resolveAsset(asset: PHAsset, size: Photo.Size, completion: (image: UIImage?) -> Void) {
+        let imageManager = PHImageManager.defaultManager()
+        let requestOptions = PHImageRequestOptions()
+
+        var targetSize = CGSizeZero
+        if size == .Small {
+            targetSize = CGSize(width: 300, height: 300)
+
+            imageManager.requestImageForAsset(asset, targetSize: targetSize, contentMode: PHImageContentMode.AspectFill, options: requestOptions) { image, info in
+                if let info = info where info["PHImageFileUTIKey"] == nil {
+                    dispatch_async(dispatch_get_main_queue(), {
+                        completion(image: image)
+                    })
+                }
+            }
+        } else {
+            let size = UIScreen.mainScreen().bounds.size
+            targetSize = CGSize(width: size.width * 3, height: size.height * 3)
+            requestOptions.deliveryMode = .HighQualityFormat
+
+            imageManager.requestImageDataForAsset(asset, options: nil) { data, _, _, _ in
+                if let data = data, image = UIImage(data: data) {
+                    dispatch_async(dispatch_get_main_queue(), {
+                        completion(image: image)
+                    })
+                }
+            }
+        }
+    }
+
+    static func checkAuthorizationStatus(completion: (success: Bool) -> Void) {
+        let currentStatus = PHPhotoLibrary.authorizationStatus()
+
+        guard currentStatus != .Authorized else {
+            completion(success: true)
+            return
+        }
+
+        PHPhotoLibrary.requestAuthorization { authorizationStatus in
+            dispatch_async(dispatch_get_main_queue(), {
+                if authorizationStatus == .Denied {
+                    completion(success: false)
+                } else if authorizationStatus == .Authorized {
+                    completion(success: true)
+                }
+            })
+        }
     }
 }

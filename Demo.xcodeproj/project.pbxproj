@@ -30,6 +30,7 @@
 		14D081371C18579700E3FFC3 /* 0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081341C18579700E3FFC3 /* 0.jpg */; };
 		14D081381C18579700E3FFC3 /* 1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081351C18579700E3FFC3 /* 1.jpg */; };
 		14D081391C18579700E3FFC3 /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081361C18579700E3FFC3 /* 2.jpg */; };
+		14D33A861C6203FA00A8BE11 /* LocalCollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D33A851C6203FA00A8BE11 /* LocalCollectionController.swift */; };
 		14EC47B81C58F6BC0028A0CD /* MovieContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */; };
 		14EC47B91C58F6C00028A0CD /* MovieContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */; };
 /* End PBXBuildFile section */
@@ -67,6 +68,7 @@
 		14D081341C18579700E3FFC3 /* 0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 0.jpg; sourceTree = "<group>"; };
 		14D081351C18579700E3FFC3 /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
 		14D081361C18579700E3FFC3 /* 2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2.jpg; sourceTree = "<group>"; };
+		14D33A851C6203FA00A8BE11 /* LocalCollectionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalCollectionController.swift; sourceTree = "<group>"; };
 		14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieContainer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -158,6 +160,7 @@
 			children = (
 				14C983FF1C0DE79200B5E515 /* AppDelegate.swift */,
 				14C9840A1C0DE7B300B5E515 /* RemoteCollectionController.swift */,
+				14D33A851C6203FA00A8BE11 /* LocalCollectionController.swift */,
 				143B5C3A1C0EED51000B6A18 /* PhotoCell.swift */,
 				143B5C3E1C0EF76E000B6A18 /* Photo.swift */,
 				14B9C0FD1C2020C600FDE58B /* HeaderView.swift */,
@@ -301,6 +304,7 @@
 				14EC47B91C58F6C00028A0CD /* MovieContainer.swift in Sources */,
 				143B5C3B1C0EED51000B6A18 /* PhotoCell.swift in Sources */,
 				1438033E1C2452A1003CA252 /* NSIndexPath+Contiguous.swift in Sources */,
+				14D33A861C6203FA00A8BE11 /* LocalCollectionController.swift in Sources */,
 				14B9C0FE1C2020C600FDE58B /* HeaderView.swift in Sources */,
 				14B9C1001C2020CB00FDE58B /* FooterView.swift in Sources */,
 				14C9840B1C0DE7B300B5E515 /* RemoteCollectionController.swift in Sources */,
