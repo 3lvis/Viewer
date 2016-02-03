@@ -1,7 +1,10 @@
 import UIKit
 import AVFoundation
 import AVKit
-import Photos
+
+#if os(iOS)
+    import Photos
+#endif
 
 protocol ViewerItemControllerDelegate: class {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?)
@@ -53,18 +56,20 @@ class ViewerItemController: UIViewController {
                         self.movieContainer.playerLayer.player = self.movieContainer.player
                         self.movieContainer.start()
                     } else if let remoteID = viewerItem.remoteID where viewerItem.local == true {
-                        let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([remoteID], options: nil)
-                        if let object = fechResult.firstObject as? PHAsset {
-                            PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: nil, resultHandler: { playerItem, _ in
-                                if let playerItem = playerItem {
-                                    dispatch_async(dispatch_get_main_queue(), {
-                                        self.movieContainer.player = AVPlayer(playerItem: playerItem)
-                                        self.movieContainer.playerLayer.player = self.movieContainer.player
-                                        self.movieContainer.start()
-                                    })
-                                }
-                            })
-                        }
+                        #if os(iOS)
+                            let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([remoteID], options: nil)
+                            if let object = fechResult.firstObject as? PHAsset {
+                                PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: nil, resultHandler: { playerItem, _ in
+                                    if let playerItem = playerItem {
+                                        dispatch_async(dispatch_get_main_queue(), {
+                                            self.movieContainer.player = AVPlayer(playerItem: playerItem)
+                                            self.movieContainer.playerLayer.player = self.movieContainer.player
+                                            self.movieContainer.start()
+                                        })
+                                    }
+                                })
+                            }
+                        #endif
                     }
                 } else {
                     viewerItem.media({ image in
