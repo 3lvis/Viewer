@@ -1,6 +1,6 @@
 import UIKit
 
-class CollectionController: UICollectionViewController {
+class RemoteCollectionController: UICollectionViewController {
     var photos = Photo.constructElements()
     var viewerController: ViewerController?
 
@@ -50,7 +50,7 @@ class CollectionController: UICollectionViewController {
     }
 }
 
-extension CollectionController {
+extension RemoteCollectionController {
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.photos.count
     }
@@ -72,13 +72,13 @@ extension CollectionController {
     }
 }
 
-extension CollectionController: ViewerControllerDataSource {
+extension RemoteCollectionController: ViewerControllerDataSource {
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
         return self.photos[indexPath.row]
     }
 }
 
-extension CollectionController: OptionsControllerDelegate {
+extension RemoteCollectionController: OptionsControllerDelegate {
     func optionsController(optionsController: OptionsController, didSelectOption option: String) {
         self.viewerController?.dismissViewControllerAnimated(true, completion: nil)
     }

@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         layout.minimumInteritemSpacing = 1
         let size = (bounds.width - numberOfColumns) / numberOfColumns
         layout.itemSize = CGSize(width: size, height: size)
-        let controller = CollectionController(collectionViewLayout: layout)
+        let controller = RemoteCollectionController(collectionViewLayout: layout)
         controller.title = "Images"
         let navigationController = UINavigationController(rootViewController: controller)
 
