@@ -51,6 +51,7 @@ class ViewerItemController: UIViewController {
                         let steamingURL = NSURL(string: url)!
                         self.movieContainer.player = AVPlayer(URL: steamingURL)
                         self.movieContainer.playerLayer.player = self.movieContainer.player
+                        self.movieContainer.start()
                     } else if let remoteID = viewerItem.remoteID where viewerItem.local == true {
                         let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([remoteID], options: nil)
                         if let object = fechResult.firstObject as? PHAsset {
