@@ -294,8 +294,9 @@ extension ViewerController {
             presentedView.center = viewerItemController.imageView.center
         }
 
-        self.view.addSubview(self.overlayView)
-        self.view.addSubview(presentedView)
+        let window = self.applicationWindow()
+        window.addSubview(self.overlayView)
+        window.addSubview(presentedView)
         self.shouldUseLightStatusBar = false
 
         UIView.animateWithDuration(0.30, animations: {
