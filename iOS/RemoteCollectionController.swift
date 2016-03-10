@@ -3,6 +3,7 @@ import UIKit
 class RemoteCollectionController: UICollectionViewController {
     var photos = Photo.constructRemoteElements()
     var viewerController: ViewerController?
+    var optionsController: OptionsController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,9 +18,9 @@ class RemoteCollectionController: UICollectionViewController {
         NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
             let button = notification.object as! UIButton
             let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
-            let optionsController = OptionsController(sourceView: button, sourceRect: rect)
-            optionsController.controllerDelegate = self
-            self.viewerController?.presentViewController(optionsController, animated: true, completion: nil)
+            self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
+            self.optionsController!.controllerDelegate = self
+            self.viewerController?.presentViewController(self.optionsController!, animated: true, completion: nil)
         }
 
         NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
@@ -80,6 +81,8 @@ extension RemoteCollectionController: ViewerControllerDataSource {
 
 extension RemoteCollectionController: OptionsControllerDelegate {
     func optionsController(optionsController: OptionsController, didSelectOption option: String) {
-        self.viewerController?.dismissViewControllerAnimated(true, completion: nil)
+        self.optionsController?.dismissViewControllerAnimated(true) {
+            self.viewerController?.dismiss(nil)
+        }
     }
 }
