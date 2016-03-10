@@ -230,14 +230,16 @@ extension ViewerController {
         let image = viewerItem.placeholder
         selectedCell.alpha = 0
 
+        let window = self.applicationWindow()
+
         let presentedView = self.presentedViewCopy()
-        presentedView.frame = self.view.convertRect(selectedCell.frame, fromView: self.collectionView)
+        presentedView.frame = window.convertRect(selectedCell.frame, fromView: self.collectionView)
         presentedView.image = image
 
-        self.view.addSubview(self.overlayView)
-        self.view.addSubview(presentedView)
-        self.view.addSubview(self.headerView)
-        self.view.addSubview(self.footerView)
+        window.addSubview(self.overlayView)
+        window.addSubview(presentedView)
+        window.addSubview(self.headerView)
+        window.addSubview(self.footerView)
 
         let centeredImageFrame = image.centeredFrame()
         UIView.animateWithDuration(0.25, animations: {
@@ -294,8 +296,9 @@ extension ViewerController {
             presentedView.center = viewerItemController.imageView.center
         }
 
-        self.view.addSubview(self.overlayView)
-        self.view.addSubview(presentedView)
+        let window = self.applicationWindow()
+        window.addSubview(self.overlayView)
+        window.addSubview(presentedView)
         self.shouldUseLightStatusBar = false
 
         UIView.animateWithDuration(0.30, animations: {
@@ -304,7 +307,7 @@ extension ViewerController {
             #if os(iOS)
                 self.setNeedsStatusBarAppearanceUpdate()
             #endif
-            presentedView.frame = self.view.convertRect(selectedCellFrame, fromView: self.collectionView)
+            presentedView.frame = window.convertRect(selectedCellFrame, fromView: self.collectionView)
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(viewerItemController.indexPath!) {
                     existingCell.alpha = 1
