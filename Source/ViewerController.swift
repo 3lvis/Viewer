@@ -401,7 +401,6 @@ extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
             self.centerElementIfNotVisible(newIndexPath)
-            self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
             return controller
@@ -413,7 +412,6 @@ extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
             self.centerElementIfNotVisible(newIndexPath)
-            self.controllerDelegate?.viewerController(self, didChangeIndexPath: newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
             return controller
@@ -428,12 +426,14 @@ extension ViewerController: UIPageViewControllerDelegate {
         guard let controllers = pendingViewControllers as? [ViewerItemController] else { fatalError() }
 
         for controller in controllers {
+            self.controllerDelegate?.viewerController(self, didChangeIndexPath: controller.indexPath!)
             self.proposedCurrentIndexPath = controller.indexPath!
         }
     }
 
     public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if completed {
+            self.controllerDelegate?.viewerController(self, didChangeIndexPath: self.proposedCurrentIndexPath)
             self.currentIndexPath = self.proposedCurrentIndexPath
         }
     }
