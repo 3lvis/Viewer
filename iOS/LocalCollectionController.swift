@@ -10,6 +10,25 @@ class LocalCollectionController: UICollectionViewController {
 
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
+
+        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.ClearNotificationName, object: nil, queue: nil) { notification in
+            self.viewerController?.dismiss(nil)
+        }
+
+        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
+            let alertController = self.alertControllerWithTitle("Options pressed")
+            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+        }
+
+        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
+            let alertController = self.alertControllerWithTitle("Favorite pressed")
+            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+        }
+
+        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.DeleteNotificationName, object: nil, queue: nil) { notification in
+            let alertController = self.alertControllerWithTitle("Delete pressed")
+            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+        }
     }
 
     override func viewDidAppear(animated: Bool) {
