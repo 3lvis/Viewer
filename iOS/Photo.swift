@@ -16,15 +16,15 @@ struct Photo: ViewerItem {
         self.remoteID = remoteID
     }
 
-    func media(completion: (image: UIImage?) -> ()) {
+    func media(completion: (image: UIImage?, error: NSError?) -> ()) {
         if self.local {
             if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([self.remoteID!], options: nil).firstObject {
                 Photo.resolveAsset(asset as! PHAsset, size: .Large, completion: { image in
-                    completion(image: image)
+                    completion(image: image, error: nil)
                 })
             }
         } else {
-            completion(image: self.placeholder)
+            completion(image: self.placeholder, error: nil)
         }
     }
 

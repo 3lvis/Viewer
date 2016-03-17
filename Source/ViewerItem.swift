@@ -12,5 +12,5 @@ public protocol ViewerItem {
     var url: String? { get }
     var local: Bool { get }
 
-    func media(completion: (image: UIImage?) -> ())
+    func media(completion: (image: UIImage?, error: NSError?) -> ())
 }

@@ -72,7 +72,7 @@ class ViewerItemController: UIViewController {
                         #endif
                     }
                 } else {
-                    viewerItem.media({ image in
+                    viewerItem.media({ image, error in
                         if let image = image {
                             self.imageView.image = image
                         }
