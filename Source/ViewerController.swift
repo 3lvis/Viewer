@@ -191,7 +191,7 @@ public class ViewerController: UIPageViewController {
             viewerItemController = ViewerItemController()
             viewerItemController.controllerDelegate = self
 
-            let gesture = UIPanGestureRecognizer(target: self, action: "panAction:")
+            let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
             gesture.delegate = self
             viewerItemController.imageView.addGestureRecognizer(gesture)
 

@@ -91,7 +91,7 @@ class ViewerItemController: UIViewController {
         self.view.addSubview(self.imageView)
         self.view.addSubview(self.movieContainer)
 
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: "tapAction")
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewerItemController.tapAction))
         self.view.addGestureRecognizer(tapRecognizer)
     }
 

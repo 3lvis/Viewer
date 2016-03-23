@@ -10,7 +10,7 @@ class HeaderView: UIView {
         let image = UIImage(named: "clear")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: "clearAction:", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(HeaderView.clearAction(_:)), forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -19,7 +19,7 @@ class HeaderView: UIView {
         let image = UIImage(named: "menu")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: "menuAction:", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(HeaderView.menuAction(_:)), forControlEvents: .TouchUpInside)
 
         return button
     }()

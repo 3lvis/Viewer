@@ -9,7 +9,7 @@ class FooterView: UIView {
         let image = UIImage(named: "favorite")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: "favoriteAction:", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(FooterView.favoriteAction(_:)), forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -18,7 +18,7 @@ class FooterView: UIView {
         let image = UIImage(named: "delete")!
         let button = UIButton(type: .Custom)
         button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: "deleteAction:", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(FooterView.deleteAction(_:)), forControlEvents: .TouchUpInside)
 
         return button
     }()
