@@ -241,13 +241,13 @@ extension ViewerController {
 
         let centeredImageFrame = image.centeredFrame()
         UIView.animateWithDuration(0.25, animations: {
+            self.presentingViewController?.tabBarController?.tabBar.alpha = 0
             self.overlayView.alpha = 1.0
             #if os(iOS)
                 self.setNeedsStatusBarAppearanceUpdate()
             #endif
             presentedView.frame = centeredImageFrame
             }) { completed in
-                self.presentingViewController?.tabBarController?.tabBar.alpha = 0
                 let controller = self.findOrCreateViewerItemController(indexPath)
                 self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
                     self.toggleButtons(true)
