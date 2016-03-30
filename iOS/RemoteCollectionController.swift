@@ -11,18 +11,6 @@ class RemoteCollectionController: UICollectionViewController {
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
 
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.ClearNotificationName, object: nil, queue: nil) { notification in
-            self.viewerController?.dismiss(nil)
-        }
-
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
-            let button = notification.object as! UIButton
-            let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
-            self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
-            self.optionsController!.controllerDelegate = self
-            self.viewerController?.presentViewController(self.optionsController!, animated: true, completion: nil)
-        }
-
         NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
             let alertController = self.alertControllerWithTitle("Favorite pressed")
             self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
@@ -88,5 +76,18 @@ extension RemoteCollectionController: OptionsControllerDelegate {
         self.optionsController?.dismissViewControllerAnimated(true) {
             self.viewerController?.dismiss(nil)
         }
+    }
+}
+
+extension RemoteCollectionController: HeaderViewDelegate {
+    func headerView(headerView: HeaderView, didPressClearButton button: UIButton) {
+        self.viewerController?.dismiss(nil)
+    }
+
+    func headerView(headerView: HeaderView, didPressMenuButton button: UIButton) {
+        let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
+        self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
+        self.optionsController!.controllerDelegate = self
+        self.viewerController?.presentViewController(self.optionsController!, animated: true, completion: nil)
     }
 }

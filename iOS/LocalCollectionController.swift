@@ -11,15 +11,6 @@ class LocalCollectionController: UICollectionViewController {
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
 
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.ClearNotificationName, object: nil, queue: nil) { notification in
-            self.viewerController?.dismiss(nil)
-        }
-
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
-            let alertController = self.alertControllerWithTitle("Options pressed")
-            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
-        }
-
         NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
             let alertController = self.alertControllerWithTitle("Favorite pressed")
             self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
@@ -88,5 +79,16 @@ extension LocalCollectionController: ViewerControllerDataSource {
         self.photos[indexPath.row] = item
 
         return self.photos[indexPath.row]
+    }
+}
+
+extension LocalCollectionController: HeaderViewDelegate {
+    func headerView(headerView: HeaderView, didPressClearButton button: UIButton) {
+        self.viewerController?.dismiss(nil)
+    }
+
+    func headerView(headerView: HeaderView, didPressMenuButton button: UIButton) {
+        let alertController = self.alertControllerWithTitle("Options pressed")
+        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
     }
 }
