@@ -67,7 +67,11 @@ extension RemoteCollectionController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, headerViewClass: HeaderView.self, footerViewClass: FooterView.self)
+        self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+        let headerView = HeaderView()
+        self.viewerController?.headerView = headerView
+        let footerView = FooterView()
+        self.viewerController?.footerView = footerView
         self.viewerController!.controllerDataSource = self
         self.presentViewController(self.viewerController!, animated: false, completion: nil)
     }

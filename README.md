@@ -6,7 +6,7 @@ From your UICollectionView:
 override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
     guard let collectionView = self.collectionView else { return }
 
-    let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, headerViewClass: HeaderView.self, footerViewClass: FooterView.self)
+    let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
     viewerController.controllerDataSource = self
     self.presentViewController(viewerController, animated: false, completion: nil)
 }
