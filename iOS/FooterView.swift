@@ -1,8 +1,12 @@
 import UIKit
 
+protocol FooterViewDelegate: class {
+    func footerView(footerView: FooterView, didPressFavoriteButton button: UIButton)
+    func footerView(footerView: FooterView, didPressDeleteButton button: UIButton)
+}
+
 class FooterView: UIView {
-    static let FavoriteNotificationName  = "FavoriteNotificationName"
-    static let DeleteNotificationName  = "DeleteNotificationName"
+    weak var viewDelegate: FooterViewDelegate?
     static let ButtonSize = CGFloat(50.0)
 
     lazy var favoriteButton: UIButton = {
@@ -52,10 +56,10 @@ class FooterView: UIView {
 
 
     func favoriteAction(button: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(FooterView.FavoriteNotificationName, object: button)
+        viewDelegate?.footerView(self, didPressFavoriteButton: button)
     }
 
     func deleteAction(button: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(FooterView.DeleteNotificationName, object: button)
+        viewDelegate?.footerView(self, didPressDeleteButton: button)
     }
 }

@@ -7,6 +7,12 @@ override func collectionView(collectionView: UICollectionView, didSelectItemAtIn
     guard let collectionView = self.collectionView else { return }
 
     let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+    let headerView = HeaderView()
+    headerView.viewDelegate = self
+    self.viewerController?.headerView = headerView
+    let footerView = FooterView()
+    footerView.viewDelegate = self
+    self.viewerController?.footerView = footerView
     viewerController.controllerDataSource = self
     self.presentViewController(viewerController, animated: false, completion: nil)
 }

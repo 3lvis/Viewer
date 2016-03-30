@@ -10,16 +10,6 @@ class LocalCollectionController: UICollectionViewController {
 
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
-
-        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
-            let alertController = self.alertControllerWithTitle("Favorite pressed")
-            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
-        }
-
-        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.DeleteNotificationName, object: nil, queue: nil) { notification in
-            let alertController = self.alertControllerWithTitle("Delete pressed")
-            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
-        }
     }
 
     override func viewDidAppear(animated: Bool) {
@@ -65,6 +55,12 @@ extension LocalCollectionController {
         guard let collectionView = self.collectionView else { return }
 
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+        let headerView = HeaderView()
+        headerView.viewDelegate = self
+        self.viewerController?.headerView = headerView
+        let footerView = FooterView()
+        footerView.viewDelegate = self
+        self.viewerController?.footerView = footerView
         self.viewerController!.controllerDataSource = self
         self.presentViewController(self.viewerController!, animated: false, completion: nil)
     }
@@ -89,6 +85,18 @@ extension LocalCollectionController: HeaderViewDelegate {
 
     func headerView(headerView: HeaderView, didPressMenuButton button: UIButton) {
         let alertController = self.alertControllerWithTitle("Options pressed")
+        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+    }
+}
+
+extension LocalCollectionController: FooterViewDelegate {
+    func footerView(footerView: FooterView, didPressFavoriteButton button: UIButton) {
+        let alertController = self.alertControllerWithTitle("Favorite pressed")
+        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+    }
+
+    func footerView(footerView: FooterView, didPressDeleteButton button: UIButton) {
+        let alertController = self.alertControllerWithTitle("Delete pressed")
         self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
     }
 }
