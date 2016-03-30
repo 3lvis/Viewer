@@ -30,13 +30,11 @@ public class ViewerController: UIPageViewController {
 
     // MARK: Initializers
 
-    public init(initialIndexPath: NSIndexPath, collectionView: UICollectionView, headerViewClass: AnyClass, footerViewClass: AnyClass) {
+    public init(initialIndexPath: NSIndexPath, collectionView: UICollectionView) {
         self.initialIndexPath = initialIndexPath
         self.currentIndexPath = initialIndexPath
         self.proposedCurrentIndexPath = initialIndexPath
         self.collectionView = collectionView
-        self.headerViewClass = headerViewClass
-        self.footerViewClass = footerViewClass
 
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
 
@@ -118,31 +116,9 @@ public class ViewerController: UIPageViewController {
         return view
     }()
 
-    private let headerViewClass: AnyClass
+    public var headerView: UIView?
 
-    private lazy var headerView: UIView = {
-        let headerClass = self.headerViewClass as! UIView.Type
-        let view = headerClass.init()
-        let bounds = UIScreen.mainScreen().bounds
-        view.frame = CGRect(x: 0, y: 0, width: bounds.width, height: ViewerController.HeaderHeight)
-        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
-        view.alpha = 0
-
-        return view
-    }()
-
-    private let footerViewClass: AnyClass
-
-    private lazy var footerView: UIView = {
-        let bounds = UIScreen.mainScreen().bounds
-        let footerClass = self.footerViewClass as! UIView.Type
-        let view = footerClass.init()
-        view.frame = CGRect(x: 0, y: bounds.size.height - ViewerController.FooterHeight, width: bounds.width, height: ViewerController.FooterHeight)
-        view.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
-        view.alpha = 0
-
-        return view
-    }()
+    public var footerView: UIView?
 
     // MARK: View Lifecycle
 
@@ -209,14 +185,14 @@ public class ViewerController: UIPageViewController {
             #if os(iOS)
                 self.setNeedsStatusBarAppearanceUpdate()
             #endif
-            self.headerView.alpha = shouldShow ? 1 : 0
-            self.footerView.alpha = shouldShow ? 1 : 0
+            self.headerView?.alpha = shouldShow ? 1 : 0
+            self.footerView?.alpha = shouldShow ? 1 : 0
         }
     }
 
     private func fadeButtons(alpha: CGFloat) {
-        self.headerView.alpha = alpha
-        self.footerView.alpha = alpha
+        self.headerView?.alpha = alpha
+        self.footerView?.alpha = alpha
     }
 }
 
@@ -236,8 +212,22 @@ extension ViewerController {
 
         self.view.addSubview(self.overlayView)
         self.view.addSubview(presentedView)
-        self.view.addSubview(self.headerView)
-        self.view.addSubview(self.footerView)
+
+        if let headerView = self.headerView {
+            let bounds = UIScreen.mainScreen().bounds
+            headerView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: ViewerController.HeaderHeight)
+            headerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
+            headerView.alpha = 0
+            self.view.addSubview(headerView)
+        }
+
+        if let footerView = self.footerView {
+            let bounds = UIScreen.mainScreen().bounds
+            footerView.frame = CGRect(x: 0, y: bounds.size.height - ViewerController.FooterHeight, width: bounds.width, height: ViewerController.FooterHeight)
+            footerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
+            footerView.alpha = 0
+            self.view.addSubview(footerView)
+        }
 
         let centeredImageFrame = image.centeredFrame()
         UIView.animateWithDuration(0.25, animations: {
@@ -311,8 +301,8 @@ extension ViewerController {
                     existingCell.alpha = 1
                 }
 
-                self.headerView.removeFromSuperview()
-                self.footerView.removeFromSuperview()
+                self.headerView?.removeFromSuperview()
+                self.footerView?.removeFromSuperview()
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
                 self.dismissViewControllerAnimated(false, completion: nil)

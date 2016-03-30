@@ -10,28 +10,6 @@ class RemoteCollectionController: UICollectionViewController {
 
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
-
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.ClearNotificationName, object: nil, queue: nil) { notification in
-            self.viewerController?.dismiss(nil)
-        }
-
-        NSNotificationCenter.defaultCenter().addObserverForName(HeaderView.MenuNotificationName, object: nil, queue: nil) { notification in
-            let button = notification.object as! UIButton
-            let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
-            self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
-            self.optionsController!.controllerDelegate = self
-            self.viewerController?.presentViewController(self.optionsController!, animated: true, completion: nil)
-        }
-
-        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.FavoriteNotificationName, object: nil, queue: nil) { notification in
-            let alertController = self.alertControllerWithTitle("Favorite pressed")
-            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
-        }
-
-        NSNotificationCenter.defaultCenter().addObserverForName(FooterView.DeleteNotificationName, object: nil, queue: nil) { notification in
-            let alertController = self.alertControllerWithTitle("Delete pressed")
-            self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
-        }
     }
 
     override func viewWillLayoutSubviews() {
@@ -67,7 +45,13 @@ extension RemoteCollectionController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, headerViewClass: HeaderView.self, footerViewClass: FooterView.self)
+        self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+        let headerView = HeaderView()
+        headerView.viewDelegate = self
+        self.viewerController?.headerView = headerView
+        let footerView = FooterView()
+        footerView.viewDelegate = self
+        self.viewerController?.footerView = footerView
         self.viewerController!.controllerDataSource = self
         self.presentViewController(self.viewerController!, animated: false, completion: nil)
     }
@@ -84,5 +68,30 @@ extension RemoteCollectionController: OptionsControllerDelegate {
         self.optionsController?.dismissViewControllerAnimated(true) {
             self.viewerController?.dismiss(nil)
         }
+    }
+}
+
+extension RemoteCollectionController: HeaderViewDelegate {
+    func headerView(headerView: HeaderView, didPressClearButton button: UIButton) {
+        self.viewerController?.dismiss(nil)
+    }
+
+    func headerView(headerView: HeaderView, didPressMenuButton button: UIButton) {
+        let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
+        self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
+        self.optionsController!.controllerDelegate = self
+        self.viewerController?.presentViewController(self.optionsController!, animated: true, completion: nil)
+    }
+}
+
+extension RemoteCollectionController: FooterViewDelegate {
+    func footerView(footerView: FooterView, didPressFavoriteButton button: UIButton) {
+        let alertController = self.alertControllerWithTitle("Favorite pressed")
+        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+    }
+
+    func footerView(footerView: FooterView, didPressDeleteButton button: UIButton) {
+        let alertController = self.alertControllerWithTitle("Delete pressed")
+        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
     }
 }

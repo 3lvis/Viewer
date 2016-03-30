@@ -1,8 +1,12 @@
 import UIKit
 
+protocol HeaderViewDelegate: class {
+    func headerView(headerView: HeaderView, didPressClearButton button: UIButton)
+    func headerView(headerView: HeaderView, didPressMenuButton button: UIButton)
+}
+
 class HeaderView: UIView {
-    static let ClearNotificationName  = "ClearNotificationName"
-    static let MenuNotificationName  = "MenuNotificationName"
+    weak var viewDelegate: HeaderViewDelegate?
     static let ButtonSize = CGFloat(50.0)
     static let TopMargin = CGFloat(15.0)
 
@@ -45,10 +49,10 @@ class HeaderView: UIView {
     }
 
     func clearAction(button: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(HeaderView.ClearNotificationName, object: button)
+        viewDelegate?.headerView(self, didPressClearButton: button)
     }
 
     func menuAction(button: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(HeaderView.MenuNotificationName, object: button)
+        viewDelegate?.headerView(self, didPressMenuButton: button)
     }
 }
