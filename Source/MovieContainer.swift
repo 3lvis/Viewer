@@ -6,6 +6,7 @@ class MovieContainer: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
+        self.addSubview(self.loadingIndicator)
         self.userInteractionEnabled = false
     }
 
@@ -23,6 +24,13 @@ class MovieContainer: UIView {
         view.autoresizingMask = [.FlexibleRightMargin, .FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleTopMargin]
 
         return view
+    }()
+
+    lazy var playButton: UIButton = {
+        let button = UIButton(type: .Custom)
+        button.backgroundColor = UIColor.redColor()
+
+        return button
     }()
 
     required init?(coder aDecoder: NSCoder) {
@@ -69,9 +77,6 @@ class MovieContainer: UIView {
 
             if self.playerLayer.superlayer == nil {
                 self.layer.addSublayer(self.playerLayer)
-            }
-            if self.loadingIndicator.superview == nil {
-                self.addSubview(self.loadingIndicator)
             }
 
             let loadingHeight = self.loadingIndicator.frame.size.height
