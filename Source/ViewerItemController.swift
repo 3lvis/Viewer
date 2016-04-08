@@ -10,8 +10,13 @@ protocol ViewerItemControllerDelegate: class {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?)
 }
 
+protocol ViewerItemControllerDataSource: class {
+    func overlayIsHidden() -> Bool
+}
+
 class ViewerItemController: UIViewController {
     weak var controllerDelegate: ViewerItemControllerDelegate?
+    weak var controllerDataSource: ViewerItemControllerDataSource?
 
     var indexPath: NSIndexPath?
 
@@ -27,6 +32,7 @@ class ViewerItemController: UIViewController {
 
     lazy var movieContainer: MovieContainer = {
         let view = MovieContainer(frame: CGRectZero)
+        view.viewDelegate = self
 
         return view
     }()
@@ -102,6 +108,15 @@ class ViewerItemController: UIViewController {
     }
 
     func tapAction() {
+        if let player = self.movieContainer.player {
+            let isPlaying = player.rate != 0 && player.error == nil
+            if isPlaying {
+                UIView.animateWithDuration(0.3) {
+                    self.movieContainer.pauseButton.alpha = self.movieContainer.pauseButton.alpha == 0 ? 1 : 0
+                }
+            }
+        }
+
         self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
     }
 
@@ -115,5 +130,14 @@ class ViewerItemController: UIViewController {
         self.movieContainer.start()
         self.movieContainer.loadingIndicator.stopAnimating()
         self.movieContainer.player?.play()
+    }
+}
+
+extension ViewerItemController: MovieContainerDelegate {
+    func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer) {
+        let overlayIsHidden = self.controllerDataSource?.overlayIsHidden() ?? false
+        if overlayIsHidden == false {
+            self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
+        }
     }
 }

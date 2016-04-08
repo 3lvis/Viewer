@@ -166,6 +166,7 @@ public class ViewerController: UIPageViewController {
         } else {
             viewerItemController = ViewerItemController()
             viewerItemController.controllerDelegate = self
+            viewerItemController.controllerDataSource = self
 
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
             gesture.delegate = self
@@ -434,6 +435,12 @@ extension ViewerController: ViewerItemControllerDelegate {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
         self.toggleButtons(self.buttonsAreVisible)
+    }
+}
+
+extension ViewerController: ViewerItemControllerDataSource {
+    func overlayIsHidden() -> Bool {
+        return !self.buttonsAreVisible
     }
 }
 
