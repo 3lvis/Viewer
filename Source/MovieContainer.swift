@@ -29,6 +29,13 @@ class MovieContainer: UIView {
         return view
     }()
 
+    private lazy var loadingIndicatorBackground: UIImageView = {
+        let view = UIImageView(image: UIImage(named: "dark-circle")!)
+        view.alpha = 0
+
+        return view
+    }()
+
     private var shouldRegisterForNotifications = true
     private var player: AVPlayer?
 
@@ -37,6 +44,7 @@ class MovieContainer: UIView {
 
         self.userInteractionEnabled = false
         self.layer.addSublayer(self.playerLayer)
+        self.addSubview(self.loadingIndicatorBackground)
         self.addSubview(self.loadingIndicator)
     }
 
@@ -55,6 +63,10 @@ class MovieContainer: UIView {
         playerLayerFrame.origin.y = 0
         self.playerLayer.frame = playerLayerFrame
 
+        let loadingBackgroundHeight = self.loadingIndicatorBackground.frame.size.height
+        let loadingBackgroundWidth = self.loadingIndicatorBackground.frame.size.width
+        self.loadingIndicatorBackground.frame = CGRect(x: (self.frame.size.width - loadingBackgroundWidth) / 2, y: (self.frame.size.height - loadingBackgroundHeight) / 2, width: loadingBackgroundWidth, height: loadingBackgroundHeight)
+
         let loadingHeight = self.loadingIndicator.frame.size.height
         let loadingWidth = self.loadingIndicator.frame.size.width
         self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
@@ -72,6 +84,7 @@ class MovieContainer: UIView {
 
     func stopPlayerAndRemoveObserverIfNecessary() {
         self.loadingIndicator.stopAnimating()
+        self.loadingIndicatorBackground.alpha = 0
         self.player?.pause()
 
         if self.shouldRegisterForNotifications == false {
@@ -110,6 +123,7 @@ class MovieContainer: UIView {
         if self.shouldRegisterForNotifications {
             if let player = self.player where player.status == .Unknown {
                 self.loadingIndicator.startAnimating()
+                self.loadingIndicatorBackground.alpha = 1
             }
 
             self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
