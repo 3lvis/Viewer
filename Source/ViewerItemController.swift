@@ -52,6 +52,7 @@ class ViewerItemController: UIViewController {
         let image = UIImage(named: "repeat")!
         button.setImage(image, forState: .Normal)
         button.alpha = 0
+        button.addTarget(self, action: #selector(ViewerItemController.repeatAction), forControlEvents: .TouchUpInside)
 
         return button
     }()
@@ -84,6 +85,7 @@ class ViewerItemController: UIViewController {
 
                 if viewerItem.type == .Video {
                     self.movieContainer.start(viewerItem)
+                    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewerItemController.movieFinishedPlaying), name: AVPlayerItemDidPlayToEndTimeNotification, object: nil)
                 } else {
                     viewerItem.media({ image, error in
                         if let image = image {
@@ -142,6 +144,13 @@ class ViewerItemController: UIViewController {
     func willDismiss() {
         self.movieContainer.stopPlayerAndRemoveObserverIfNecessary()
         self.movieContainer.stop()
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: nil)
+    }
+
+    func movieFinishedPlaying() {
+        self.repeatButton.alpha = 1
+        self.pauseButton.alpha = 0
+        self.playButton.alpha = 0
     }
 
     func didCentered() {
@@ -162,6 +171,17 @@ class ViewerItemController: UIViewController {
         self.pauseButton.alpha = 0
         self.playButton.alpha = 0
         self.playIfNeeded()
+    }
+
+    func repeatAction() {
+        self.repeatButton.alpha = 0
+
+        if let overlayIsHidden = self.controllerDataSource?.overlayIsHidden() where !overlayIsHidden {
+            self.pauseButton.alpha = 1
+        }
+
+        self.movieContainer.stop()
+        self.movieContainer.play()
     }
 
     func playIfNeeded() {
