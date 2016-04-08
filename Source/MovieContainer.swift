@@ -2,6 +2,10 @@ import UIKit
 import AVFoundation
 import AVKit
 
+#if os(iOS)
+    import Photos
+#endif
+
 protocol MovieContainerDelegate: class {
     func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer)
 }
@@ -9,7 +13,7 @@ protocol MovieContainerDelegate: class {
 class MovieContainer: UIView {
     weak var viewDelegate: MovieContainerDelegate?
 
-    lazy var playerLayer: AVPlayerLayer = {
+    private lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
         playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
 
@@ -18,58 +22,27 @@ class MovieContainer: UIView {
 
     var image: UIImage?
 
-    lazy var loadingIndicator: UIActivityIndicatorView = {
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
         view.autoresizingMask = [.FlexibleRightMargin, .FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleTopMargin]
 
         return view
     }()
 
-    lazy var playButton: UIButton = {
-        let button = UIButton(type: .Custom)
-        let image = UIImage(named: "play")!
-        button.setImage(image, forState: .Normal)
-        button.alpha = 0
-        button.addTarget(self, action: #selector(MovieContainer.playAction), forControlEvents: .TouchUpInside)
-
-        return button
-    }()
-
-    lazy var repeatButton: UIButton = {
-        let button = UIButton(type: .Custom)
-        let image = UIImage(named: "repeat")!
-        button.setImage(image, forState: .Normal)
-        button.alpha = 0
-
-        return button
-    }()
-
-    lazy var pauseButton: UIButton = {
-        let button = UIButton(type: .Custom)
-        let image = UIImage(named: "pause")!
-        button.setImage(image, forState: .Normal)
-        button.alpha = 0
-        button.addTarget(self, action: #selector(MovieContainer.pauseAction), forControlEvents: .TouchUpInside)
-
-        return button
-    }()
+    private var shouldRegisterForNotifications = true
+    private var player: AVPlayer?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
+        self.userInteractionEnabled = false
         self.layer.addSublayer(self.playerLayer)
-        self.addSubview(self.playButton)
-        self.addSubview(self.repeatButton)
-        self.addSubview(self.pauseButton)
         self.addSubview(self.loadingIndicator)
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    var shouldRegisterForNotifications = true
-    var player: AVPlayer?
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -85,13 +58,6 @@ class MovieContainer: UIView {
         let loadingHeight = self.loadingIndicator.frame.size.height
         let loadingWidth = self.loadingIndicator.frame.size.width
         self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
-
-        let buttonImage = UIImage(named: "play")!
-        let buttonHeight = buttonImage.size.height
-        let buttonWidth = buttonImage.size.width
-        self.playButton.frame = CGRect(x: (self.frame.size.width - buttonWidth) / 2, y: (self.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
-        self.repeatButton.frame = CGRect(x: (self.frame.size.width - buttonWidth) / 2, y: (self.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
-        self.pauseButton.frame = CGRect(x: (self.frame.size.width - buttonWidth) / 2, y: (self.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
     }
 
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
@@ -114,25 +80,63 @@ class MovieContainer: UIView {
         }
     }
 
+    func start(viewerItem: ViewerItem) {
+        if let url = viewerItem.url {
+            let steamingURL = NSURL(string: url)!
+            self.player = AVPlayer(URL: steamingURL)
+            self.playerLayer.player = self.player
+            self.start()
+        } else if let remoteID = viewerItem.remoteID where viewerItem.local == true {
+            #if os(iOS)
+                let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([remoteID], options: nil)
+                if let object = fechResult.firstObject as? PHAsset {
+                    PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: nil, resultHandler: { playerItem, _ in
+                        if let playerItem = playerItem {
+                            dispatch_async(dispatch_get_main_queue(), {
+                                self.player = AVPlayer(playerItem: playerItem)
+                                self.playerLayer.player = self.player
+                                self.start()
+                            })
+                        }
+                    })
+                }
+            #endif
+        }
+    }
+
     func start() {
+        self.playerLayer.hidden = false
+
         if self.shouldRegisterForNotifications {
-            self.loadingIndicator.startAnimating()
+            if let player = self.player where player.status == .Unknown {
+                self.loadingIndicator.startAnimating()
+            }
 
             self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
             self.shouldRegisterForNotifications = false
         }
     }
 
-    func pauseAction() {
-        self.player?.pause()
-        self.pauseButton.alpha = 0
-        self.playButton.alpha = 1
+    func stop() {
+        self.playerLayer.hidden = true
+        self.player?.seekToTime(kCMTimeZero)
     }
 
-    func playAction() {
+    func play() {
         self.player?.play()
-        self.pauseButton.alpha = 0
-        self.playButton.alpha = 0
-        self.viewDelegate?.movieContainerDidStartedPlayingMovie(self)
+        self.playerLayer.hidden = false
+    }
+
+    func pause() {
+        self.player?.pause()
+    }
+
+    func isPlaying() -> Bool {
+        if let player = self.player {
+            let isPlaying = player.rate != 0 && player.error == nil
+            return isPlaying
+        }
+
+        return false
     }
 }

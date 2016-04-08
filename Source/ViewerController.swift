@@ -339,6 +339,7 @@ extension ViewerController {
         let isDraggedUp = translatedPoint.y < viewHalfHeight
         let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
 
+        controller.dimControls(alpha)
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
 
@@ -356,6 +357,7 @@ extension ViewerController {
                 UIView.animateWithDuration(0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = UIColor.blackColor()
+                    controller.dimControls(1.0)
 
                     if self.buttonsAreVisible == true {
                         self.fadeButtons(1)
