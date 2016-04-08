@@ -403,7 +403,9 @@ extension ViewerController: UIPageViewControllerDataSource {
     }
 
     public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
+        if let viewerItemController = viewController as? ViewerItemController, newIndexPath =
+            viewerItemController.indexPath?.next(self.collectionView) {
+            viewerItemController.willDismiss()
             self.centerElementIfNotVisible(newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
