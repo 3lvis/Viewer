@@ -121,12 +121,14 @@ class MovieContainer: UIView {
         self.playerLayer.hidden = false
 
         if self.shouldRegisterForNotifications {
-            if let player = self.player where player.status == .Unknown {
+            guard let player = self.player else { fatalError("No player item was found") }
+
+            if player.status == .Unknown {
                 self.loadingIndicator.startAnimating()
                 self.loadingIndicatorBackground.alpha = 1
             }
 
-            self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
+            player.addObserver(self, forKeyPath: "status", options: [], context: nil)
             self.shouldRegisterForNotifications = false
         }
     }
