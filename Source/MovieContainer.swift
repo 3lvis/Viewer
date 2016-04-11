@@ -2,14 +2,18 @@ import UIKit
 import AVFoundation
 import AVKit
 
+#if os(iOS)
+    import Photos
+#endif
+
+protocol MovieContainerDelegate: class {
+    func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer)
+}
+
 class MovieContainer: UIView {
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    weak var viewDelegate: MovieContainerDelegate?
 
-        self.userInteractionEnabled = false
-    }
-
-    lazy var playerLayer: AVPlayerLayer = {
+    private lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
         playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
 
@@ -18,19 +22,35 @@ class MovieContainer: UIView {
 
     var image: UIImage?
 
-    lazy var loadingIndicator: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(activityIndicatorStyle: .White)
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
         view.autoresizingMask = [.FlexibleRightMargin, .FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleTopMargin]
 
         return view
     }()
 
+    private lazy var loadingIndicatorBackground: UIImageView = {
+        let view = UIImageView(image: UIImage(named: "dark-circle")!)
+        view.alpha = 0
+
+        return view
+    }()
+
+    private var shouldRegisterForNotifications = true
+    private var player: AVPlayer?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        self.userInteractionEnabled = false
+        self.layer.addSublayer(self.playerLayer)
+        self.addSubview(self.loadingIndicatorBackground)
+        self.addSubview(self.loadingIndicator)
+    }
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    var shouldRegisterForNotifications = true
-    var player: AVPlayer?
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -42,6 +62,14 @@ class MovieContainer: UIView {
         playerLayerFrame.origin.x = 0
         playerLayerFrame.origin.y = 0
         self.playerLayer.frame = playerLayerFrame
+
+        let loadingBackgroundHeight = self.loadingIndicatorBackground.frame.size.height
+        let loadingBackgroundWidth = self.loadingIndicatorBackground.frame.size.width
+        self.loadingIndicatorBackground.frame = CGRect(x: (self.frame.size.width - loadingBackgroundWidth) / 2, y: (self.frame.size.height - loadingBackgroundHeight) / 2, width: loadingBackgroundWidth, height: loadingBackgroundHeight)
+
+        let loadingHeight = self.loadingIndicator.frame.size.height
+        let loadingWidth = self.loadingIndicator.frame.size.width
+        self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
     }
 
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
@@ -50,11 +78,13 @@ class MovieContainer: UIView {
         if player.status == .ReadyToPlay {
             self.stopPlayerAndRemoveObserverIfNecessary()
             player.play()
+            self.viewDelegate?.movieContainerDidStartedPlayingMovie(self)
         }
     }
 
     func stopPlayerAndRemoveObserverIfNecessary() {
         self.loadingIndicator.stopAnimating()
+        self.loadingIndicatorBackground.alpha = 0
         self.player?.pause()
 
         if self.shouldRegisterForNotifications == false {
@@ -63,23 +93,66 @@ class MovieContainer: UIView {
         }
     }
 
+    func start(viewerItem: ViewerItem) {
+        if let url = viewerItem.url {
+            let steamingURL = NSURL(string: url)!
+            self.player = AVPlayer(URL: steamingURL)
+            self.playerLayer.player = self.player
+            self.start()
+        } else if let remoteID = viewerItem.remoteID where viewerItem.local == true {
+            #if os(iOS)
+                let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([remoteID], options: nil)
+                if let object = fechResult.firstObject as? PHAsset {
+                    PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: nil, resultHandler: { playerItem, _ in
+                        if let playerItem = playerItem {
+                            dispatch_async(dispatch_get_main_queue(), {
+                                self.player = AVPlayer(playerItem: playerItem)
+                                self.playerLayer.player = self.player
+                                self.start()
+                            })
+                        }
+                    })
+                }
+            #endif
+        }
+    }
+
     func start() {
+        self.playerLayer.hidden = false
+
         if self.shouldRegisterForNotifications {
-            self.loadingIndicator.startAnimating()
+            guard let player = self.player else { fatalError("No player item was found") }
 
-            if self.playerLayer.superlayer == nil {
-                self.layer.addSublayer(self.playerLayer)
-            }
-            if self.loadingIndicator.superview == nil {
-                self.addSubview(self.loadingIndicator)
+            if player.status == .Unknown {
+                self.loadingIndicator.startAnimating()
+                self.loadingIndicatorBackground.alpha = 1
             }
 
-            let loadingHeight = self.loadingIndicator.frame.size.height
-            let loadingWidth = self.loadingIndicator.frame.size.width
-            self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
-
-            self.player?.addObserver(self, forKeyPath: "status", options: [], context: nil)
+            player.addObserver(self, forKeyPath: "status", options: [], context: nil)
             self.shouldRegisterForNotifications = false
         }
+    }
+
+    func stop() {
+        self.playerLayer.hidden = true
+        self.player?.seekToTime(kCMTimeZero)
+    }
+
+    func play() {
+        self.player?.play()
+        self.playerLayer.hidden = false
+    }
+
+    func pause() {
+        self.player?.pause()
+    }
+
+    func isPlaying() -> Bool {
+        if let player = self.player {
+            let isPlaying = player.rate != 0 && player.error == nil
+            return isPlaying
+        }
+
+        return false
     }
 }

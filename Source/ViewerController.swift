@@ -166,6 +166,7 @@ public class ViewerController: UIPageViewController {
         } else {
             viewerItemController = ViewerItemController()
             viewerItemController.controllerDelegate = self
+            viewerItemController.controllerDataSource = self
 
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
             gesture.delegate = self
@@ -338,6 +339,7 @@ extension ViewerController {
         let isDraggedUp = translatedPoint.y < viewHalfHeight
         let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
 
+        controller.dimControls(alpha)
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
 
@@ -355,6 +357,7 @@ extension ViewerController {
                 UIView.animateWithDuration(0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = UIColor.blackColor()
+                    controller.dimControls(1.0)
 
                     if self.buttonsAreVisible == true {
                         self.fadeButtons(1)
@@ -390,6 +393,7 @@ extension ViewerController {
 extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
+            viewerItemController.willDismiss()
             self.centerElementIfNotVisible(newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
@@ -400,7 +404,8 @@ extension ViewerController: UIPageViewControllerDataSource {
     }
 
     public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
+        if let viewerItemController = viewController as? ViewerItemController, newIndexPath =
+            viewerItemController.indexPath?.next(self.collectionView) {
             self.centerElementIfNotVisible(newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
@@ -434,6 +439,12 @@ extension ViewerController: ViewerItemControllerDelegate {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
         self.toggleButtons(self.buttonsAreVisible)
+    }
+}
+
+extension ViewerController: ViewerItemControllerDataSource {
+    func overlayIsHidden() -> Bool {
+        return !self.buttonsAreVisible
     }
 }
 
