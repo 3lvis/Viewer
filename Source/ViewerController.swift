@@ -393,6 +393,7 @@ extension ViewerController {
 extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
+            viewerItemController.willDismiss()
             self.centerElementIfNotVisible(newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
@@ -405,7 +406,6 @@ extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         if let viewerItemController = viewController as? ViewerItemController, newIndexPath =
             viewerItemController.indexPath?.next(self.collectionView) {
-            viewerItemController.willDismiss()
             self.centerElementIfNotVisible(newIndexPath)
             let controller = self.findOrCreateViewerItemController(newIndexPath)
 
