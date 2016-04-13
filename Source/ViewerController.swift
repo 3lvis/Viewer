@@ -8,6 +8,7 @@ import CoreData
  */
 
 public protocol ViewerControllerDataSource: class {
+    func numerOfItemsInViewerController(viewerController: ViewerController) -> Int
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem
 }
 
@@ -23,7 +24,7 @@ public protocol ViewerControllerDelegate: class {
     func viewerControllerDidDismiss(viewerController: ViewerController)
 }
 
-public class ViewerController: UIPageViewController {
+public class ViewerController: UIViewController {
     private static let HeaderHeight = CGFloat(64)
     private static let FooterHeight = CGFloat(50)
     private static let DraggingMargin = CGFloat(60)
@@ -36,10 +37,8 @@ public class ViewerController: UIPageViewController {
         self.proposedCurrentIndexPath = initialIndexPath
         self.collectionView = collectionView
 
-        super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+        super.init(nibName: nil, bundle: nil)
 
-        self.dataSource = self
-        self.delegate = self
         self.view.backgroundColor = UIColor.clearColor()
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.modalPresentationStyle = .OverCurrentContext
@@ -120,7 +119,31 @@ public class ViewerController: UIPageViewController {
 
     public var footerView: UIView?
 
+    lazy var scrollView: PaginatedScrollView = {
+        let view = PaginatedScrollView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.row)
+        view.viewDataSource = self
+        view.backgroundColor = UIColor.clearColor()
+
+        return view
+    }()
+
     // MARK: View Lifecycle
+
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.view.addSubview(self.scrollView)
+    }
+
+    public override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+
+        if presented {
+            self.scrollView.configure()
+        }
+    }
+
+    var presented = false
 
     public override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
@@ -239,17 +262,16 @@ extension ViewerController {
             #endif
             presentedView.frame = centeredImageFrame
             }) { completed in
-                let controller = self.findOrCreateViewerItemController(indexPath)
-                self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
-                    self.toggleButtons(true)
-                    self.buttonsAreVisible = true
-                    self.currentIndexPath = indexPath
-                    presentedView.removeFromSuperview()
-                    self.overlayView.removeFromSuperview()
-                    self.view.backgroundColor = UIColor.blackColor()
+                self.scrollView.configure()
+                self.toggleButtons(true)
+                self.buttonsAreVisible = true
+                self.currentIndexPath = indexPath
+                presentedView.removeFromSuperview()
+                self.overlayView.removeFromSuperview()
+                self.view.backgroundColor = UIColor.blackColor()
+                self.presented = true
 
-                    completion?()
-                })
+                completion?()
         }
     }
 
@@ -459,5 +481,15 @@ extension ViewerController: UIGestureRecognizerDelegate {
         }
         
         return true
+    }
+}
+
+extension ViewerController: PaginatedScrollViewDataSource {
+    func numberOfPagesInPaginatedScrollView(paginatedScrollView: PaginatedScrollView) -> Int {
+        return self.controllerDataSource?.numerOfItemsInViewerController(self) ?? 0
+    }
+
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
+        return self.findOrCreateViewerItemController(NSIndexPath(forRow: index, inSection: 0))
     }
 }

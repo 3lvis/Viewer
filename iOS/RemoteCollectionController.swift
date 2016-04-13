@@ -58,6 +58,10 @@ extension RemoteCollectionController {
 }
 
 extension RemoteCollectionController: ViewerControllerDataSource {
+    func numerOfItemsInViewerController(viewerController: ViewerController) -> Int {
+        return self.photos.count
+    }
+
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
         return self.photos[indexPath.row]
     }
