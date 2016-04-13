@@ -114,12 +114,6 @@ class ViewerItemController: UIViewController {
         self.view.addGestureRecognizer(tapRecognizer)
     }
 
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        self.movieContainer.stopPlayerAndRemoveObserverIfNecessary()
-    }
-
     func tapAction() {
         if self.movieContainer.isPlaying() {
             UIView.animateWithDuration(0.3) {

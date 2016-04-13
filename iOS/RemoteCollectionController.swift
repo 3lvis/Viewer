@@ -78,7 +78,8 @@ extension RemoteCollectionController: ViewerControllerDataSource {
 
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
         let photos = self.sections[indexPath.section]
-        return photos[indexPath.row]
+        let viewerItem = photos[indexPath.row]
+        return viewerItem
     }
 }
 

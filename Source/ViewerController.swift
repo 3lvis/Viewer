@@ -252,7 +252,6 @@ extension ViewerController {
             #endif
             presentedView.frame = centeredImageFrame
             }) { completed in
-                self.scrollView.configure()
                 self.toggleButtons(true)
                 self.buttonsAreVisible = true
                 self.currentIndexPath = indexPath
