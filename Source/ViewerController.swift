@@ -100,6 +100,9 @@ public class ViewerController: UIViewController {
      */
     private var currentIndexPath: NSIndexPath
 
+    /**
+     A helper to prevent the paginated scroll view to be set up twice when is presented
+     */
     private var presented = false
 
     private lazy var overlayView: UIView = {
