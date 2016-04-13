@@ -11,6 +11,7 @@ struct Photo: ViewerItem {
     var placeholder = UIImage(named: "clear.png")!
     var url: String?
     var local: Bool = false
+    static let NumberOfSections = 20
 
     init(remoteID: String) {
         self.remoteID = remoteID
@@ -28,39 +29,43 @@ struct Photo: ViewerItem {
         }
     }
 
-    static func constructRemoteElements() -> [ViewerItem] {
-        var elements = [ViewerItem]()
+    static func constructRemoteElements() -> [[ViewerItem]] {
+        var sections = [[ViewerItem]]()
 
-        for i in 1..<60 {
-            var photo = Photo(remoteID: "\(i)")
+        for section in 0..<Photo.NumberOfSections {
+            var elements = [ViewerItem]()
+            for row in 0..<10 {
+                var photo = Photo(remoteID: "\(section)-\(row)")
 
-            let index = Int(arc4random_uniform(6))
-            switch index {
-            case 0:
-                photo.placeholder = UIImage(named: "0.jpg")!
-                break
-            case 1:
-                photo.placeholder = UIImage(named: "1.jpg")!
-                break
-            case 2:
-                photo.placeholder = UIImage(named: "2.jpg")!
-                break
-            case 3:
-                photo.placeholder = UIImage(named: "3.jpg")!
-                break
-            case 4:
-                photo.placeholder = UIImage(named: "4.jpg")!
-                break
-            case 5:
-                photo.placeholder = UIImage(named: "5.png")!
-                photo.url = "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4"
-                photo.type = .Video
-            default: break
+                let index = Int(arc4random_uniform(6))
+                switch index {
+                case 0:
+                    photo.placeholder = UIImage(named: "0.jpg")!
+                    break
+                case 1:
+                    photo.placeholder = UIImage(named: "1.jpg")!
+                    break
+                case 2:
+                    photo.placeholder = UIImage(named: "2.jpg")!
+                    break
+                case 3:
+                    photo.placeholder = UIImage(named: "3.jpg")!
+                    break
+                case 4:
+                    photo.placeholder = UIImage(named: "4.jpg")!
+                    break
+                case 5:
+                    photo.placeholder = UIImage(named: "5.png")!
+                    photo.url = "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4"
+                    photo.type = .Video
+                default: break
+                }
+                elements.append(photo)
             }
-            elements.append(photo)
+            sections.append(elements)
         }
 
-        return elements
+        return sections
     }
 
     static func constructLocalElements() -> [ViewerItem] {

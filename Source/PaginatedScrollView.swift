@@ -5,8 +5,13 @@ protocol PaginatedScrollViewDataSource: class {
     func paginatedScrollView(paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController
 }
 
+protocol PaginatedScrollViewDelegate: class {
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didChangeIndex index: Int)
+}
+
 class PaginatedScrollView: UIScrollView {
     weak var viewDataSource: PaginatedScrollViewDataSource?
+    weak var viewDelegate: PaginatedScrollViewDelegate?
     unowned var parentController: UIViewController
     var currentPage: Int
 
@@ -88,7 +93,11 @@ extension PaginatedScrollView: UIScrollViewDelegate {
         if self.shoudEvaluate {
             let pageWidth = self.frame.size.width
             let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
+            if page != self.currentPage {
+                self.viewDelegate?.paginatedScrollView(self, didChangeIndex: page)
+            }
             self.currentPage = page
+
             self.loadScrollViewWithPage(page - 1)
             self.loadScrollViewWithPage(page)
             self.loadScrollViewWithPage(page + 1)

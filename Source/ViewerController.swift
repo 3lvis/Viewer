@@ -34,7 +34,6 @@ public class ViewerController: UIViewController {
     public init(initialIndexPath: NSIndexPath, collectionView: UICollectionView) {
         self.initialIndexPath = initialIndexPath
         self.currentIndexPath = initialIndexPath
-        self.proposedCurrentIndexPath = initialIndexPath
         self.collectionView = collectionView
 
         super.init(nibName: nil, bundle: nil)
@@ -101,10 +100,7 @@ public class ViewerController: UIViewController {
      */
     private var currentIndexPath: NSIndexPath
 
-    /**
-     Tracks the index to be, it will be ignored if the swiping transition is not finished
-     */
-    private var proposedCurrentIndexPath: NSIndexPath
+    private var presented = false
 
     private lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
@@ -120,8 +116,9 @@ public class ViewerController: UIViewController {
     public var footerView: UIView?
 
     lazy var scrollView: PaginatedScrollView = {
-        let view = PaginatedScrollView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.row)
+        let view = PaginatedScrollView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
         view.viewDataSource = self
+        view.viewDelegate = self
         view.backgroundColor = UIColor.clearColor()
 
         return view
@@ -142,8 +139,6 @@ public class ViewerController: UIViewController {
             self.scrollView.configure()
         }
     }
-
-    var presented = false
 
     public override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
@@ -412,50 +407,6 @@ extension ViewerController {
     }
 }
 
-extension ViewerController: UIPageViewControllerDataSource {
-    public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
-            viewerItemController.willDismiss()
-            self.centerElementIfNotVisible(newIndexPath)
-            let controller = self.findOrCreateViewerItemController(newIndexPath)
-
-            return controller
-        }
-
-        return nil
-    }
-
-    public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, newIndexPath =
-            viewerItemController.indexPath?.next(self.collectionView) {
-            self.centerElementIfNotVisible(newIndexPath)
-            let controller = self.findOrCreateViewerItemController(newIndexPath)
-
-            return controller
-        }
-
-        return nil
-    }
-}
-
-extension ViewerController: UIPageViewControllerDelegate {
-    public func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
-        guard let controllers = pendingViewControllers as? [ViewerItemController] else { fatalError() }
-
-        for controller in controllers {
-            self.controllerDelegate?.viewerController(self, didChangeIndexPath: controller.indexPath!)
-            self.proposedCurrentIndexPath = controller.indexPath!
-        }
-    }
-
-    public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        if completed {
-            self.controllerDelegate?.viewerController(self, didChangeIndexPath: self.proposedCurrentIndexPath)
-            self.currentIndexPath = self.proposedCurrentIndexPath
-        }
-    }
-}
-
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
@@ -490,6 +441,15 @@ extension ViewerController: PaginatedScrollViewDataSource {
     }
 
     func paginatedScrollView(paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
-        return self.findOrCreateViewerItemController(NSIndexPath(forRow: index, inSection: 0))
+        let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
+        return self.findOrCreateViewerItemController(indexPath)
+    }
+}
+
+extension ViewerController: PaginatedScrollViewDelegate {
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didChangeIndex index: Int) {
+        let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
+        self.currentIndexPath = indexPath
+        self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
     }
 }

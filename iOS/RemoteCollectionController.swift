@@ -1,15 +1,23 @@
 import UIKit
 
 class RemoteCollectionController: UICollectionViewController {
-    var photos = Photo.constructRemoteElements()
+    var sections = Photo.constructRemoteElements()
     var viewerController: ViewerController?
     var optionsController: OptionsController?
+    var numberOfItems = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.collectionView?.backgroundColor = UIColor.whiteColor()
         self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
+
+        var count = 0
+        for i in 0..<self.sections.count {
+            let photos = self.sections[i]
+            count += photos.count
+        }
+        self.numberOfItems = count
     }
 
     override func viewWillLayoutSubviews() {
@@ -30,13 +38,19 @@ class RemoteCollectionController: UICollectionViewController {
 }
 
 extension RemoteCollectionController {
+    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+        return self.sections.count
+    }
+
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.photos.count
+        let photos = self.sections[section]
+        return photos.count
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
-        let photo = self.photos[indexPath.row]
+        let photos = self.sections[indexPath.section]
+        let photo = photos[indexPath.row]
         cell.display(photo)
 
         return cell
@@ -59,11 +73,12 @@ extension RemoteCollectionController {
 
 extension RemoteCollectionController: ViewerControllerDataSource {
     func numerOfItemsInViewerController(viewerController: ViewerController) -> Int {
-        return self.photos.count
+        return self.numberOfItems
     }
 
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
-        return self.photos[indexPath.row]
+        let photos = self.sections[indexPath.section]
+        return photos[indexPath.row]
     }
 }
 
