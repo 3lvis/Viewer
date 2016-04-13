@@ -29,8 +29,6 @@ public class ViewerController: UIViewController {
     private static let FooterHeight = CGFloat(50)
     private static let DraggingMargin = CGFloat(60)
 
-    // MARK: Initializers
-
     public init(initialIndexPath: NSIndexPath, collectionView: UICollectionView) {
         self.initialIndexPath = initialIndexPath
         self.currentIndexPath = initialIndexPath
@@ -49,8 +47,6 @@ public class ViewerController: UIViewController {
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    // MARK: Variables
 
     public weak var controllerDelegate: ViewerControllerDelegate?
     public weak var controllerDataSource: ViewerControllerDataSource?
@@ -148,7 +144,9 @@ public class ViewerController: UIViewController {
 
         self.present(self.initialIndexPath, completion: nil)
     }
+}
 
+extension ViewerController {
     #if os(iOS)
     public override func prefersStatusBarHidden() -> Bool {
         let orientation = UIApplication.sharedApplication().statusBarOrientation
@@ -167,8 +165,6 @@ public class ViewerController: UIViewController {
         }
     }
     #endif
-
-    // MARK: Private methods
 
     private func presentedViewCopy() -> UIImageView {
         let presentedView = UIImageView()
@@ -216,11 +212,7 @@ public class ViewerController: UIViewController {
         self.headerView?.alpha = alpha
         self.footerView?.alpha = alpha
     }
-}
 
-// MARK: Core Methods
-
-extension ViewerController {
     private func present(indexPath: NSIndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) else { fatalError("Data source not implemented") }
 
@@ -333,9 +325,6 @@ extension ViewerController {
         }
     }
 
-    /*
-    Has to be internal since it's used as an action
-    */
     func panAction(gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
         let viewHeight = controller.imageView.frame.size.height
