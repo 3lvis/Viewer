@@ -16,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         layout.minimumInteritemSpacing = 1
         let size = (bounds.width - numberOfColumns) / numberOfColumns
         layout.itemSize = CGSize(width: size, height: size)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
 
         let remoteController = RemoteCollectionController(collectionViewLayout: layout)
         remoteController.title = "Remote"

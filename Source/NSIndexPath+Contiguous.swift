@@ -44,4 +44,32 @@ extension NSIndexPath {
 
         return nil
     }
+
+    class func indexPathForIndex(collectionView: UICollectionView, index: Int) -> NSIndexPath? {
+        var count = 0
+        let sections = collectionView.numberOfSections()
+        for section in 0..<sections {
+            let rows = collectionView.numberOfItemsInSection(section)
+            if index >= count && index < count + rows {
+                let foundRow = index - count
+                return NSIndexPath(forRow: foundRow, inSection: section)
+            }
+            count += rows
+        }
+
+        return nil
+    }
+
+    func totalRow(collectionView: UICollectionView) -> Int {
+        var count = 0
+        let sections = collectionView.numberOfSections()
+        for section in 0..<sections {
+            if section < self.section {
+                let rows = collectionView.numberOfItemsInSection(section)
+                count += rows
+            }
+        }
+
+        return count + self.row
+    }
 }

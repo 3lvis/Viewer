@@ -67,6 +67,10 @@ extension LocalCollectionController {
 }
 
 extension LocalCollectionController: ViewerControllerDataSource {
+    func numerOfItemsInViewerController(viewerController: ViewerController) -> Int {
+        return self.photos.count
+    }
+
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
         var item = self.photos[indexPath.row]
         if let cell = self.collectionView?.cellForItemAtIndexPath(indexPath) as? PhotoCell, placeholder = cell.imageView.image {

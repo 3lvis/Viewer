@@ -8,6 +8,7 @@ import CoreData
  */
 
 public protocol ViewerControllerDataSource: class {
+    func numerOfItemsInViewerController(viewerController: ViewerController) -> Int
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem
 }
 
@@ -23,23 +24,18 @@ public protocol ViewerControllerDelegate: class {
     func viewerControllerDidDismiss(viewerController: ViewerController)
 }
 
-public class ViewerController: UIPageViewController {
+public class ViewerController: UIViewController {
     private static let HeaderHeight = CGFloat(64)
     private static let FooterHeight = CGFloat(50)
     private static let DraggingMargin = CGFloat(60)
 
-    // MARK: Initializers
-
     public init(initialIndexPath: NSIndexPath, collectionView: UICollectionView) {
         self.initialIndexPath = initialIndexPath
         self.currentIndexPath = initialIndexPath
-        self.proposedCurrentIndexPath = initialIndexPath
         self.collectionView = collectionView
 
-        super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+        super.init(nibName: nil, bundle: nil)
 
-        self.dataSource = self
-        self.delegate = self
         self.view.backgroundColor = UIColor.clearColor()
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.modalPresentationStyle = .OverCurrentContext
@@ -51,8 +47,6 @@ public class ViewerController: UIPageViewController {
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    // MARK: Variables
 
     public weak var controllerDelegate: ViewerControllerDelegate?
     public weak var controllerDataSource: ViewerControllerDataSource?
@@ -103,9 +97,9 @@ public class ViewerController: UIPageViewController {
     private var currentIndexPath: NSIndexPath
 
     /**
-     Tracks the index to be, it will be ignored if the swiping transition is not finished
+     A helper to prevent the paginated scroll view to be set up twice when is presented
      */
-    private var proposedCurrentIndexPath: NSIndexPath
+    private var presented = false
 
     private lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.mainScreen().bounds)
@@ -120,14 +114,39 @@ public class ViewerController: UIPageViewController {
 
     public var footerView: UIView?
 
+    lazy var scrollView: PaginatedScrollView = {
+        let view = PaginatedScrollView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
+        view.viewDataSource = self
+        view.viewDelegate = self
+        view.backgroundColor = UIColor.clearColor()
+
+        return view
+    }()
+
     // MARK: View Lifecycle
+
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.view.addSubview(self.scrollView)
+    }
+
+    public override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+
+        if presented {
+            self.scrollView.configure()
+        }
+    }
 
     public override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
         self.present(self.initialIndexPath, completion: nil)
     }
+}
 
+extension ViewerController {
     #if os(iOS)
     public override func prefersStatusBarHidden() -> Bool {
         let orientation = UIApplication.sharedApplication().statusBarOrientation
@@ -147,8 +166,6 @@ public class ViewerController: UIPageViewController {
     }
     #endif
 
-    // MARK: Private methods
-
     private func presentedViewCopy() -> UIImageView {
         let presentedView = UIImageView()
         presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
@@ -166,6 +183,7 @@ public class ViewerController: UIPageViewController {
         } else {
             viewerItemController = ViewerItemController()
             viewerItemController.controllerDelegate = self
+            viewerItemController.controllerDataSource = self
 
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
             gesture.delegate = self
@@ -194,11 +212,7 @@ public class ViewerController: UIPageViewController {
         self.headerView?.alpha = alpha
         self.footerView?.alpha = alpha
     }
-}
 
-// MARK: Core Methods
-
-extension ViewerController {
     private func present(indexPath: NSIndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) else { fatalError("Data source not implemented") }
 
@@ -238,23 +252,22 @@ extension ViewerController {
             #endif
             presentedView.frame = centeredImageFrame
             }) { completed in
-                let controller = self.findOrCreateViewerItemController(indexPath)
-                self.setViewControllers([controller], direction: .Forward, animated: false, completion: { finished in
-                    self.toggleButtons(true)
-                    self.buttonsAreVisible = true
-                    self.currentIndexPath = indexPath
-                    presentedView.removeFromSuperview()
-                    self.overlayView.removeFromSuperview()
-                    self.view.backgroundColor = UIColor.blackColor()
+                self.toggleButtons(true)
+                self.buttonsAreVisible = true
+                self.currentIndexPath = indexPath
+                presentedView.removeFromSuperview()
+                self.overlayView.removeFromSuperview()
+                self.view.backgroundColor = UIColor.blackColor()
+                self.presented = true
+                let item = self.findOrCreateViewerItemController(indexPath)
+                item.didFocused()
 
-                    completion?()
-                })
+                completion?()
         }
     }
 
     public func dismiss(completion: (() -> Void)?) {
         let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
-        controller.willDismiss()
         self.dismiss(controller, completion: completion)
     }
 
@@ -265,6 +278,8 @@ extension ViewerController {
         let image = viewerItem.placeholder
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
+        viewerItemController.willDismiss()
+
         self.view.alpha = 0
         self.fadeButtons(0)
         self.buttonsAreVisible = false
@@ -312,9 +327,6 @@ extension ViewerController {
         }
     }
 
-    /*
-    Has to be internal since it's used as an action
-    */
     func panAction(gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
         let viewHeight = controller.imageView.frame.size.height
@@ -338,6 +350,7 @@ extension ViewerController {
         let isDraggedUp = translatedPoint.y < viewHalfHeight
         let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
 
+        controller.dimControls(alpha)
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(alpha)
 
@@ -355,12 +368,13 @@ extension ViewerController {
                 UIView.animateWithDuration(0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = UIColor.blackColor()
+                    controller.dimControls(1.0)
 
                     if self.buttonsAreVisible == true {
                         self.fadeButtons(1)
                     }
                     }) { completed in
-                        controller.didCentered()
+                        controller.didFocused()
                         self.shouldHideStatusBar = false
                         self.shouldUseLightStatusBar = true
                         #if os(iOS)
@@ -387,53 +401,17 @@ extension ViewerController {
     }
 }
 
-extension ViewerController: UIPageViewControllerDataSource {
-    public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
-            self.centerElementIfNotVisible(newIndexPath)
-            let controller = self.findOrCreateViewerItemController(newIndexPath)
-
-            return controller
-        }
-
-        return nil
-    }
-
-    public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        if let viewerItemController = viewController as? ViewerItemController, newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
-            self.centerElementIfNotVisible(newIndexPath)
-            let controller = self.findOrCreateViewerItemController(newIndexPath)
-
-            return controller
-        }
-
-        return nil
-    }
-}
-
-extension ViewerController: UIPageViewControllerDelegate {
-    public func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
-        guard let controllers = pendingViewControllers as? [ViewerItemController] else { fatalError() }
-
-        for controller in controllers {
-            self.controllerDelegate?.viewerController(self, didChangeIndexPath: controller.indexPath!)
-            self.proposedCurrentIndexPath = controller.indexPath!
-        }
-    }
-
-    public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        if completed {
-            self.controllerDelegate?.viewerController(self, didChangeIndexPath: self.proposedCurrentIndexPath)
-            self.currentIndexPath = self.proposedCurrentIndexPath
-        }
-    }
-}
-
 extension ViewerController: ViewerItemControllerDelegate {
     func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
         self.toggleButtons(self.buttonsAreVisible)
+    }
+}
+
+extension ViewerController: ViewerItemControllerDataSource {
+    func overlayIsHidden() -> Bool {
+        return !self.buttonsAreVisible
     }
 }
 
@@ -448,5 +426,32 @@ extension ViewerController: UIGestureRecognizerDelegate {
         }
         
         return true
+    }
+}
+
+extension ViewerController: PaginatedScrollViewDataSource {
+    func numberOfPagesInPaginatedScrollView(paginatedScrollView: PaginatedScrollView) -> Int {
+        return self.controllerDataSource?.numerOfItemsInViewerController(self) ?? 0
+    }
+
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
+        let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
+        return self.findOrCreateViewerItemController(indexPath)
+    }
+}
+
+extension ViewerController: PaginatedScrollViewDelegate {
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didMoveToIndex index: Int) {
+        let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
+        self.currentIndexPath = indexPath
+        self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
+        let viewerItem = self.findOrCreateViewerItemController(indexPath)
+        viewerItem.didFocused()
+    }
+
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didMoveFromIndex index: Int) {
+        let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
+        let viewerItem = self.findOrCreateViewerItemController(indexPath)
+        viewerItem.willDismiss()
     }
 }
