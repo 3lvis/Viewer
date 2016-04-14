@@ -82,17 +82,6 @@ class ViewerItemController: UIViewController {
                 self.movieContainer.image = viewerItem.placeholder
                 self.imageView.image = viewerItem.placeholder
                 self.movieContainer.frame = viewerItem.placeholder.centeredFrame()
-
-                if viewerItem.type == .Video {
-                    self.movieContainer.start(viewerItem)
-                    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewerItemController.movieFinishedPlaying), name: AVPlayerItemDidPlayToEndTimeNotification, object: nil)
-                } else {
-                    viewerItem.media({ image, error in
-                        if let image = image {
-                            self.imageView.image = image
-                        }
-                    })
-                }
                 self.changed = false
             }
         }
@@ -136,22 +125,34 @@ class ViewerItemController: UIViewController {
     }
 
     func willDismiss() {
-        self.movieContainer.stopPlayerAndRemoveObserverIfNecessary()
-        self.movieContainer.stop()
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: nil)
+        guard let viewerItem = self.viewerItem else { return }
+
+        if viewerItem.type == .Video {
+            self.movieContainer.stopPlayerAndRemoveObserverIfNecessary()
+            self.movieContainer.stop()
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: nil)
+        }
+    }
+
+    func didFocused() {
+        guard let viewerItem = self.viewerItem else { return }
+
+        if viewerItem.type == .Video {
+            self.movieContainer.start(viewerItem)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewerItemController.movieFinishedPlaying), name: AVPlayerItemDidPlayToEndTimeNotification, object: nil)
+        } else {
+            viewerItem.media({ image, error in
+                if let image = image {
+                    self.imageView.image = image
+                }
+            })
+        }
     }
 
     func movieFinishedPlaying() {
         self.repeatButton.alpha = 1
         self.pauseButton.alpha = 0
         self.playButton.alpha = 0
-    }
-
-    func didCentered() {
-        self.movieContainer.play()
-        self.pauseButton.alpha = 0
-        self.playButton.alpha = 0
-        self.playIfNeeded()
     }
 
     func pauseAction() {

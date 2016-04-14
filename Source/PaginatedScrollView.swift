@@ -6,7 +6,8 @@ protocol PaginatedScrollViewDataSource: class {
 }
 
 protocol PaginatedScrollViewDelegate: class {
-    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didChangeIndex index: Int)
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didMoveToIndex index: Int)
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didMoveFromIndex index: Int)
 }
 
 class PaginatedScrollView: UIScrollView {
@@ -94,7 +95,8 @@ extension PaginatedScrollView: UIScrollViewDelegate {
             let pageWidth = self.frame.size.width
             let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
             if page != self.currentPage {
-                self.viewDelegate?.paginatedScrollView(self, didChangeIndex: page)
+                self.viewDelegate?.paginatedScrollView(self, didMoveToIndex: page)
+                self.viewDelegate?.paginatedScrollView(self, didMoveFromIndex: self.currentPage)
             }
             self.currentPage = page
 

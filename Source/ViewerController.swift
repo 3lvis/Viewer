@@ -259,6 +259,8 @@ extension ViewerController {
                 self.overlayView.removeFromSuperview()
                 self.view.backgroundColor = UIColor.blackColor()
                 self.presented = true
+                let item = self.findOrCreateViewerItemController(indexPath)
+                item.didFocused()
 
                 completion?()
         }
@@ -266,7 +268,6 @@ extension ViewerController {
 
     public func dismiss(completion: (() -> Void)?) {
         let controller = self.findOrCreateViewerItemController(self.currentIndexPath)
-        controller.willDismiss()
         self.dismiss(controller, completion: completion)
     }
 
@@ -277,6 +278,8 @@ extension ViewerController {
         let image = viewerItem.placeholder
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clearColor()
+        viewerItemController.willDismiss()
+
         self.view.alpha = 0
         self.fadeButtons(0)
         self.buttonsAreVisible = false
@@ -371,7 +374,7 @@ extension ViewerController {
                         self.fadeButtons(1)
                     }
                     }) { completed in
-                        controller.didCentered()
+                        controller.didFocused()
                         self.shouldHideStatusBar = false
                         self.shouldUseLightStatusBar = true
                         #if os(iOS)
@@ -438,9 +441,17 @@ extension ViewerController: PaginatedScrollViewDataSource {
 }
 
 extension ViewerController: PaginatedScrollViewDelegate {
-    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didChangeIndex index: Int) {
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didMoveToIndex index: Int) {
         let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
         self.currentIndexPath = indexPath
         self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
+        let viewerItem = self.findOrCreateViewerItemController(indexPath)
+        viewerItem.didFocused()
+    }
+
+    func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didMoveFromIndex index: Int) {
+        let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
+        let viewerItem = self.findOrCreateViewerItemController(indexPath)
+        viewerItem.willDismiss()
     }
 }

@@ -135,7 +135,9 @@ class MovieContainer: UIView {
 
     func stop() {
         self.playerLayer.hidden = true
+        self.player?.pause()
         self.player?.seekToTime(kCMTimeZero)
+        self.playerLayer.player = nil
     }
 
     func play() {
