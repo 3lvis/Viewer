@@ -66,22 +66,10 @@ extension RemoteCollectionController {
         let footerView = FooterView()
         footerView.viewDelegate = self
         self.viewerController?.footerView = footerView
-        self.viewerController!.controllerDelegate = self
         self.viewerController!.controllerDataSource = self
         self.presentViewController(self.viewerController!, animated: false, completion: nil)
     }
 }
-
-extension RemoteCollectionController: ViewerControllerDelegate {
-    func viewerController(viewerController: ViewerController, didChangeIndexPath indexPath: NSIndexPath) {
-        self.collectionView?.scrollToItemAtIndexPath(indexPath, atScrollPosition: .Bottom, animated: true)
-    }
-
-    func viewerControllerDidDismiss(viewerController: ViewerController) {
-
-    }
-}
-
 
 extension RemoteCollectionController: ViewerControllerDataSource {
     func numerOfItemsInViewerController(viewerController: ViewerController) -> Int {

@@ -136,8 +136,6 @@ public class ViewerController: UIViewController {
 
         if presented {
             self.scrollView.configure()
-
-            let visibleIndexPaths = self.collectionView.indexPathsForVisibleItems()
             if !self.collectionView.indexPathsForVisibleItems().contains(self.currentIndexPath) {
                 self.collectionView.scrollToItemAtIndexPath(self.currentIndexPath, atScrollPosition: .Bottom, animated: true)
             }
@@ -406,7 +404,6 @@ extension ViewerController {
     }
 
     private func evaluateCellVisibility(collectionView collectionView: UICollectionView, currentIndexPath: NSIndexPath, upcomingIndexPath: NSIndexPath) {
-        let visibleIndexPaths = collectionView.indexPathsForVisibleItems()
         if !collectionView.indexPathsForVisibleItems().contains(upcomingIndexPath) {
             var position: UICollectionViewScrollPosition?
             if currentIndexPath.compareDirection(upcomingIndexPath) == .Forward {
