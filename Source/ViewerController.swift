@@ -136,7 +136,11 @@ public class ViewerController: UIViewController {
 
         if presented {
             self.scrollView.configure()
-            self.controllerDelegate?.viewerController(self, didChangeIndexPath: self.currentIndexPath)
+
+            let visibleIndexPaths = self.collectionView.indexPathsForVisibleItems()
+            if !self.collectionView.indexPathsForVisibleItems().contains(self.currentIndexPath) {
+                self.collectionView.scrollToItemAtIndexPath(self.currentIndexPath, atScrollPosition: .Bottom, animated: true)
+            }
         }
     }
 
@@ -400,6 +404,21 @@ extension ViewerController {
             }
         }
     }
+
+    private func evaluateCellVisibility(collectionView collectionView: UICollectionView, currentIndexPath: NSIndexPath, upcomingIndexPath: NSIndexPath) {
+        let visibleIndexPaths = collectionView.indexPathsForVisibleItems()
+        if !collectionView.indexPathsForVisibleItems().contains(upcomingIndexPath) {
+            var position: UICollectionViewScrollPosition?
+            if currentIndexPath.compareDirection(upcomingIndexPath) == .Forward {
+                position = .Bottom
+            } else if currentIndexPath.compareDirection(upcomingIndexPath) == .Backward {
+                position = .Top
+            }
+            if let position = position {
+                collectionView.scrollToItemAtIndexPath(upcomingIndexPath, atScrollPosition: position, animated: true)
+            }
+        }
+    }
 }
 
 extension ViewerController: ViewerItemControllerDelegate {
@@ -444,6 +463,7 @@ extension ViewerController: PaginatedScrollViewDataSource {
 extension ViewerController: PaginatedScrollViewDelegate {
     func paginatedScrollView(paginatedScrollView: PaginatedScrollView, didMoveToIndex index: Int) {
         let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
+        self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
         self.currentIndexPath = indexPath
         self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
         let viewerItem = self.findOrCreateViewerItemController(indexPath)
