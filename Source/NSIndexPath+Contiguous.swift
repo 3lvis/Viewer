@@ -1,6 +1,12 @@
 import UIKit
 
 extension NSIndexPath {
+    enum Direction {
+        case Forward
+        case Backward
+        case Same
+    }
+
     func indexPaths(collectionView: UICollectionView) -> [NSIndexPath] {
         var indexPaths = [NSIndexPath]()
 
@@ -71,5 +77,18 @@ extension NSIndexPath {
         }
 
         return count + self.row
+    }
+
+    func compareDirection(indexPath: NSIndexPath) -> Direction {
+        let current = self.row * self.section
+        let coming = indexPath.row * indexPath.section
+
+        if current == coming {
+            return .Same
+        } else if current < coming {
+            return .Forward
+        } else {
+            return .Backward
+        }
     }
 }
