@@ -136,6 +136,7 @@ public class ViewerController: UIViewController {
 
         if presented {
             self.scrollView.configure()
+            self.controllerDelegate?.viewerController(self, didChangeIndexPath: self.currentIndexPath)
         }
     }
 
