@@ -22,10 +22,12 @@ class PaginatedScrollView: UIScrollView {
 
         super.init(frame: frame)
 
-        self.pagingEnabled = true
+        #if os(iOS)
+            self.pagingEnabled = true
+            self.scrollsToTop = false
+        #endif
         self.showsHorizontalScrollIndicator = false
         self.showsVerticalScrollIndicator = false
-        self.scrollsToTop = false
         self.delegate = self
         self.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.decelerationRate = UIScrollViewDecelerationRateFast
