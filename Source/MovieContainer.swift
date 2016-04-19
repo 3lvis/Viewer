@@ -99,9 +99,9 @@ class MovieContainer: UIView {
             self.player = AVPlayer(URL: steamingURL)
             self.playerLayer.player = self.player
             self.start()
-        } else if let remoteID = viewerItem.remoteID where viewerItem.local == true {
+        } else if viewerItem.local == true {
             #if os(iOS)
-                let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([remoteID], options: nil)
+                let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.remoteID], options: nil)
                 if let object = fechResult.firstObject as? PHAsset {
                     PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: nil, resultHandler: { playerItem, _ in
                         if let playerItem = playerItem {

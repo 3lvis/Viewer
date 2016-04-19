@@ -37,7 +37,7 @@ class PhotoCell: UICollectionViewCell {
         self.videoIndicator.hidden = photo.type == .Image
 
         if photo.local {
-            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([photo.remoteID!], options: nil).firstObject {
+            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([photo.remoteID], options: nil).firstObject {
                 Photo.resolveAsset(asset as! PHAsset, size: .Small, completion: { image in
                     self.imageView.image = image
                 })
