@@ -101,18 +101,21 @@ class MovieContainer: UIView {
             self.start()
         } else if viewerItem.local == true {
             #if os(iOS)
-                let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.remoteID], options: nil)
-                if let object = fechResult.firstObject as? PHAsset {
-                    PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: nil, resultHandler: { playerItem, _ in
-                        if let playerItem = playerItem {
-                            dispatch_async(dispatch_get_main_queue(), {
-                                self.player = AVPlayer(playerItem: playerItem)
-                                self.playerLayer.player = self.player
-                                self.start()
-                            })
-                        }
+                let result = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.remoteID], options: nil)
+                guard let object = result.firstObject as? PHAsset else { fatalError("Couldn't get asset for id: \(viewerItem.remoteID)") }
+                let requestOptions = PHVideoRequestOptions()
+                requestOptions.networkAccessAllowed = true
+                requestOptions.version = .Original
+                PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: requestOptions, resultHandler: { playerItem, info in
+                    guard let playerItem = playerItem else { fatalError("Player item was nil: \(info)") }
+                    print(playerItem.tracks)
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.player = AVPlayer(playerItem: playerItem)
+                        self.player?.rate = Float(playerItem.preferredPeakBitRate)
+                        self.playerLayer.player = self.player
+                        self.start()
                     })
-                }
+                })
             #endif
         }
     }
