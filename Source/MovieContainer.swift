@@ -93,6 +93,8 @@ class MovieContainer: UIView {
         }
     }
 
+    weak var timeObserver: AnyObject?
+
     func start(viewerItem: ViewerItem) {
         if let url = viewerItem.url {
             let steamingURL = NSURL(string: url)!
@@ -101,18 +103,39 @@ class MovieContainer: UIView {
             self.start()
         } else if viewerItem.local == true {
             #if os(iOS)
-                let fechResult = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.remoteID], options: nil)
-                if let object = fechResult.firstObject as? PHAsset {
-                    PHImageManager.defaultManager().requestPlayerItemForVideo(object, options: nil, resultHandler: { playerItem, _ in
-                        if let playerItem = playerItem {
-                            dispatch_async(dispatch_get_main_queue(), {
-                                self.player = AVPlayer(playerItem: playerItem)
-                                self.playerLayer.player = self.player
-                                self.start()
+                let result = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.remoteID], options: nil)
+                guard let asset = result.firstObject as? PHAsset else { fatalError("Couldn't get asset for id: \(viewerItem.remoteID)") }
+                let requestOptions = PHVideoRequestOptions()
+                requestOptions.networkAccessAllowed = true
+                requestOptions.version = .Original
+                PHImageManager.defaultManager().requestPlayerItemForVideo(asset, options: requestOptions, resultHandler: { playerItem, info in
+                    guard let playerItem = playerItem else { fatalError("Player item was nil: \(info)") }
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.player = AVPlayer(playerItem: playerItem)
+                        guard let player = self.player else { fatalError("Couldn't create player from playerItem: \(playerItem)") }
+                        player.rate = Float(playerItem.preferredPeakBitRate)
+                        self.playerLayer.player = player
+                        self.start()
+
+                        if let timeObserver = self.timeObserver {
+                            player.removeTimeObserver(timeObserver)
+                        }
+
+                        if asset.mediaSubtypes == .VideoHighFrameRate {
+                            let interval = CMTime(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
+                            self.timeObserver = player.addPeriodicTimeObserverForInterval(interval, queue: nil, usingBlock: { time in
+                                let currentTime = CMTimeGetSeconds(player.currentTime())
+                                if currentTime >= 2 {
+                                    if player.rate != 0.000001 {
+                                        player.rate = 0.000001
+                                    }
+                                } else if player.rate != 1.0 {
+                                    player.rate = 1.0
+                                }
                             })
                         }
                     })
-                }
+                })
             #endif
         }
     }
@@ -138,6 +161,9 @@ class MovieContainer: UIView {
         self.player?.pause()
         self.player?.seekToTime(kCMTimeZero)
         self.playerLayer.player = nil
+        if let timeObserver = self.timeObserver {
+            self.player?.removeTimeObserver(timeObserver)
+        }
     }
 
     func play() {
