@@ -102,28 +102,21 @@ struct Photo: ViewerItem {
     static func resolveAsset(asset: PHAsset, size: Photo.Size, completion: (image: UIImage?) -> Void) {
         let imageManager = PHImageManager.defaultManager()
         let requestOptions = PHImageRequestOptions()
-
-        var targetSize = CGSizeZero
+        requestOptions.networkAccessAllowed = true
         if size == .Small {
-            targetSize = CGSize(width: 300, height: 300)
-
+            let targetSize = CGSize(width: 300, height: 300)
             imageManager.requestImageForAsset(asset, targetSize: targetSize, contentMode: PHImageContentMode.AspectFill, options: requestOptions) { image, info in
                 if let info = info where info["PHImageFileUTIKey"] == nil {
-                    dispatch_async(dispatch_get_main_queue(), {
-                        completion(image: image)
-                    })
+                    completion(image: image)
                 }
             }
         } else {
-            let size = UIScreen.mainScreen().bounds.size
-            targetSize = CGSize(width: size.width * 3, height: size.height * 3)
-            requestOptions.deliveryMode = .HighQualityFormat
-
-            imageManager.requestImageDataForAsset(asset, options: nil) { data, _, _, _ in
+            requestOptions.version = .Original
+            imageManager.requestImageDataForAsset(asset, options: requestOptions) { data, _, _, _ in
                 if let data = data, image = UIImage(data: data) {
-                    dispatch_async(dispatch_get_main_queue(), {
-                        completion(image: image)
-                    })
+                    completion(image: image)
+                } else {
+                    fatalError("Couldn't get photo")
                 }
             }
         }
