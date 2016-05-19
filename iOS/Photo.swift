@@ -7,19 +7,19 @@ struct Photo: ViewerItem {
     }
 
     var type: ViewerItemType = .Image
-    var remoteID: String
+    var id: String
     var placeholder = UIImage(named: "clear.png")!
     var url: String?
     var local: Bool = false
     static let NumberOfSections = 20
 
-    init(remoteID: String) {
-        self.remoteID = remoteID
+    init(id: String) {
+        self.id = id
     }
 
     func media(completion: (image: UIImage?, error: NSError?) -> ()) {
         if self.local {
-            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([self.remoteID], options: nil).firstObject {
+            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([self.id], options: nil).firstObject {
                 Photo.resolveAsset(asset as! PHAsset, size: .Large, completion: { image in
                     completion(image: image, error: nil)
                 })
@@ -35,7 +35,7 @@ struct Photo: ViewerItem {
         for section in 0..<Photo.NumberOfSections {
             var elements = [ViewerItem]()
             for row in 0..<10 {
-                var photo = Photo(remoteID: "\(section)-\(row)")
+                var photo = Photo(id: "\(section)-\(row)")
 
                 let index = Int(arc4random_uniform(6))
                 switch index {
@@ -84,7 +84,7 @@ struct Photo: ViewerItem {
         if fetchResult?.count > 0 {
             fetchResult?.enumerateObjectsUsingBlock { object, index, stop in
                 if let asset = object as? PHAsset {
-                    var photo = Photo(remoteID: asset.localIdentifier)
+                    var photo = Photo(id: asset.localIdentifier)
 
                     if asset.duration > 0 {
                         photo.type = .Video

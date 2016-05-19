@@ -7,7 +7,7 @@ public enum ViewerItemType: String {
 
 public protocol ViewerItem {
     var type: ViewerItemType { get }
-    var remoteID: String { get }
+    var id: String { get }
     var placeholder: UIImage { get set }
     var url: String? { get }
     var local: Bool { get }

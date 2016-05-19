@@ -70,7 +70,7 @@ class ViewerItemController: UIViewController {
     var changed = false
     var viewerItem: ViewerItem? {
         willSet {
-            if self.viewerItem?.remoteID != newValue?.remoteID {
+            if self.viewerItem?.id != newValue?.id {
                 self.changed = true
             }
         }

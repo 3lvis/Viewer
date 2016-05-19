@@ -181,7 +181,7 @@ extension ViewerController {
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
         var viewerItemController: ViewerItemController
 
-        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.remoteID) as? ViewerItemController {
+        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.id) as? ViewerItemController {
             viewerItemController = cachedController
         } else {
             viewerItemController = ViewerItemController()
@@ -192,7 +192,7 @@ extension ViewerController {
             gesture.delegate = self
             viewerItemController.imageView.addGestureRecognizer(gesture)
 
-            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.remoteID)
+            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.id)
         }
 
         viewerItemController.viewerItem = viewerItem

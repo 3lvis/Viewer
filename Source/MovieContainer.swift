@@ -103,8 +103,8 @@ class MovieContainer: UIView {
             self.start()
         } else if viewerItem.local == true {
             #if os(iOS)
-                let result = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.remoteID], options: nil)
-                guard let asset = result.firstObject as? PHAsset else { fatalError("Couldn't get asset for id: \(viewerItem.remoteID)") }
+                let result = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.id], options: nil)
+                guard let asset = result.firstObject as? PHAsset else { fatalError("Couldn't get asset for id: \(viewerItem.id)") }
                 let requestOptions = PHVideoRequestOptions()
                 requestOptions.networkAccessAllowed = true
                 requestOptions.version = .Original
