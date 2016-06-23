@@ -32,3 +32,16 @@ DerivedData
 # CocoaPods
 Pods
 *.lock
+
+.idea/.name
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/runConfigurations/iOS.xml
+.idea/runConfigurations/Tests.xml
+.idea/vcs.xml
+.idea/Viewer.iml
+.idea/workspace.xml
+.idea/xcode.xml
+Demo.xcodeproj/project.pbxproj
+Demo.xcodeproj/project.pbxproj
