@@ -20,6 +20,8 @@ class ViewerItemController: UIViewController {
 
     var indexPath: NSIndexPath?
 
+    var scrollView = UIScrollView()
+
     lazy var imageView: UIImageView = {
         let view = UIImageView(frame: UIScreen.mainScreen().bounds)
         view.backgroundColor = UIColor.clearColor()
@@ -92,7 +94,23 @@ class ViewerItemController: UIViewController {
 
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.view.backgroundColor = UIColor.blackColor()
-        self.view.addSubview(self.imageView)
+
+
+        var vWidth = self.view.frame.width
+        var vHeight = self.view.frame.height
+
+        self.scrollView.delegate = self
+        self.scrollView.frame = CGRectMake(0, 0, vWidth, vHeight)
+        self.scrollView.backgroundColor = UIColor(red: 90, green: 90, blue: 90, alpha: 0.90)
+        self.scrollView.alwaysBounceVertical = false
+        self.scrollView.alwaysBounceHorizontal = false
+        self.scrollView.showsVerticalScrollIndicator = true
+        self.scrollView.flashScrollIndicators()
+        self.scrollView.minimumZoomScale = 1.0
+        self.scrollView.maximumZoomScale = 10.0
+        self.scrollView.addSubview(self.imageView)
+
+        self.view.addSubview(self.scrollView)
         self.view.addSubview(self.movieContainer)
 
         self.view.addSubview(self.playButton)
@@ -101,6 +119,8 @@ class ViewerItemController: UIViewController {
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewerItemController.tapAction))
         self.view.addGestureRecognizer(tapRecognizer)
+        let pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ViewerItemController.zoom))
+        self.view.addGestureRecognizer(pinchRecognizer)
     }
 
     func tapAction() {
@@ -209,6 +229,36 @@ class ViewerItemController: UIViewController {
             self.shouldDimPause = false
             self.shouldDimPlay = false
         }
+    }
+
+    func zoom(sender:UIPinchGestureRecognizer) {
+
+        if sender.state == .Ended || sender.state == .Changed {
+
+            let currentScale = self.view.frame.size.width / self.view.bounds.size.width
+            var newScale = currentScale*sender.scale
+
+            if newScale < 1 {
+                newScale = 1
+            }
+            if newScale > 9 {
+                newScale = 9
+            }
+
+            let transform = CGAffineTransformMakeScale(newScale, newScale)
+
+            self.imageView.transform = transform
+            sender.scale = 1
+
+        }
+
+    }
+}
+
+extension ViewerItemController : UIScrollViewDelegate {
+
+    func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+        return self.imageView
     }
 }
 
