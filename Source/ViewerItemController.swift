@@ -101,13 +101,14 @@ class ViewerItemController: UIViewController {
 
         self.scrollView.delegate = self
         self.scrollView.frame = CGRectMake(0, 0, vWidth, vHeight)
-        self.scrollView.backgroundColor = UIColor(red: 90, green: 90, blue: 90, alpha: 0.90)
+        self.scrollView.backgroundColor = UIColor.clearColor()
         self.scrollView.alwaysBounceVertical = false
         self.scrollView.alwaysBounceHorizontal = false
         self.scrollView.showsVerticalScrollIndicator = true
         self.scrollView.flashScrollIndicators()
         self.scrollView.minimumZoomScale = 1.0
         self.scrollView.maximumZoomScale = 10.0
+        self.scrollView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.scrollView.addSubview(self.imageView)
 
         self.view.addSubview(self.scrollView)
