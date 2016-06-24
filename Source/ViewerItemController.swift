@@ -20,7 +20,24 @@ class ViewerItemController: UIViewController {
 
     var indexPath: NSIndexPath?
 
-    var scrollView = UIScrollView()
+    lazy var scrollView: UIScrollView = {
+        var vWidth = self.view.frame.width
+        var vHeight = self.view.frame.height
+
+        let scrollView = UIScrollView()
+        scrollView.delegate = self
+        scrollView.frame = CGRectMake(0, 0, vWidth, vHeight)
+        scrollView.backgroundColor = UIColor.clearColor()
+        scrollView.alwaysBounceVertical = false
+        scrollView.alwaysBounceHorizontal = false
+        scrollView.showsVerticalScrollIndicator = true
+        scrollView.flashScrollIndicators()
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = 10.0
+        scrollView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+
+        return scrollView
+    }()
 
     lazy var imageView: UIImageView = {
         let view = UIImageView(frame: UIScreen.mainScreen().bounds)
@@ -95,20 +112,6 @@ class ViewerItemController: UIViewController {
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.view.backgroundColor = UIColor.blackColor()
 
-
-        var vWidth = self.view.frame.width
-        var vHeight = self.view.frame.height
-
-        self.scrollView.delegate = self
-        self.scrollView.frame = CGRectMake(0, 0, vWidth, vHeight)
-        self.scrollView.backgroundColor = UIColor.clearColor()
-        self.scrollView.alwaysBounceVertical = false
-        self.scrollView.alwaysBounceHorizontal = false
-        self.scrollView.showsVerticalScrollIndicator = true
-        self.scrollView.flashScrollIndicators()
-        self.scrollView.minimumZoomScale = 1.0
-        self.scrollView.maximumZoomScale = 10.0
-        self.scrollView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.scrollView.addSubview(self.imageView)
 
         self.view.addSubview(self.scrollView)
