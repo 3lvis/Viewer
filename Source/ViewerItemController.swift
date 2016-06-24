@@ -123,8 +123,6 @@ class ViewerItemController: UIViewController {
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewerItemController.tapAction))
         self.view.addGestureRecognizer(tapRecognizer)
-        let pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(ViewerItemController.zoom))
-        self.view.addGestureRecognizer(pinchRecognizer)
     }
 
     func tapAction() {
@@ -233,29 +231,6 @@ class ViewerItemController: UIViewController {
             self.shouldDimPause = false
             self.shouldDimPlay = false
         }
-    }
-
-    func zoom(sender:UIPinchGestureRecognizer) {
-
-        if sender.state == .Ended || sender.state == .Changed {
-
-            let currentScale = self.view.frame.size.width / self.view.bounds.size.width
-            var newScale = currentScale*sender.scale
-
-            if newScale < 1 {
-                newScale = 1
-            }
-            if newScale > 9 {
-                newScale = 9
-            }
-
-            let transform = CGAffineTransformMakeScale(newScale, newScale)
-
-            self.imageView.transform = transform
-            sender.scale = 1
-
-        }
-
     }
 }
 
