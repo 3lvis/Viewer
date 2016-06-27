@@ -183,4 +183,8 @@ class MovieContainer: UIView {
 
         return false
     }
+
+    func updateProgressBar(forDuration duration: Double, currentTime: Double){
+       print("progress = \(duration/currentTime)")
+    }
 }
