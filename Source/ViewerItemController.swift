@@ -20,6 +20,25 @@ class ViewerItemController: UIViewController {
 
     var indexPath: NSIndexPath?
 
+    lazy var scrollView: UIScrollView = {
+        var vWidth = self.view.frame.width
+        var vHeight = self.view.frame.height
+
+        let scrollView = UIScrollView()
+        scrollView.delegate = self
+        scrollView.frame = CGRectMake(0, 0, vWidth, vHeight)
+        scrollView.backgroundColor = UIColor.clearColor()
+        scrollView.alwaysBounceVertical = false
+        scrollView.alwaysBounceHorizontal = false
+        scrollView.showsVerticalScrollIndicator = true
+        scrollView.flashScrollIndicators()
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = self.maxZoomScale()
+        scrollView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+
+        return scrollView
+    }()
+
     lazy var imageView: UIImageView = {
         let view = UIImageView(frame: UIScreen.mainScreen().bounds)
         view.backgroundColor = UIColor.clearColor()
@@ -82,9 +101,26 @@ class ViewerItemController: UIViewController {
                 self.movieContainer.image = viewerItem.placeholder
                 self.imageView.image = viewerItem.placeholder
                 self.movieContainer.frame = viewerItem.placeholder.centeredFrame()
+
                 self.changed = false
             }
         }
+    }
+
+    func maxZoomScale() -> CGFloat {
+
+        guard let image = self.imageView.image else { return 0 }
+
+        var widthFactor = CGFloat(0.0)
+        var heightFactor = CGFloat(0.0)
+        if image.size.width > self.view.bounds.width {
+            widthFactor = image.size.width / self.view.bounds.width
+        }
+        if image.size.height > self.view.bounds.height {
+            heightFactor = image.size.height / self.view.bounds.height
+        }
+
+        return max(widthFactor, heightFactor)
     }
 
     override func viewDidLoad() {
@@ -92,7 +128,10 @@ class ViewerItemController: UIViewController {
 
         self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         self.view.backgroundColor = UIColor.blackColor()
-        self.view.addSubview(self.imageView)
+
+        self.scrollView.addSubview(self.imageView)
+
+        self.view.addSubview(self.scrollView)
         self.view.addSubview(self.movieContainer)
 
         self.view.addSubview(self.playButton)
@@ -209,6 +248,13 @@ class ViewerItemController: UIViewController {
             self.shouldDimPause = false
             self.shouldDimPlay = false
         }
+    }
+}
+
+extension ViewerItemController : UIScrollViewDelegate {
+
+    func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+        return self.imageView
     }
 }
 

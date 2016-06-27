@@ -32,3 +32,6 @@ DerivedData
 # CocoaPods
 Pods
 *.lock
+
+# AppCode
+.idea
