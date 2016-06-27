@@ -8,6 +8,7 @@ import AVKit
 
 protocol MovieContainerDelegate: class {
     func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer)
+    func movieContainer(movieContainder: MovieContainer, didRequestToUpdateProgress progress: Double)
 }
 
 class MovieContainer: UIView {
@@ -199,6 +200,8 @@ class MovieContainer: UIView {
     }
 
     func updateProgressBar(forDuration duration: Double, currentTime: Double){
-       print("progress = \((currentTime/duration))")
+
+        let progress = currentTime/duration
+        self.viewDelegate?.movieContainer(self, didRequestToUpdateProgress: progress)
     }
 }

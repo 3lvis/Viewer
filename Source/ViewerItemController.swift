@@ -266,4 +266,8 @@ extension ViewerItemController: MovieContainerDelegate {
     func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer) {
         self.playIfNeeded()
     }
+
+    func movieContainer(movieContainder: MovieContainer, didRequestToUpdateProgress progress: Double){
+        print("progress = \(progress)")
+    }
 }
