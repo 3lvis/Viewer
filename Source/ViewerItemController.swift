@@ -33,7 +33,7 @@ class ViewerItemController: UIViewController {
         scrollView.showsVerticalScrollIndicator = true
         scrollView.flashScrollIndicators()
         scrollView.minimumZoomScale = 1.0
-        scrollView.maximumZoomScale = 10.0
+        scrollView.maximumZoomScale = self.maxZoomScale()
         scrollView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 
         return scrollView
@@ -102,7 +102,6 @@ class ViewerItemController: UIViewController {
                 self.imageView.image = viewerItem.placeholder
                 self.movieContainer.frame = viewerItem.placeholder.centeredFrame()
 
-                self.scrollView.maximumZoomScale = self.maxZoomScale()
                 self.changed = false
             }
         }
