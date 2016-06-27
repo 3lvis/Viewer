@@ -102,33 +102,26 @@ class ViewerItemController: UIViewController {
                 self.imageView.image = viewerItem.placeholder
                 self.movieContainer.frame = viewerItem.placeholder.centeredFrame()
 
-                self.scrollView.maximumZoomScale = imageSizeForScaleAspectFit.width
+                self.scrollView.maximumZoomScale = self.maxZoomScale()
                 self.changed = false
             }
         }
     }
 
-    var imageSizeForScaleAspectFit : CGSize {
-        get {
-            guard let image = self.imageView.image else {
-                return CGSizeZero
-            }
+    func maxZoomScale() -> CGFloat {
 
-            var imageWidth = image.size.width
-            var imageHeight = image.size.height
+        guard let image = self.imageView.image else { return 0 }
 
-            var widthFactor = CGFloat(0.0)
-            var heightFactor = CGFloat(0.0)
-            if image.size.width > self.view.bounds.width {
-                widthFactor = image.size.height/(image.size.width/self.view.bounds.width)
-            } else if image.size.height > self.view.bounds.height {
-                heightFactor = image.size.width/(image.size.height/self.view.bounds.height)
-            }
-
-
-
-            return CGSize(width: imageWidth, height: imageHeight)
+        var widthFactor = CGFloat(0.0)
+        var heightFactor = CGFloat(0.0)
+        if image.size.width > self.view.bounds.width {
+            widthFactor = image.size.width / self.view.bounds.width
         }
+        if image.size.height > self.view.bounds.height {
+            heightFactor = image.size.height / self.view.bounds.height
+        }
+
+        return max(widthFactor, heightFactor)
     }
 
     override func viewDidLoad() {
