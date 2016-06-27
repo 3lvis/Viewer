@@ -141,6 +141,19 @@ class MovieContainer: UIView {
     }
 
     func start() {
+
+        guard let player = self.player, currentItem = player.currentItem else { return }
+
+        let interval = CMTime(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
+        player.addPeriodicTimeObserverForInterval(interval, queue: nil, usingBlock: {
+            time in
+
+            let duration = CMTimeGetSeconds(currentItem.asset.duration)
+            let currentTime = CMTimeGetSeconds(player.currentTime())
+
+            self.updateProgressBar(forDuration: duration, currentTime: currentTime)
+        })
+
         self.playerLayer.hidden = false
 
         if self.shouldRegisterForNotifications {
@@ -167,6 +180,7 @@ class MovieContainer: UIView {
     }
 
     func play() {
+
         self.player?.play()
         self.playerLayer.hidden = false
     }
@@ -185,6 +199,6 @@ class MovieContainer: UIView {
     }
 
     func updateProgressBar(forDuration duration: Double, currentTime: Double){
-       print("progress = \(duration/currentTime)")
+       print("progress = \((currentTime/duration))")
     }
 }
