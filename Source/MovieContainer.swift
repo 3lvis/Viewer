@@ -145,7 +145,7 @@ class MovieContainer: UIView {
 
         guard let player = self.player, currentItem = player.currentItem else { return }
 
-        let interval = CMTime(seconds: 0.4, preferredTimescale: Int32(NSEC_PER_SEC))
+        let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
         player.addPeriodicTimeObserverForInterval(interval, queue: nil, usingBlock: {
             time in
 

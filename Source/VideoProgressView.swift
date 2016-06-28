@@ -21,9 +21,7 @@ class VideoProgressView: UIView {
     var currentTime = 0.0 {
         didSet {
             self.currentTimeLabel.text = self.timeStringForSeconds(self.currentTime)
-            UIView.animateWithDuration(0.2) {
-                self.setFrameForProgressBar()
-            }
+            self.setFrameForProgressBar()
         }
     }
 
