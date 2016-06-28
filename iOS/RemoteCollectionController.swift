@@ -33,6 +33,7 @@ class RemoteCollectionController: UICollectionViewController {
     func alertControllerWithTitle(title: String) -> UIAlertController {
         let alertController = UIAlertController(title: title, message: nil, preferredStyle: .Alert)
         alertController.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+
         return alertController
     }
 }
@@ -44,6 +45,7 @@ extension RemoteCollectionController {
 
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let photos = self.sections[section]
+
         return photos.count
     }
 
@@ -79,6 +81,7 @@ extension RemoteCollectionController: ViewerControllerDataSource {
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
         let photos = self.sections[indexPath.section]
         let viewerItem = photos[indexPath.row]
+
         return viewerItem
     }
 }

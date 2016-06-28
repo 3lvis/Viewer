@@ -87,6 +87,7 @@ class ViewerItemController: UIViewController {
     lazy var videoProgressView: VideoProgressView = {
         let progressView = VideoProgressView(frame: CGRectZero)
         progressView.alpha = 0
+
         return progressView
     }()
 
