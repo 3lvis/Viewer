@@ -201,7 +201,9 @@ class MovieContainer: UIView {
 
     func updateProgressBar(forDuration duration: Double, currentTime: Double){
 
-        let progress = currentTime/duration
-        self.viewDelegate?.movieContainer(self, didRequestToUpdateProgress: progress)
+        let progress = currentTime / duration
+        if progress > 0 {
+            self.viewDelegate?.movieContainer(self, didRequestToUpdateProgress: progress)
+        }
     }
 }

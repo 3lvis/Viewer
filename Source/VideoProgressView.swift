@@ -15,13 +15,14 @@ class VideoProgressView: UIView {
     private static let ProgressBarHeight = CGFloat(6.0)
 
     var progress = 0.0 {
+
         didSet{
             self.layoutSubviews()
         }
     }
 
     var widthForBar : CGFloat {
-        return self.bounds.width - 2 * VideoProgressView.ProgressBarMargin
+        return self.bounds.width - (2 * VideoProgressView.ProgressBarMargin)
     }
 
     var widthForProgressBar : CGFloat {
