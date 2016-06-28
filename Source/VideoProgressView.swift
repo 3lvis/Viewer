@@ -74,7 +74,7 @@ class VideoProgressView: UIView {
         return currentTimeLabel
     }()
 
-    lazy var durationTimeLabel : UILabel = {
+    lazy var durationTimeLabel: UILabel = {
         let durationTimeLabel = UILabel()
         durationTimeLabel.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
         durationTimeLabel.textColor = UIColor.whiteColor()
@@ -115,7 +115,7 @@ class VideoProgressView: UIView {
         self.progressBar.frame = CGRect(x: 0, y: 0, width: self.widthForProgressBar, height: VideoProgressView.ProgressBarHeight)
     }
 
-    func timeStringForSeconds(secondValue : Double) -> String{
+    func timeStringForSeconds(secondValue: Double) -> String{
        let minutes = Int((secondValue % 3600) / 60)
        let seconds = Int((secondValue % 3600) % 60)
 

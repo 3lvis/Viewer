@@ -260,7 +260,7 @@ class ViewerItemController: UIViewController {
     }
 }
 
-extension ViewerItemController : UIScrollViewDelegate {
+extension ViewerItemController: UIScrollViewDelegate {
     func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
         if self.viewerItem?.type == .Image {
             return self.imageView
