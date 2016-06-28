@@ -8,7 +8,7 @@ import AVKit
 
 protocol MovieContainerDelegate: class {
     func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer)
-    func movieContainer(movieContainder: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
+    func movieContainer(movieContainer: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
 }
 
 class MovieContainer: UIView {
@@ -146,14 +146,14 @@ class MovieContainer: UIView {
         guard let player = self.player, currentItem = player.currentItem else { return }
 
         let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
-        player.addPeriodicTimeObserverForInterval(interval, queue: nil, usingBlock: {
+        player.addPeriodicTimeObserverForInterval(interval, queue: nil) {
             time in
 
             let duration = CMTimeGetSeconds(currentItem.asset.duration)
             let currentTime = CMTimeGetSeconds(player.currentTime())
 
             self.updateProgressBar(forDuration: duration, currentTime: currentTime)
-        })
+        }
 
         self.playerLayer.hidden = false
 
@@ -181,7 +181,6 @@ class MovieContainer: UIView {
     }
 
     func play() {
-
         self.player?.play()
         self.playerLayer.hidden = false
     }
@@ -199,8 +198,7 @@ class MovieContainer: UIView {
         return false
     }
 
-    func updateProgressBar(forDuration duration: Double, currentTime: Double){
-
-            self.viewDelegate?.movieContainer(self, didRequestToUpdateProgressBar: duration, currentTime: currentTime)
+    func updateProgressBar(forDuration duration: Double, currentTime: Double) {
+        self.viewDelegate?.movieContainer(self, didRequestToUpdateProgressBar: duration, currentTime: currentTime)
     }
 }
