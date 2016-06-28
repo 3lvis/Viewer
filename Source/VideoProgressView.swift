@@ -10,6 +10,7 @@ import UIKit
 
 class VideoProgressView: UIView {
 
+    static let Height = CGFloat(55.0)
     private static let ProgressBarMargin = CGFloat(65.0)
     private static let ProgressBarHeight = CGFloat(6.0)
 

@@ -168,8 +168,7 @@ class ViewerItemController: UIViewController {
         self.repeatButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
         self.pauseButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
 
-        // needs adjustment
-        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - 84), width: self.view.frame.width, height: 44)
+        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - buttonHeight - VideoProgressView.Height), width: self.view.frame.width, height: VideoProgressView.Height)
     }
 
     func willDismiss() {
