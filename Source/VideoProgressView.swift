@@ -1,11 +1,3 @@
-//
-//  VideoProgressView.swift
-//  Demo
-//
-//  Created by Marijn Schilling on 28/06/16.
-//
-//
-
 import UIKit
 
 class VideoProgressView: UIView {
@@ -51,7 +43,7 @@ class VideoProgressView: UIView {
         return widthForBar * CGFloat(progressPercentage)
     }
 
-    lazy var maskBarForRoundedCorners : UIView = {
+    lazy var maskBarForRoundedCorners: UIView = {
         let maskView = UIView()
         maskView.backgroundColor = UIColor.clearColor()
         maskView.layer.cornerRadius = ProgressBarHeight/2
@@ -61,14 +53,14 @@ class VideoProgressView: UIView {
     }()
 
 
-    lazy var backgroundBar : UIView = {
+    lazy var backgroundBar: UIView = {
         let backgroundBar = UIView()
         backgroundBar.backgroundColor = UIColor.whiteColor()
         backgroundBar.alpha = 0.2
         return backgroundBar
     }()
 
-    lazy var progressBar : UIView = {
+    lazy var progressBar: UIView = {
         let progressBar = UIView()
         progressBar.backgroundColor = UIColor.whiteColor()
         return progressBar
