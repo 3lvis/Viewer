@@ -29,7 +29,9 @@ class VideoProgressView: UIView {
     var currentTime = 0.0 {
         didSet {
             self.currentTimeLabel.text = self.timeStringForSeconds(self.currentTime)
-            self.layoutSubviews()
+            UIView.animateWithDuration(0.2) {
+                self.setFrameForProgressBar()
+            }
         }
     }
 
@@ -107,12 +109,16 @@ class VideoProgressView: UIView {
 
         self.maskBarForRoundedCorners.frame = CGRect(x: VideoProgressView.ProgressBarXMargin, y: VideoProgressView.ProgressBarYMargin, width: self.widthForBar, height: VideoProgressView.ProgressBarHeight)
         self.backgroundBar.frame = CGRect(x: 0, y: 0, width: self.widthForBar, height: VideoProgressView.ProgressBarHeight)
-        self.progressBar.frame = CGRect(x: 0, y: 0, width: self.widthForProgressBar, height: VideoProgressView.ProgressBarHeight)
+        self.setFrameForProgressBar()
 
         let xPosForCurrentTimeLabel = (VideoProgressView.ProgressBarXMargin - VideoProgressView.TextLabelWidth)/2
         self.currentTimeLabel.frame = CGRect(x: xPosForCurrentTimeLabel, y: VideoProgressView.TextLabelMargin, width: VideoProgressView.TextLabelWidth, height: VideoProgressView.TextLabelHeight)
         let xPosForDurationTimeLabel = self.bounds.width - VideoProgressView.TextLabelWidth - (VideoProgressView.ProgressBarXMargin - VideoProgressView.TextLabelWidth)/2
         self.durationTimeLabel.frame = CGRect(x: xPosForDurationTimeLabel, y: VideoProgressView.TextLabelMargin, width: VideoProgressView.TextLabelWidth, height: VideoProgressView.TextLabelHeight)
+    }
+
+    func setFrameForProgressBar(){
+        self.progressBar.frame = CGRect(x: 0, y: 0, width: self.widthForProgressBar, height: VideoProgressView.ProgressBarHeight)
     }
 
     func timeStringForSeconds(secondValue : Double) -> String{
