@@ -23,7 +23,6 @@ class ViewerItemController: UIViewController {
     var indexPath: NSIndexPath?
 
     lazy var scrollView: UIScrollView = {
-
         let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
         scrollView.backgroundColor = UIColor.clearColor()
@@ -113,7 +112,6 @@ class ViewerItemController: UIViewController {
     }
 
     func maxZoomScale() -> CGFloat {
-
         guard let image = self.imageView.image else { return 0 }
 
         var widthFactor = CGFloat(0.0)
@@ -229,7 +227,6 @@ class ViewerItemController: UIViewController {
     }
 
     func playIfNeeded() {
-
         let overlayIsHidden = self.controllerDataSource?.overlayIsHidden() ?? false
         if overlayIsHidden == false {
             self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
@@ -263,7 +260,6 @@ class ViewerItemController: UIViewController {
 }
 
 extension ViewerItemController : UIScrollViewDelegate {
-
     func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
         if self.viewerItem?.type == .Image {
             return self.imageView

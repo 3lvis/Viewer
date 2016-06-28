@@ -142,7 +142,6 @@ class MovieContainer: UIView {
     }
 
     func start() {
-
         guard let player = self.player, currentItem = player.currentItem else { return }
 
         let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
