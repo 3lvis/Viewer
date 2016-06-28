@@ -98,7 +98,7 @@ class VideoProgressView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func layoutSubviews(){
+    override func layoutSubviews() {
         super.layoutSubviews()
 
         self.maskBarForRoundedCorners.frame = CGRect(x: VideoProgressView.ProgressBarXMargin, y: VideoProgressView.ProgressBarYMargin, width: self.widthForBar, height: VideoProgressView.ProgressBarHeight)
@@ -111,11 +111,11 @@ class VideoProgressView: UIView {
         self.durationTimeLabel.frame = CGRect(x: xPosForDurationTimeLabel, y: VideoProgressView.TextLabelMargin, width: VideoProgressView.TextLabelWidth, height: VideoProgressView.TextLabelHeight)
     }
 
-    func setFrameForProgressBar(){
+    func setFrameForProgressBar() {
         self.progressBar.frame = CGRect(x: 0, y: 0, width: self.widthForProgressBar, height: VideoProgressView.ProgressBarHeight)
     }
 
-    func timeStringForSeconds(secondValue: Double) -> String{
+    func timeStringForSeconds(secondValue: Double) -> String {
        let minutes = Int((secondValue % 3600) / 60)
        let seconds = Int((secondValue % 3600) % 60)
 
