@@ -15,6 +15,8 @@ protocol ViewerItemControllerDataSource: class {
 }
 
 class ViewerItemController: UIViewController {
+    private static let FooterViewHeight = CGFloat(50.0)
+
     weak var controllerDelegate: ViewerItemControllerDelegate?
     weak var controllerDataSource: ViewerItemControllerDataSource?
 
@@ -166,7 +168,7 @@ class ViewerItemController: UIViewController {
         self.repeatButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
         self.pauseButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
 
-        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - buttonHeight - VideoProgressView.Height), width: self.view.frame.width, height: VideoProgressView.Height)
+        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - ViewerItemController.FooterViewHeight - VideoProgressView.Height), width: self.view.frame.width, height: VideoProgressView.Height)
     }
 
     func willDismiss() {
