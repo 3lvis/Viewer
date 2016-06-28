@@ -21,12 +21,9 @@ class ViewerItemController: UIViewController {
     var indexPath: NSIndexPath?
 
     lazy var scrollView: UIScrollView = {
-        var vWidth = self.view.frame.width
-        var vHeight = self.view.frame.height
 
-        let scrollView = UIScrollView()
+        let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
-        scrollView.frame = CGRectMake(0, 0, vWidth, vHeight)
         scrollView.backgroundColor = UIColor.clearColor()
         scrollView.alwaysBounceVertical = false
         scrollView.alwaysBounceHorizontal = false
@@ -153,7 +150,6 @@ class ViewerItemController: UIViewController {
         if self.movieContainer.isPlaying() {
             UIView.animateWithDuration(0.3) {
                 self.pauseButton.alpha = self.pauseButton.alpha == 0 ? 1 : 0
-                self.videoProgressView.alpha = self.videoProgressView.alpha == 0 ? 1 : 0
             }
         }
 
@@ -230,6 +226,8 @@ class ViewerItemController: UIViewController {
     }
 
     func playIfNeeded() {
+        self.videoProgressView.alpha = 1
+
         let overlayIsHidden = self.controllerDataSource?.overlayIsHidden() ?? false
         if overlayIsHidden == false {
             self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
@@ -278,7 +276,8 @@ extension ViewerItemController: MovieContainerDelegate {
         self.playIfNeeded()
     }
 
-    func movieContainer(movieContainder: MovieContainer, didRequestToUpdateProgress progress: Double){
-       self.videoProgressView.progress = progress
+    func movieContainer(movieContainder: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
+       self.videoProgressView.currentTime = currentTime
+       self.videoProgressView.duration = duration
     }
 }
