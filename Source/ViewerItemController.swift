@@ -86,6 +86,11 @@ class ViewerItemController: UIViewController {
         return button
     }()
 
+    lazy var videoProgressView: VideoProgressView = {
+        let progressView = VideoProgressView(frame: CGRectZero)
+        return progressView
+    }()
+
     var changed = false
     var viewerItem: ViewerItem? {
         willSet {
@@ -137,6 +142,7 @@ class ViewerItemController: UIViewController {
         self.view.addSubview(self.playButton)
         self.view.addSubview(self.repeatButton)
         self.view.addSubview(self.pauseButton)
+        self.view.addSubview(self.videoProgressView)
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewerItemController.tapAction))
         self.view.addGestureRecognizer(tapRecognizer)
@@ -161,6 +167,9 @@ class ViewerItemController: UIViewController {
         self.playButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
         self.repeatButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
         self.pauseButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
+
+        // needs adjustment
+        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - 84), width: self.view.frame.width, height: 44)
     }
 
     func willDismiss() {
@@ -268,6 +277,6 @@ extension ViewerItemController: MovieContainerDelegate {
     }
 
     func movieContainer(movieContainder: MovieContainer, didRequestToUpdateProgress progress: Double){
-        print("progress = \(progress)")
+       self.videoProgressView.progress = progress
     }
 }
