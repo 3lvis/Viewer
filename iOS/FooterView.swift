@@ -51,6 +51,7 @@ class FooterView: UIView {
     func widthForElementAtIndex(index: Int, totalElements: Int) -> (x: CGFloat, width: CGFloat) {
         let bounds = UIScreen.mainScreen().bounds
         let singleFrame = bounds.width / CGFloat(totalElements)
+
         return (singleFrame * CGFloat(index), singleFrame)
     }
 
