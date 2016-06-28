@@ -88,6 +88,7 @@ class ViewerItemController: UIViewController {
 
     lazy var videoProgressView: VideoProgressView = {
         let progressView = VideoProgressView(frame: CGRectZero)
+        progressView.alpha = 0
         return progressView
     }()
 
@@ -152,6 +153,7 @@ class ViewerItemController: UIViewController {
         if self.movieContainer.isPlaying() {
             UIView.animateWithDuration(0.3) {
                 self.pauseButton.alpha = self.pauseButton.alpha == 0 ? 1 : 0
+                self.videoProgressView.alpha = self.videoProgressView.alpha == 0 ? 1 : 0
             }
         }
 
@@ -212,6 +214,7 @@ class ViewerItemController: UIViewController {
         self.movieContainer.play()
         self.pauseButton.alpha = 0
         self.playButton.alpha = 0
+        self.videoProgressView.alpha = 1
         self.playIfNeeded()
     }
 
