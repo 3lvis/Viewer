@@ -5,7 +5,41 @@
 ![platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20OS%20X%20%7C%20watchOS%20%7C%20tvOS%20-lightgrey.svg)
 [![License](https://img.shields.io/cocoapods/l/Viewer.svg?style=flat)](https://cocoapods.org/pods/DATAStack)
 
-## Usage
+## Demo
+
+### Focus
+
+Select an image to enter Lightbox mode.
+
+<p align="center">
+  <img src="https://github.com/bakkenbaeck/Viewer/raw/master/GitHub/focus.gif"/>
+</p>
+
+### Browse
+
+Open an image or video to browse.
+
+<p align="center">
+  <img src="https://github.com/bakkenbaeck/Viewer/raw/master/GitHub/play.gif"/>
+</p>
+
+### Rotation
+
+Portrait or landscape, it just works.
+
+<p align="center">
+  <img src="https://github.com/bakkenbaeck/Viewer/raw/master/GitHub/rotation.gif"/>
+</p>
+
+### Zoom
+
+Pinch-to-zoom works seamlessly in images.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/zoom.gif"/>
+</p>
+
+## Setup
 
 From your UICollectionView:
 
