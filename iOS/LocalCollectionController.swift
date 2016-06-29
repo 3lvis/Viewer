@@ -34,6 +34,7 @@ class LocalCollectionController: UICollectionViewController {
     func alertControllerWithTitle(title: String) -> UIAlertController {
         let alertController = UIAlertController(title: title, message: nil, preferredStyle: .Alert)
         alertController.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+
         return alertController
     }
 }
