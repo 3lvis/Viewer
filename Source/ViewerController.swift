@@ -174,6 +174,7 @@ extension ViewerController {
         presentedView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         presentedView.contentMode = .ScaleAspectFill
         presentedView.clipsToBounds = true
+
         return presentedView
     }
 
@@ -453,6 +454,7 @@ extension ViewerController: PaginatedScrollViewDataSource {
 
     func paginatedScrollView(paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
         let indexPath = NSIndexPath.indexPathForIndex(self.collectionView, index: index)!
+
         return self.findOrCreateViewerItemController(indexPath)
     }
 }

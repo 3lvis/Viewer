@@ -15,18 +15,16 @@ protocol ViewerItemControllerDataSource: class {
 }
 
 class ViewerItemController: UIViewController {
+    private static let FooterViewHeight = CGFloat(50.0)
+
     weak var controllerDelegate: ViewerItemControllerDelegate?
     weak var controllerDataSource: ViewerItemControllerDataSource?
 
     var indexPath: NSIndexPath?
 
     lazy var scrollView: UIScrollView = {
-        var vWidth = self.view.frame.width
-        var vHeight = self.view.frame.height
-
-        let scrollView = UIScrollView()
+        let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
-        scrollView.frame = CGRectMake(0, 0, vWidth, vHeight)
         scrollView.backgroundColor = UIColor.clearColor()
         scrollView.alwaysBounceVertical = false
         scrollView.alwaysBounceHorizontal = false
@@ -86,6 +84,13 @@ class ViewerItemController: UIViewController {
         return button
     }()
 
+    lazy var videoProgressView: VideoProgressView = {
+        let progressView = VideoProgressView(frame: CGRectZero)
+        progressView.alpha = 0
+
+        return progressView
+    }()
+
     var changed = false
     var viewerItem: ViewerItem? {
         willSet {
@@ -108,7 +113,6 @@ class ViewerItemController: UIViewController {
     }
 
     func maxZoomScale() -> CGFloat {
-
         guard let image = self.imageView.image else { return 0 }
 
         var widthFactor = CGFloat(0.0)
@@ -137,6 +141,7 @@ class ViewerItemController: UIViewController {
         self.view.addSubview(self.playButton)
         self.view.addSubview(self.repeatButton)
         self.view.addSubview(self.pauseButton)
+        self.view.addSubview(self.videoProgressView)
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewerItemController.tapAction))
         self.view.addGestureRecognizer(tapRecognizer)
@@ -146,6 +151,7 @@ class ViewerItemController: UIViewController {
         if self.movieContainer.isPlaying() {
             UIView.animateWithDuration(0.3) {
                 self.pauseButton.alpha = self.pauseButton.alpha == 0 ? 1 : 0
+                self.videoProgressView.alpha = self.videoProgressView.alpha == 0 ? 1 : 0
             }
         }
 
@@ -161,6 +167,8 @@ class ViewerItemController: UIViewController {
         self.playButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
         self.repeatButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
         self.pauseButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
+
+        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - ViewerItemController.FooterViewHeight - VideoProgressView.Height), width: self.view.frame.width, height: VideoProgressView.Height)
     }
 
     func willDismiss() {
@@ -204,6 +212,7 @@ class ViewerItemController: UIViewController {
         self.movieContainer.play()
         self.pauseButton.alpha = 0
         self.playButton.alpha = 0
+        self.videoProgressView.alpha = 0
         self.playIfNeeded()
     }
 
@@ -251,15 +260,23 @@ class ViewerItemController: UIViewController {
     }
 }
 
-extension ViewerItemController : UIScrollViewDelegate {
-
+extension ViewerItemController: UIScrollViewDelegate {
     func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
-        return self.imageView
+        if self.viewerItem?.type == .Image {
+            return self.imageView
+        } else {
+            return nil
+        }
     }
 }
 
 extension ViewerItemController: MovieContainerDelegate {
     func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer) {
         self.playIfNeeded()
+    }
+
+    func movieContainer(movieContainder: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
+       self.videoProgressView.currentTime = currentTime
+       self.videoProgressView.duration = duration
     }
 }

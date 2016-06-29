@@ -53,6 +53,9 @@
 		14D33A861C6203FA00A8BE11 /* LocalCollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D33A851C6203FA00A8BE11 /* LocalCollectionController.swift */; };
 		14EC47B81C58F6BC0028A0CD /* MovieContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */; };
 		14EC47B91C58F6C00028A0CD /* MovieContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */; };
+		E6D592831D226528006EF238 /* VideoProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D592821D226528006EF238 /* VideoProgressView.swift */; };
+		E6D592841D226528006EF238 /* VideoProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D592821D226528006EF238 /* VideoProgressView.swift */; };
+		E6D592891D22A2B8006EF238 /* DINNextLTPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -103,6 +106,8 @@
 		14D081361C18579700E3FFC3 /* 2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2.jpg; sourceTree = "<group>"; };
 		14D33A851C6203FA00A8BE11 /* LocalCollectionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalCollectionController.swift; sourceTree = "<group>"; };
 		14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieContainer.swift; sourceTree = "<group>"; };
+		E6D592821D226528006EF238 /* VideoProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoProgressView.swift; sourceTree = "<group>"; };
+		E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DINNextLTPro-Regular.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +131,7 @@
 		1459C2171CB694690007E498 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				E6D592851D229716006EF238 /* Fonts */,
 				1459C2181CB694690007E498 /* pause.png */,
 				1459C2191CB694690007E498 /* pause@2x.png */,
 				1459C21A1CB694690007E498 /* pause@3x.png */,
@@ -191,6 +197,7 @@
 				143803381C2452A1003CA252 /* ViewerController.swift */,
 				143803391C2452A1003CA252 /* ViewerItem.swift */,
 				1438033A1C2452A1003CA252 /* ViewerItemController.swift */,
+				E6D592821D226528006EF238 /* VideoProgressView.swift */,
 				14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */,
 				14C327B71CBE69F800CC0F98 /* PaginatedScrollView.swift */,
 			);
@@ -232,6 +239,14 @@
 				14C984061C0DE79200B5E515 /* Info.plist */,
 			);
 			path = iOS;
+			sourceTree = "<group>";
+		};
+		E6D592851D229716006EF238 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */,
+			);
+			name = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -327,6 +342,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6D592891D22A2B8006EF238 /* DINNextLTPro-Regular.otf in Resources */,
 				1459C2251CB694690007E498 /* play@2x.png in Resources */,
 				14AE4D5D1C18834500EEC4D9 /* 3.jpg in Resources */,
 				14AE4D5F1C18928B00EEC4D9 /* 4.jpg in Resources */,
@@ -359,6 +375,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				147EE8581C92F10700A7B449 /* UIViewController+Window.swift in Sources */,
+				E6D592831D226528006EF238 /* VideoProgressView.swift in Sources */,
 				14C327B81CBE69F800CC0F98 /* PaginatedScrollView.swift in Sources */,
 				147EE8591C92F10A00A7B449 /* ViewerController.swift in Sources */,
 				147EE85B1C92F10E00A7B449 /* ViewerItemController.swift in Sources */,
@@ -383,6 +400,7 @@
 				14EC47B91C58F6C00028A0CD /* MovieContainer.swift in Sources */,
 				143B5C3B1C0EED51000B6A18 /* PhotoCell.swift in Sources */,
 				1438033E1C2452A1003CA252 /* NSIndexPath+Contiguous.swift in Sources */,
+				E6D592841D226528006EF238 /* VideoProgressView.swift in Sources */,
 				14D33A861C6203FA00A8BE11 /* LocalCollectionController.swift in Sources */,
 				14B9C0FE1C2020C600FDE58B /* HeaderView.swift in Sources */,
 				14C327B91CBE69F800CC0F98 /* PaginatedScrollView.swift in Sources */,
