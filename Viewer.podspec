@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Viewer"
-  s.summary          = "Artistic image viewer"
+  s.summary          = "Image viewer (or Lightbox) with support for local and remove videos and images"
   s.version          = "0.1.0"
   s.homepage         = "https://github.com/3lvis/Viewer"
   s.license          = 'MIT'
