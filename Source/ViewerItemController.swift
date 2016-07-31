@@ -113,10 +113,10 @@ class ViewerItemController: UIViewController {
     }
 
     func maxZoomScale() -> CGFloat {
-        guard let image = self.imageView.image else { return 0 }
+        guard let image = self.imageView.image else { return 1 }
 
-        var widthFactor = CGFloat(0.0)
-        var heightFactor = CGFloat(0.0)
+        var widthFactor = CGFloat(1.0)
+        var heightFactor = CGFloat(1.0)
         if image.size.width > self.view.bounds.width {
             widthFactor = image.size.width / self.view.bounds.width
         }
