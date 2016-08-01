@@ -191,6 +191,7 @@ class ViewerItemController: UIViewController {
             viewerItem.media({ image, error in
                 if let image = image {
                     self.imageView.image = image
+                    self.scrollView.maximumZoomScale = self.maxZoomScale()
                 }
             })
         }
