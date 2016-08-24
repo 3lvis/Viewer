@@ -10,7 +10,7 @@ struct Photo: ViewerItem {
     var id: String
     var placeholder = UIImage(named: "clear.png")!
     var url: String?
-    var local: Bool = false
+    var isLocal: Bool = false
     static let NumberOfSections = 20
 
     init(id: String) {
@@ -18,7 +18,7 @@ struct Photo: ViewerItem {
     }
 
     func media(completion: (image: UIImage?, error: NSError?) -> ()) {
-        if self.local {
+        if self.isLocal {
             if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([self.id], options: nil).firstObject {
                 Photo.resolveAsset(asset as! PHAsset, size: .Large, completion: { image in
                     completion(image: image, error: nil)
@@ -90,7 +90,7 @@ struct Photo: ViewerItem {
                         photo.type = .Video
                     }
 
-                    photo.local = true
+                    photo.isLocal = true
                     elements.append(photo)
                 }
             }

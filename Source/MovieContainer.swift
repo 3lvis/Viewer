@@ -102,7 +102,7 @@ class MovieContainer: UIView {
             self.player = AVPlayer(URL: steamingURL)
             self.playerLayer.player = self.player
             self.start()
-        } else if viewerItem.local == true {
+        } else if viewerItem.isLocal == true {
             #if os(iOS)
                 let result = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.id], options: nil)
                 guard let asset = result.firstObject as? PHAsset else { fatalError("Couldn't get asset for id: \(viewerItem.id)") }
