@@ -73,10 +73,7 @@ extension LocalCollectionController: ViewerControllerDataSource {
     }
 
     func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
-        var item = self.photos[indexPath.row]
-        if let cell = self.collectionView?.cellForItemAtIndexPath(indexPath) as? PhotoCell, placeholder = cell.imageView.image {
-            item.placeholder = placeholder
-        }
+        let item = self.photos[indexPath.row]
         self.photos[indexPath.row] = item
 
         return self.photos[indexPath.row]

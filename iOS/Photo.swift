@@ -7,58 +7,51 @@ struct Photo: ViewerItem {
     }
 
     var type: ViewerItemType = .Image
-    var id: String
-    var placeholder = UIImage(named: "clear.png")!
-    var url: String?
+    var assetID: String?
+    var videoURL: String?
+    var imageURL: String?
     static let NumberOfSections = 20
 
-    init(id: String) {
-        self.id = id
-    }
-
     func media(completion: (image: UIImage?, error: NSError?) -> ()) {
-        if self.url == nil {
-            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([self.id], options: nil).firstObject {
+        if let assetID = self.assetID {
+            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([assetID], options: nil).firstObject {
                 Photo.resolveAsset(asset as! PHAsset, size: .Large, completion: { image in
                     completion(image: image, error: nil)
                 })
             }
+        } else if let url = self.imageURL {
+            let session = NSURLSession(configuration: .defaultSessionConfiguration())
+            let request = NSURLRequest(URL: NSURL(string: url)!)
+            let task = session.dataTaskWithRequest(request) { data, _, _ in
+                var image: UIImage?
+                if let data = data {
+                    image = UIImage(data: data)
+                }
+                dispatch_async(dispatch_get_main_queue()) {
+                    completion(image: image, error: nil)
+                }
+            }
+            task.resume()
         } else {
-            completion(image: self.placeholder, error: nil)
+            completion(image: nil, error: nil)
         }
     }
 
     static func constructRemoteElements() -> [[ViewerItem]] {
         var sections = [[ViewerItem]]()
 
-        for section in 0..<Photo.NumberOfSections {
+        for section in 1..<Photo.NumberOfSections {
             var elements = [ViewerItem]()
-            for row in 0..<10 {
-                var photo = Photo(id: "\(section)-\(row)")
+            for row in 1..<10 {
+                var photo = Photo()
 
-                let index = Int(arc4random_uniform(6))
-                switch index {
-                case 0:
-                    photo.placeholder = UIImage(named: "0.jpg")!
-                    break
-                case 1:
-                    photo.placeholder = UIImage(named: "1.jpg")!
-                    break
-                case 2:
-                    photo.placeholder = UIImage(named: "2.jpg")!
-                    break
-                case 3:
-                    photo.placeholder = UIImage(named: "3.jpg")!
-                    break
-                case 4:
-                    photo.placeholder = UIImage(named: "4.jpg")!
-                    break
-                case 5:
-                    photo.placeholder = UIImage(named: "5.png")!
-                    photo.url = "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4"
+                if row == 1 {
+                    photo.videoURL = "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4"
                     photo.type = .Video
-                default: break
+                } else {
+                    photo.imageURL = "http://placehold.it/300x300&text=image\(section * 10 + row)"
                 }
+
                 elements.append(photo)
             }
             sections.append(elements)
@@ -83,7 +76,8 @@ struct Photo: ViewerItem {
         if fetchResult?.count > 0 {
             fetchResult?.enumerateObjectsUsingBlock { object, index, stop in
                 if let asset = object as? PHAsset {
-                    var photo = Photo(id: asset.localIdentifier)
+                    var photo = Photo()
+                    photo.assetID = asset.localIdentifier
 
                     if asset.duration > 0 {
                         photo.type = .Video

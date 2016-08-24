@@ -93,21 +93,13 @@ class ViewerItemController: UIViewController {
 
     var changed = false
     var viewerItem: ViewerItem? {
-        willSet {
-            if self.viewerItem?.id != newValue?.id {
-                self.changed = true
-            }
-        }
-
         didSet {
             guard let viewerItem = self.viewerItem else { return }
 
-            if self.changed {
-                self.movieContainer.image = viewerItem.placeholder
-                self.imageView.image = viewerItem.placeholder
-                self.movieContainer.frame = viewerItem.placeholder.centeredFrame()
-
-                self.changed = false
+            viewerItem.media { image, error in
+                self.movieContainer.image = image
+                self.imageView.image = image
+                self.movieContainer.frame = image?.centeredFrame() ?? CGRectZero
             }
         }
     }

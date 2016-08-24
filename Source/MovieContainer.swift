@@ -97,15 +97,15 @@ class MovieContainer: UIView {
     weak var timeObserver: AnyObject?
 
     func start(viewerItem: ViewerItem) {
-        if let url = viewerItem.url {
+        if let url = viewerItem.videoURL {
             let steamingURL = NSURL(string: url)!
             self.player = AVPlayer(URL: steamingURL)
             self.playerLayer.player = self.player
             self.start()
-        } else {
+        } else if let assetID = viewerItem.assetID {
             #if os(iOS)
-                let result = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.id], options: nil)
-                guard let asset = result.firstObject as? PHAsset else { fatalError("Couldn't get asset for id: \(viewerItem.id)") }
+                let result = PHAsset.fetchAssetsWithLocalIdentifiers([assetID], options: nil)
+                guard let asset = result.firstObject as? PHAsset else { fatalError("Couldn't get asset for id: \(assetID)") }
                 let requestOptions = PHVideoRequestOptions()
                 requestOptions.networkAccessAllowed = true
                 requestOptions.version = .Original
@@ -138,6 +138,8 @@ class MovieContainer: UIView {
                     })
                 })
             #endif
+        } else {
+            fatalError()
         }
     }
 

@@ -123,8 +123,6 @@ public class ViewerController: UIViewController {
         return view
     }()
 
-    // MARK: View Lifecycle
-
     public override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -181,8 +179,7 @@ extension ViewerController {
     private func findOrCreateViewerItemController(indexPath: NSIndexPath) -> ViewerItemController {
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
         var viewerItemController: ViewerItemController
-
-        if let cachedController = self.viewerItemControllerCache.objectForKey(viewerItem.id) as? ViewerItemController {
+        if let cachedController = self.viewerItemControllerCache.objectForKey(NSDate().description) as? ViewerItemController {
             viewerItemController = cachedController
         } else {
             viewerItemController = ViewerItemController()
@@ -193,7 +190,7 @@ extension ViewerController {
             gesture.delegate = self
             viewerItemController.imageView.addGestureRecognizer(gesture)
 
-            self.viewerItemControllerCache.setObject(viewerItemController, forKey: viewerItem.id)
+            self.viewerItemControllerCache.setObject(viewerItemController, forKey: NSDate().description)
         }
 
         viewerItemController.viewerItem = viewerItem
@@ -221,40 +218,40 @@ extension ViewerController {
         guard let selectedCell = self.collectionView.cellForItemAtIndexPath(indexPath) else { fatalError("Data source not implemented") }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
-        let image = viewerItem.placeholder
-        selectedCell.alpha = 0
+        viewerItem.media { image, error in
+            selectedCell.alpha = 0
 
-        let presentedView = self.presentedViewCopy()
-        presentedView.frame = self.view.convertRect(selectedCell.frame, fromView: self.collectionView)
-        presentedView.image = image
+            let presentedView = self.presentedViewCopy()
+            presentedView.frame = self.view.convertRect(selectedCell.frame, fromView: self.collectionView)
+            presentedView.image = image
 
-        self.view.addSubview(self.overlayView)
-        self.view.addSubview(presentedView)
+            self.view.addSubview(self.overlayView)
+            self.view.addSubview(presentedView)
 
-        if let headerView = self.headerView {
-            let bounds = UIScreen.mainScreen().bounds
-            headerView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: ViewerController.HeaderHeight)
-            headerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
-            headerView.alpha = 0
-            self.view.addSubview(headerView)
-        }
+            if let headerView = self.headerView {
+                let bounds = UIScreen.mainScreen().bounds
+                headerView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: ViewerController.HeaderHeight)
+                headerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleWidth]
+                headerView.alpha = 0
+                self.view.addSubview(headerView)
+            }
 
-        if let footerView = self.footerView {
-            let bounds = UIScreen.mainScreen().bounds
-            footerView.frame = CGRect(x: 0, y: bounds.size.height - ViewerController.FooterHeight, width: bounds.width, height: ViewerController.FooterHeight)
-            footerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
-            footerView.alpha = 0
-            self.view.addSubview(footerView)
-        }
+            if let footerView = self.footerView {
+                let bounds = UIScreen.mainScreen().bounds
+                footerView.frame = CGRect(x: 0, y: bounds.size.height - ViewerController.FooterHeight, width: bounds.width, height: ViewerController.FooterHeight)
+                footerView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleTopMargin, .FlexibleWidth]
+                footerView.alpha = 0
+                self.view.addSubview(footerView)
+            }
 
-        let centeredImageFrame = image.centeredFrame()
-        UIView.animateWithDuration(0.25, animations: {
-            self.presentingViewController?.tabBarController?.tabBar.alpha = 0
-            self.overlayView.alpha = 1.0
-            #if os(iOS)
-                self.setNeedsStatusBarAppearanceUpdate()
-            #endif
-            presentedView.frame = centeredImageFrame
+            let centeredImageFrame = image?.centeredFrame() ?? CGRectZero
+            UIView.animateWithDuration(0.25, animations: {
+                self.presentingViewController?.tabBarController?.tabBar.alpha = 0
+                self.overlayView.alpha = 1.0
+                #if os(iOS)
+                    self.setNeedsStatusBarAppearanceUpdate()
+                #endif
+                presentedView.frame = centeredImageFrame
             }) { completed in
                 self.toggleButtons(true)
                 self.buttonsAreVisible = true
@@ -265,8 +262,9 @@ extension ViewerController {
                 self.presented = true
                 let item = self.findOrCreateViewerItemController(indexPath)
                 item.didFocused()
-
+                
                 completion?()
+            }
         }
     }
 
@@ -279,42 +277,42 @@ extension ViewerController {
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItemAtIndexPath(viewerItemController.indexPath!)?.frame else { fatalError() }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath!)
-        let image = viewerItem.placeholder
-        viewerItemController.imageView.alpha = 0
-        viewerItemController.view.backgroundColor = UIColor.clearColor()
-        viewerItemController.willDismiss()
+        viewerItem.media { image, error in
+            viewerItemController.imageView.alpha = 0
+            viewerItemController.view.backgroundColor = UIColor.clearColor()
+            viewerItemController.willDismiss()
 
-        self.view.alpha = 0
-        self.fadeButtons(0)
-        self.buttonsAreVisible = false
-        self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
+            self.view.alpha = 0
+            self.fadeButtons(0)
+            self.buttonsAreVisible = false
+            self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
 
-        self.shouldHideStatusBar = false
-        #if os(iOS)
-            self.setNeedsStatusBarAppearanceUpdate()
-        #endif
-        self.overlayView.alpha = self.isDragging ? CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor) : 1.0
-        self.overlayView.frame = UIScreen.mainScreen().bounds
-
-        let presentedView = self.presentedViewCopy()
-        presentedView.frame = image.centeredFrame()
-        presentedView.image = image
-        if self.isDragging {
-            presentedView.center = viewerItemController.imageView.center
-        }
-
-        let window = self.applicationWindow()
-        window.addSubview(self.overlayView)
-        window.addSubview(presentedView)
-        self.shouldUseLightStatusBar = false
-
-        UIView.animateWithDuration(0.30, animations: {
-            self.presentingViewController?.tabBarController?.tabBar.alpha = 1
-            self.overlayView.alpha = 0.0
+            self.shouldHideStatusBar = false
             #if os(iOS)
                 self.setNeedsStatusBarAppearanceUpdate()
             #endif
-            presentedView.frame = self.view.convertRect(selectedCellFrame, fromView: self.collectionView)
+            self.overlayView.alpha = self.isDragging ? CGColorGetAlpha(viewerItemController.view.backgroundColor!.CGColor) : 1.0
+            self.overlayView.frame = UIScreen.mainScreen().bounds
+
+            let presentedView = self.presentedViewCopy()
+            presentedView.frame = image?.centeredFrame() ?? CGRectZero
+            presentedView.image = image
+            if self.isDragging {
+                presentedView.center = viewerItemController.imageView.center
+            }
+
+            let window = self.applicationWindow()
+            window.addSubview(self.overlayView)
+            window.addSubview(presentedView)
+            self.shouldUseLightStatusBar = false
+
+            UIView.animateWithDuration(0.30, animations: {
+                self.presentingViewController?.tabBarController?.tabBar.alpha = 1
+                self.overlayView.alpha = 0.0
+                #if os(iOS)
+                    self.setNeedsStatusBarAppearanceUpdate()
+                #endif
+                presentedView.frame = self.view.convertRect(selectedCellFrame, fromView: self.collectionView)
             }) { completed in
                 if let existingCell = self.collectionView.cellForItemAtIndexPath(viewerItemController.indexPath!) {
                     existingCell.alpha = 1
@@ -326,8 +324,9 @@ extension ViewerController {
                 self.overlayView.removeFromSuperview()
                 self.dismissViewControllerAnimated(false, completion: nil)
                 self.controllerDelegate?.viewerControllerDidDismiss(self)
-
+                
                 completion?()
+            }
         }
     }
 
