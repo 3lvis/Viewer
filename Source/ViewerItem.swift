@@ -10,7 +10,7 @@ public protocol ViewerItem {
     var id: String { get }
     var placeholder: UIImage { get set }
     var url: String? { get }
-    var local: Bool { get }
+    var isLocal: Bool { get }
 
     func media(completion: (image: UIImage?, error: NSError?) -> ())
 }
