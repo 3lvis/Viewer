@@ -17,15 +17,15 @@ struct Photo: ViewerItem {
         self.id = id
     }
 
-    func media(completion: (image: UIImage?, error: NSError?) -> ()) {
+    func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> ()) {
         if self.isLocal {
-            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([self.id], options: nil).firstObject {
-                Photo.resolveAsset(asset as! PHAsset, size: .Large, completion: { image in
-                    completion(image: image, error: nil)
+            if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [self.id], options: nil).firstObject {
+                Photo.resolveAsset(asset: asset, size: .Large, completion: { image in
+                    completion(image, nil)
                 })
             }
         } else {
-            completion(image: self.placeholder, error: nil)
+            completion(self.placeholder, nil)
         }
     }
 
@@ -73,48 +73,42 @@ struct Photo: ViewerItem {
 
         let fetchOptions = PHFetchOptions()
         let authorizationStatus = PHPhotoLibrary.authorizationStatus()
-        var fetchResult: PHFetchResult?
 
-        guard authorizationStatus == .Authorized else { abort() }
+        guard authorizationStatus == .authorized else { abort() }
 
-        if fetchResult == nil {
-            fetchResult = PHAsset.fetchAssetsWithOptions(fetchOptions)
-        }
+        let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
+        if fetchResult.count > 0 {
+            fetchResult.enumerateObjects ({ asset, index, stop in
+                var photo = Photo(id: asset.localIdentifier)
 
-        if fetchResult?.count > 0 {
-            fetchResult?.enumerateObjectsUsingBlock { object, index, stop in
-                if let asset = object as? PHAsset {
-                    var photo = Photo(id: asset.localIdentifier)
-
-                    if asset.duration > 0 {
-                        photo.type = .Video
-                    }
-
-                    photo.isLocal = true
-                    elements.append(photo)
+                if asset.duration > 0 {
+                    photo.type = .Video
                 }
-            }
+
+                photo.isLocal = true
+                elements.append(photo)
+            })
         }
 
         return elements
     }
 
-    static func resolveAsset(asset: PHAsset, size: Photo.Size, completion: (image: UIImage?) -> Void) {
-        let imageManager = PHImageManager.defaultManager()
+    static func resolveAsset(asset: PHAsset, size: Photo.Size, completion: @escaping (_ image: UIImage?) -> Void) {
+        let imageManager = PHImageManager.default()
         let requestOptions = PHImageRequestOptions()
-        requestOptions.networkAccessAllowed = true
+        requestOptions.isNetworkAccessAllowed = true
         if size == .Small {
             let targetSize = CGSize(width: 300, height: 300)
-            imageManager.requestImageForAsset(asset, targetSize: targetSize, contentMode: PHImageContentMode.AspectFill, options: requestOptions) { image, info in
-                if let info = info where info["PHImageFileUTIKey"] == nil {
-                    completion(image: image)
+            imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: PHImageContentMode.aspectFill, options: requestOptions) { image, info in
+                if let info = info , info["PHImageFileUTIKey"] == nil {
+                    completion(image)
                 }
             }
         } else {
-            requestOptions.version = .Original
-            imageManager.requestImageDataForAsset(asset, options: requestOptions) { data, _, _, _ in
-                if let data = data, image = UIImage(data: data) {
-                    completion(image: image)
+            requestOptions.version = .original
+            imageManager.requestImageData(for: asset, options: requestOptions) { data, _, _, _ in
+                if let data = data, let image = UIImage(data: data) {
+                    completion(image)
                 } else {
                     fatalError("Couldn't get photo")
                 }
@@ -122,22 +116,22 @@ struct Photo: ViewerItem {
         }
     }
 
-    static func checkAuthorizationStatus(completion: (success: Bool) -> Void) {
+    static func checkAuthorizationStatus(completion: @escaping (_ success: Bool) -> Void) {
         let currentStatus = PHPhotoLibrary.authorizationStatus()
 
-        guard currentStatus != .Authorized else {
-            completion(success: true)
+        guard currentStatus != .authorized else {
+            completion(true)
             return
         }
 
         PHPhotoLibrary.requestAuthorization { authorizationStatus in
-            dispatch_async(dispatch_get_main_queue(), {
-                if authorizationStatus == .Denied {
-                    completion(success: false)
-                } else if authorizationStatus == .Authorized {
-                    completion(success: true)
+            DispatchQueue.main.async {
+                if authorizationStatus == .denied {
+                    completion(false)
+                } else if authorizationStatus == .authorized {
+                    completion(true)
                 }
-            })
+            }
         }
     }
 }

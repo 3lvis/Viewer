@@ -6,7 +6,7 @@ class PhotoCell: UICollectionViewCell {
 
     lazy var imageView: UIImageView = {
         let view = UIImageView()
-        view.contentMode = .ScaleAspectFill
+        view.contentMode = .scaleAspectFill
 
         return view
     }()
@@ -15,7 +15,7 @@ class PhotoCell: UICollectionViewCell {
         super.init(frame: frame)
 
         self.clipsToBounds = true
-        self.backgroundColor = UIColor.blackColor()
+        self.backgroundColor = UIColor.black
         self.addSubview(self.imageView)
         self.addSubview(self.videoIndicator)
     }
@@ -27,18 +27,18 @@ class PhotoCell: UICollectionViewCell {
     lazy var videoIndicator: UIImageView = {
         let view = UIImageView()
         view.image = UIImage(named: "video-indicator")!
-        view.hidden = true
-        view.contentMode = .Center
+        view.isHidden = true
+        view.contentMode = .center
 
         return view
     }()
 
     func display(photo: ViewerItem) {
-        self.videoIndicator.hidden = photo.type == .Image
+        self.videoIndicator.isHidden = photo.type == .Image
 
         if photo.isLocal {
-            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([photo.id], options: nil).firstObject {
-                Photo.resolveAsset(asset as! PHAsset, size: .Small, completion: { image in
+            if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [photo.id], options: nil).firstObject {
+                Photo.resolveAsset(asset: asset, size: .Small, completion: { image in
                     self.imageView.image = image
                 })
             }

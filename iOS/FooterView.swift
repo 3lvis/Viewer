@@ -11,18 +11,18 @@ class FooterView: UIView {
 
     lazy var favoriteButton: UIButton = {
         let image = UIImage(named: "favorite")!
-        let button = UIButton(type: .Custom)
-        button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: #selector(FooterView.favoriteAction(_:)), forControlEvents: .TouchUpInside)
+        let button = UIButton(type: .custom)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(FooterView.favoriteAction(_:)), for: .TouchUpInside)
 
         return button
     }()
 
     lazy var deleteButton: UIButton = {
         let image = UIImage(named: "delete")!
-        let button = UIButton(type: .Custom)
-        button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: #selector(FooterView.deleteAction(_:)), forControlEvents: .TouchUpInside)
+        let button = UIButton(type: .custom)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(FooterView.deleteAction(_:)), for: .TouchUpInside)
 
         return button
     }()
@@ -49,7 +49,7 @@ class FooterView: UIView {
     }
 
     func widthForElementAtIndex(index: Int, totalElements: Int) -> (x: CGFloat, width: CGFloat) {
-        let bounds = UIScreen.mainScreen().bounds
+        let bounds = UIScreen.main.bounds
         let singleFrame = bounds.width / CGFloat(totalElements)
 
         return (singleFrame * CGFloat(index), singleFrame)

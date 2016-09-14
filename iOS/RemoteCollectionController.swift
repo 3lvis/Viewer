@@ -9,8 +9,8 @@ class RemoteCollectionController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.collectionView?.backgroundColor = UIColor.whiteColor()
-        self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
+        self.collectionView?.backgroundColor = UIColor.white
+        self.collectionView?.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
 
         var count = 0
         for i in 0..<self.sections.count {
@@ -25,14 +25,14 @@ class RemoteCollectionController: UICollectionViewController {
 
         let layout = self.collectionView?.collectionViewLayout as! UICollectionViewFlowLayout
         let columns = CGFloat(4)
-        let bounds = UIScreen.mainScreen().bounds
+        let bounds = UIScreen.main.bounds
         let size = (bounds.width - columns) / columns
         layout.itemSize = CGSize(width: size, height: size)
     }
 
     func alertControllerWithTitle(title: String) -> UIAlertController {
-        let alertController = UIAlertController(title: title, message: nil, preferredStyle: .Alert)
-        alertController.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+        let alertController = UIAlertController(title: title, message: nil, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
 
         return alertController
     }
@@ -50,10 +50,10 @@ extension RemoteCollectionController {
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath as IndexPath) as! PhotoCell
         let photos = self.sections[indexPath.section]
         let photo = photos[indexPath.row]
-        cell.display(photo)
+        cell.display(photo as! CALayer)
 
         return cell
     }
@@ -61,7 +61,7 @@ extension RemoteCollectionController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+        self.viewerController = ViewerController(initialIndexPath: indexPath as IndexPath, collectionView: collectionView)
         let headerView = HeaderView()
         headerView.viewDelegate = self
         self.viewerController?.headerView = headerView
@@ -69,7 +69,7 @@ extension RemoteCollectionController {
         footerView.viewDelegate = self
         self.viewerController?.footerView = footerView
         self.viewerController!.controllerDataSource = self
-        self.presentViewController(self.viewerController!, animated: false, completion: nil)
+        self.present(self.viewerController!, animated: false, completion: nil)
     }
 }
 
@@ -88,7 +88,7 @@ extension RemoteCollectionController: ViewerControllerDataSource {
 
 extension RemoteCollectionController: OptionsControllerDelegate {
     func optionsController(optionsController: OptionsController, didSelectOption option: String) {
-        self.optionsController?.dismissViewControllerAnimated(true) {
+        self.optionsController?.dismiss(animated: true) {
             self.viewerController?.dismiss(nil)
         }
     }
@@ -103,7 +103,7 @@ extension RemoteCollectionController: HeaderViewDelegate {
         let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
         self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
         self.optionsController!.controllerDelegate = self
-        self.viewerController?.presentViewController(self.optionsController!, animated: true, completion: nil)
+        self.viewerController?.present(self.optionsController!, animated: true, completion: nil)
     }
 }
 

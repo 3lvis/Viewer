@@ -7,14 +7,14 @@ import AVKit
 #endif
 
 protocol MovieContainerDelegate: class {
-    func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer)
-    func movieContainer(movieContainer: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
+    func movieContainerDidStartedPlayingMovie(_ movieContainer: MovieContainer)
+    func movieContainer(_ movieContainer: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
 }
 
 class MovieContainer: UIView {
     weak var viewDelegate: MovieContainerDelegate?
 
-    private lazy var playerLayer: AVPlayerLayer = {
+    fileprivate lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
         playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
 
@@ -23,27 +23,27 @@ class MovieContainer: UIView {
 
     var image: UIImage?
 
-    private lazy var loadingIndicator: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
-        view.autoresizingMask = [.FlexibleRightMargin, .FlexibleLeftMargin, .FlexibleBottomMargin, .FlexibleTopMargin]
+    fileprivate lazy var loadingIndicator: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        view.autoresizingMask = [.flexibleRightMargin, .flexibleLeftMargin, .flexibleBottomMargin, .flexibleTopMargin]
 
         return view
     }()
 
-    private lazy var loadingIndicatorBackground: UIImageView = {
+    fileprivate lazy var loadingIndicatorBackground: UIImageView = {
         let view = UIImageView(image: UIImage(named: "dark-circle")!)
         view.alpha = 0
 
         return view
     }()
 
-    private var shouldRegisterForNotifications = true
-    private var player: AVPlayer?
+    fileprivate var shouldRegisterForNotifications = true
+    fileprivate var player: AVPlayer?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.userInteractionEnabled = false
+        self.isUserInteractionEnabled = false
         self.layer.addSublayer(self.playerLayer)
         self.addSubview(self.loadingIndicatorBackground)
         self.addSubview(self.loadingIndicator)
@@ -73,10 +73,10 @@ class MovieContainer: UIView {
         self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
     }
 
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         guard let player = object as? AVPlayer else { return }
 
-        if player.status == .ReadyToPlay {
+        if player.status == .readyToPlay {
             self.stopPlayerAndRemoveObserverIfNecessary()
             player.play()
             self.viewDelegate?.movieContainerDidStartedPlayingMovie(self)
@@ -96,22 +96,22 @@ class MovieContainer: UIView {
 
     weak var timeObserver: AnyObject?
 
-    func start(viewerItem: ViewerItem) {
+    func start(_ viewerItem: ViewerItem) {
         if let url = viewerItem.url {
-            let steamingURL = NSURL(string: url)!
-            self.player = AVPlayer(URL: steamingURL)
+            let steamingURL = URL(string: url)!
+            self.player = AVPlayer(url: steamingURL)
             self.playerLayer.player = self.player
             self.start()
         } else if viewerItem.isLocal == true {
             #if os(iOS)
-                let result = PHAsset.fetchAssetsWithLocalIdentifiers([viewerItem.id], options: nil)
-                guard let asset = result.firstObject as? PHAsset else { fatalError("Couldn't get asset for id: \(viewerItem.id)") }
+                let result = PHAsset.fetchAssets(withLocalIdentifiers: [viewerItem.id], options: nil)
+                guard let asset = result.firstObject else { fatalError("Couldn't get asset for id: \(viewerItem.id)") }
                 let requestOptions = PHVideoRequestOptions()
-                requestOptions.networkAccessAllowed = true
-                requestOptions.version = .Original
-                PHImageManager.defaultManager().requestPlayerItemForVideo(asset, options: requestOptions, resultHandler: { playerItem, info in
+                requestOptions.isNetworkAccessAllowed = true
+                requestOptions.version = .original
+                PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions, resultHandler: { playerItem, info in
                     guard let playerItem = playerItem else { fatalError("Player item was nil: \(info)") }
-                    dispatch_async(dispatch_get_main_queue(), {
+                    DispatchQueue.main.async(execute: {
                         self.player = AVPlayer(playerItem: playerItem)
                         guard let player = self.player else { fatalError("Couldn't create player from playerItem: \(playerItem)") }
                         player.rate = Float(playerItem.preferredPeakBitRate)
@@ -122,9 +122,9 @@ class MovieContainer: UIView {
                             player.removeTimeObserver(timeObserver)
                         }
 
-                        if asset.mediaSubtypes == .VideoHighFrameRate {
+                        if asset.mediaSubtypes == .videoHighFrameRate {
                             let interval = CMTime(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
-                            self.timeObserver = player.addPeriodicTimeObserverForInterval(interval, queue: nil, usingBlock: { time in
+                            self.timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil, using: { time in
                                 let currentTime = CMTimeGetSeconds(player.currentTime())
                                 if currentTime >= 2 {
                                     if player.rate != 0.000001 {
@@ -133,7 +133,7 @@ class MovieContainer: UIView {
                                 } else if player.rate != 1.0 {
                                     player.rate = 1.0
                                 }
-                            })
+                            }) as AnyObject?
                         }
                     })
                 })
@@ -142,10 +142,10 @@ class MovieContainer: UIView {
     }
 
     func start() {
-        guard let player = self.player, currentItem = player.currentItem else { return }
+        guard let player = self.player, let currentItem = player.currentItem else { return }
 
         let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
-        player.addPeriodicTimeObserverForInterval(interval, queue: nil) {
+        player.addPeriodicTimeObserver(forInterval: interval, queue: nil) {
             time in
 
             let duration = CMTimeGetSeconds(currentItem.asset.duration)
@@ -154,12 +154,12 @@ class MovieContainer: UIView {
             self.updateProgressBar(forDuration: duration, currentTime: currentTime)
         }
 
-        self.playerLayer.hidden = false
+        self.playerLayer.isHidden = false
 
         if self.shouldRegisterForNotifications {
             guard let player = self.player else { fatalError("No player item was found") }
 
-            if player.status == .Unknown {
+            if player.status == .unknown {
                 self.loadingIndicator.startAnimating()
                 self.loadingIndicatorBackground.alpha = 1
             }
@@ -170,9 +170,9 @@ class MovieContainer: UIView {
     }
 
     func stop() {
-        self.playerLayer.hidden = true
+        self.playerLayer.isHidden = true
         self.player?.pause()
-        self.player?.seekToTime(kCMTimeZero)
+        self.player?.seek(to: kCMTimeZero)
         self.playerLayer.player = nil
         if let timeObserver = self.timeObserver {
             self.player?.removeTimeObserver(timeObserver)
@@ -181,7 +181,7 @@ class MovieContainer: UIView {
 
     func play() {
         self.player?.play()
-        self.playerLayer.hidden = false
+        self.playerLayer.isHidden = false
     }
 
     func pause() {

@@ -12,18 +12,18 @@ class HeaderView: UIView {
 
     lazy var clearButton: UIButton = {
         let image = UIImage(named: "clear")!
-        let button = UIButton(type: .Custom)
-        button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: #selector(HeaderView.clearAction(_:)), forControlEvents: .TouchUpInside)
+        let button = UIButton(type: .custom)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(HeaderView.clearAction(_:)), for: .TouchUpInside)
 
         return button
     }()
 
     lazy var menuButton: UIButton = {
         let image = UIImage(named: "menu")!
-        let button = UIButton(type: .Custom)
-        button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: #selector(HeaderView.menuAction(_:)), forControlEvents: .TouchUpInside)
+        let button = UIButton(type: .custom)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(HeaderView.menuAction(_:)), for: .TouchUpInside)
 
         return button
     }()
@@ -44,7 +44,7 @@ class HeaderView: UIView {
 
         self.clearButton.frame = CGRect(x: 0, y: HeaderView.TopMargin, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
 
-        let x = UIScreen.mainScreen().bounds.size.width - HeaderView.ButtonSize
+        let x = UIScreen.main.bounds.size.width - HeaderView.ButtonSize
         self.menuButton.frame = CGRect(x: x, y: HeaderView.TopMargin, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
     }
 

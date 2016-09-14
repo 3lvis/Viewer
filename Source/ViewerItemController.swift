@@ -7,7 +7,7 @@ import AVKit
 #endif
 
 protocol ViewerItemControllerDelegate: class {
-    func viewerItemControllerDidTapItem(viewerItemController: ViewerItemController, completion: (() -> Void)?)
+    func viewerItemControllerDidTapItem(_ viewerItemController: ViewerItemController, completion: (() -> Void)?)
 }
 
 protocol ViewerItemControllerDataSource: class {
@@ -15,34 +15,34 @@ protocol ViewerItemControllerDataSource: class {
 }
 
 class ViewerItemController: UIViewController {
-    private static let FooterViewHeight = CGFloat(50.0)
+    fileprivate static let FooterViewHeight = CGFloat(50.0)
 
     weak var controllerDelegate: ViewerItemControllerDelegate?
     weak var controllerDataSource: ViewerItemControllerDataSource?
 
-    var indexPath: NSIndexPath?
+    var indexPath: IndexPath?
 
     lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
-        scrollView.backgroundColor = UIColor.clearColor()
+        scrollView.backgroundColor = UIColor.clear
         scrollView.alwaysBounceVertical = false
         scrollView.alwaysBounceHorizontal = false
         scrollView.showsVerticalScrollIndicator = true
         scrollView.flashScrollIndicators()
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = self.maxZoomScale()
-        scrollView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         return scrollView
     }()
 
     lazy var imageView: UIImageView = {
-        let view = UIImageView(frame: UIScreen.mainScreen().bounds)
-        view.backgroundColor = UIColor.clearColor()
-        view.contentMode = .ScaleAspectFit
-        view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        view.userInteractionEnabled = true
+        let view = UIImageView(frame: UIScreen.main.bounds)
+        view.backgroundColor = UIColor.clear
+        view.contentMode = .scaleAspectFit
+        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.isUserInteractionEnabled = true
 
         return view
     }()
@@ -55,37 +55,37 @@ class ViewerItemController: UIViewController {
     }()
 
     lazy var playButton: UIButton = {
-        let button = UIButton(type: .Custom)
+        let button = UIButton(type: .custom)
         let image = UIImage(named: "play")!
-        button.setImage(image, forState: .Normal)
+        button.setImage(image, for: UIControlState())
         button.alpha = 0
-        button.addTarget(self, action: #selector(ViewerItemController.playAction), forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(ViewerItemController.playAction), for: .touchUpInside)
 
         return button
     }()
 
     lazy var repeatButton: UIButton = {
-        let button = UIButton(type: .Custom)
+        let button = UIButton(type: .custom)
         let image = UIImage(named: "repeat")!
-        button.setImage(image, forState: .Normal)
+        button.setImage(image, for: UIControlState())
         button.alpha = 0
-        button.addTarget(self, action: #selector(ViewerItemController.repeatAction), forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(ViewerItemController.repeatAction), for: .touchUpInside)
 
         return button
     }()
 
     lazy var pauseButton: UIButton = {
-        let button = UIButton(type: .Custom)
+        let button = UIButton(type: .custom)
         let image = UIImage(named: "pause")!
-        button.setImage(image, forState: .Normal)
+        button.setImage(image, for: UIControlState())
         button.alpha = 0
-        button.addTarget(self, action: #selector(ViewerItemController.pauseAction), forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(ViewerItemController.pauseAction), for: .touchUpInside)
 
         return button
     }()
 
     lazy var videoProgressView: VideoProgressView = {
-        let progressView = VideoProgressView(frame: CGRectZero)
+        let progressView = VideoProgressView(frame: CGRect.zero)
         progressView.alpha = 0
 
         return progressView
@@ -130,8 +130,8 @@ class ViewerItemController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        self.view.backgroundColor = UIColor.blackColor()
+        self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.view.backgroundColor = UIColor.black
 
         self.scrollView.addSubview(self.imageView)
 
@@ -149,10 +149,10 @@ class ViewerItemController: UIViewController {
 
     func tapAction() {
         if self.movieContainer.isPlaying() {
-            UIView.animateWithDuration(0.3) {
+            UIView.animate(withDuration: 0.3, animations: {
                 self.pauseButton.alpha = self.pauseButton.alpha == 0 ? 1 : 0
                 self.videoProgressView.alpha = self.videoProgressView.alpha == 0 ? 1 : 0
-            }
+            }) 
         }
 
         self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
@@ -177,7 +177,7 @@ class ViewerItemController: UIViewController {
         if viewerItem.type == .Video {
             self.movieContainer.stopPlayerAndRemoveObserverIfNecessary()
             self.movieContainer.stop()
-            NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: nil)
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         }
     }
 
@@ -186,7 +186,7 @@ class ViewerItemController: UIViewController {
 
         if viewerItem.type == .Video {
             self.movieContainer.start(viewerItem)
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewerItemController.movieFinishedPlaying), name: AVPlayerItemDidPlayToEndTimeNotification, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.movieFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         } else {
             viewerItem.media({ image, error in
                 if let image = image {
@@ -220,7 +220,7 @@ class ViewerItemController: UIViewController {
     func repeatAction() {
         self.repeatButton.alpha = 0
 
-        if let overlayIsHidden = self.controllerDataSource?.overlayIsHidden() where !overlayIsHidden {
+        if let overlayIsHidden = self.controllerDataSource?.overlayIsHidden() , !overlayIsHidden {
             self.pauseButton.alpha = 1
         }
 
@@ -237,7 +237,7 @@ class ViewerItemController: UIViewController {
 
     var shouldDimPause: Bool = false
     var shouldDimPlay: Bool = false
-    func dimControls(alpha: CGFloat) {
+    func dimControls(_ alpha: CGFloat) {
         if self.pauseButton.alpha == 1.0 {
             self.shouldDimPause = true
         }
@@ -262,7 +262,7 @@ class ViewerItemController: UIViewController {
 }
 
 extension ViewerItemController: UIScrollViewDelegate {
-    func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         if self.viewerItem?.type == .Image {
             return self.imageView
         } else {
@@ -272,11 +272,11 @@ extension ViewerItemController: UIScrollViewDelegate {
 }
 
 extension ViewerItemController: MovieContainerDelegate {
-    func movieContainerDidStartedPlayingMovie(movieContainer: MovieContainer) {
+    func movieContainerDidStartedPlayingMovie(_ movieContainer: MovieContainer) {
         self.playIfNeeded()
     }
 
-    func movieContainer(movieContainder: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
+    func movieContainer(_ movieContainder: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
        self.videoProgressView.currentTime = currentTime
        self.videoProgressView.duration = duration
     }

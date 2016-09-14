@@ -2,6 +2,6 @@ import UIKit
 
 extension UIViewController {
     func applicationWindow() -> UIWindow {
-        return UIApplication.sharedApplication().keyWindow!
+        return UIApplication.shared.keyWindow!
     }
 }

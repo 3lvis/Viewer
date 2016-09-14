@@ -8,11 +8,11 @@ class LocalCollectionController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.collectionView?.backgroundColor = UIColor.whiteColor()
-        self.collectionView?.registerClass(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
+        self.collectionView?.backgroundColor = UIColor.white
+        self.collectionView?.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         Photo.checkAuthorizationStatus { success in
@@ -26,36 +26,36 @@ class LocalCollectionController: UICollectionViewController {
 
         let layout = self.collectionView?.collectionViewLayout as! UICollectionViewFlowLayout
         let columns = CGFloat(4)
-        let bounds = UIScreen.mainScreen().bounds
+        let bounds = UIScreen.main.bounds
         let size = (bounds.width - columns) / columns
         layout.itemSize = CGSize(width: size, height: size)
     }
 
     func alertControllerWithTitle(title: String) -> UIAlertController {
-        let alertController = UIAlertController(title: title, message: nil, preferredStyle: .Alert)
-        alertController.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+        let alertController = UIAlertController(title: title, message: nil, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
 
         return alertController
     }
 }
 
 extension LocalCollectionController {
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.photos.count
     }
 
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCell.Identifier, forIndexPath: indexPath) as! PhotoCell
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath as IndexPath) as! PhotoCell
         let photo = self.photos[indexPath.row]
-        cell.display(photo)
+        cell.display(photo as! CALayer)
 
         return cell
     }
 
-    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+        self.viewerController = ViewerController(initialIndexPath: indexPath as IndexPath, collectionView: collectionView)
         let headerView = HeaderView()
         headerView.viewDelegate = self
         self.viewerController?.headerView = headerView
@@ -63,18 +63,18 @@ extension LocalCollectionController {
         footerView.viewDelegate = self
         self.viewerController?.footerView = footerView
         self.viewerController!.controllerDataSource = self
-        self.presentViewController(self.viewerController!, animated: false, completion: nil)
+        self.present(self.viewerController!, animated: false, completion: nil)
     }
 }
 
 extension LocalCollectionController: ViewerControllerDataSource {
-    func numerOfItemsInViewerController(viewerController: ViewerController) -> Int {
+    func numerOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
         return self.photos.count
     }
 
-    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
+    func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> ViewerItem {
         var item = self.photos[indexPath.row]
-        if let cell = self.collectionView?.cellForItemAtIndexPath(indexPath) as? PhotoCell, placeholder = cell.imageView.image {
+        if let cell = self.collectionView?.cellForItem(at: indexPath as IndexPath) as? PhotoCell, let placeholder = cell.imageView.image {
             item.placeholder = placeholder
         }
         self.photos[indexPath.row] = item
@@ -89,19 +89,19 @@ extension LocalCollectionController: HeaderViewDelegate {
     }
 
     func headerView(headerView: HeaderView, didPressMenuButton button: UIButton) {
-        let alertController = self.alertControllerWithTitle("Options pressed")
-        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+        let alertController = self.alertControllerWithTitle(title: "Options pressed")
+        self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 }
 
 extension LocalCollectionController: FooterViewDelegate {
     func footerView(footerView: FooterView, didPressFavoriteButton button: UIButton) {
-        let alertController = self.alertControllerWithTitle("Favorite pressed")
-        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+        let alertController = self.alertControllerWithTitle(title: "Favorite pressed")
+        self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 
     func footerView(footerView: FooterView, didPressDeleteButton button: UIButton) {
-        let alertController = self.alertControllerWithTitle("Delete pressed")
-        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+        let alertController = self.alertControllerWithTitle(title: "Delete pressed")
+        self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 }

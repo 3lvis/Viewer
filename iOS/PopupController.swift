@@ -14,11 +14,11 @@ class OptionsController: UITableViewController {
     init(sourceView: UIView, sourceRect: CGRect) {
         super.init(nibName: nil, bundle: nil)
 
-        self.modalPresentationStyle = .Popover
+        self.modalPresentationStyle = .popover
         self.preferredContentSize = CGSize(width: OptionsController.PopoverSize, height: OptionsController.PopoverSize)
         self.popoverPresentationController?.delegate = self
-        self.popoverPresentationController?.backgroundColor = UIColor.whiteColor()
-        self.popoverPresentationController?.permittedArrowDirections = [.Any]
+        self.popoverPresentationController?.backgroundColor = UIColor.white
+        self.popoverPresentationController?.permittedArrowDirections = [.any]
         self.popoverPresentationController?.sourceView = sourceView
         self.popoverPresentationController?.sourceRect = sourceRect
     }
@@ -31,13 +31,13 @@ class OptionsController: UITableViewController {
         super.viewDidLoad()
 
         self.tableView.rowHeight = OptionsController.RowHeight
-        self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: OptionsController.CellIdentifier)
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: OptionsController.CellIdentifier)
     }
 }
 
 extension OptionsController: UIPopoverPresentationControllerDelegate {
     func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
-        return .None
+        return .none
     }
 }
 
@@ -47,7 +47,7 @@ extension OptionsController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(OptionsController.CellIdentifier, forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: OptionsController.CellIdentifier, for: indexPath as IndexPath)
 
         let option = self.options[indexPath.row]
         cell.textLabel?.text = option
