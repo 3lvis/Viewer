@@ -24,7 +24,7 @@ public protocol ViewerControllerDelegate: class {
     func viewerControllerDidDismiss(_ viewerController: ViewerController)
 }
 
-open class ViewerController: UIViewController {
+public class ViewerController: UIViewController {
     fileprivate static let HeaderHeight = CGFloat(64)
     fileprivate static let FooterHeight = CGFloat(50)
     fileprivate static let DraggingMargin = CGFloat(60)
@@ -48,8 +48,8 @@ open class ViewerController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    open weak var controllerDelegate: ViewerControllerDelegate?
-    open weak var controllerDataSource: ViewerControllerDataSource?
+    public weak var controllerDelegate: ViewerControllerDelegate?
+    public weak var controllerDataSource: ViewerControllerDataSource?
 
     /**
      Cache for the reused ViewerItemControllers
@@ -110,9 +110,9 @@ open class ViewerController: UIViewController {
         return view
     }()
 
-    open var headerView: UIView?
+    public var headerView: UIView?
 
-    open var footerView: UIView?
+    public var footerView: UIView?
 
     lazy var scrollView: PaginatedScrollView = {
         let view = PaginatedScrollView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
@@ -125,13 +125,13 @@ open class ViewerController: UIViewController {
 
     // MARK: View Lifecycle
 
-    open override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         self.view.addSubview(self.scrollView)
     }
 
-    open override func viewWillLayoutSubviews() {
+    public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
         if presented {
@@ -142,7 +142,7 @@ open class ViewerController: UIViewController {
         }
     }
 
-    open override func viewDidAppear(_ animated: Bool) {
+    public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         self.present(self.initialIndexPath, completion: nil)
@@ -151,7 +151,7 @@ open class ViewerController: UIViewController {
 
 extension ViewerController {
     #if os(iOS)
-    open override var prefersStatusBarHidden : Bool {
+    public override var prefersStatusBarHidden : Bool {
         let orientation = UIApplication.shared.statusBarOrientation
         if UIInterfaceOrientationIsLandscape(orientation) {
             return true
@@ -160,7 +160,7 @@ extension ViewerController {
         return self.shouldHideStatusBar
     }
 
-    open override var preferredStatusBarStyle : UIStatusBarStyle {
+    public override var preferredStatusBarStyle : UIStatusBarStyle {
         if self.shouldUseLightStatusBar {
             return .lightContent
         } else {
