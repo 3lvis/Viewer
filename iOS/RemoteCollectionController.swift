@@ -30,7 +30,7 @@ class RemoteCollectionController: UICollectionViewController {
         layout.itemSize = CGSize(width: size, height: size)
     }
 
-    func alertControllerWithTitle(title: String) -> UIAlertController {
+    func alertController(with title: String) -> UIAlertController {
         let alertController = UIAlertController(title: title, message: nil, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
 
@@ -39,17 +39,17 @@ class RemoteCollectionController: UICollectionViewController {
 }
 
 extension RemoteCollectionController {
-    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return self.sections.count
     }
 
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let photos = self.sections[section]
 
         return photos.count
     }
 
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath as IndexPath) as! PhotoCell
         let photos = self.sections[indexPath.section]
         let photo = photos[indexPath.row]
@@ -58,7 +58,7 @@ extension RemoteCollectionController {
         return cell
     }
 
-    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let collectionView = self.collectionView else { return }
 
         self.viewerController = ViewerController(initialIndexPath: indexPath as IndexPath, collectionView: collectionView)
@@ -74,11 +74,11 @@ extension RemoteCollectionController {
 }
 
 extension RemoteCollectionController: ViewerControllerDataSource {
-    func numerOfItemsInViewerController(viewerController: ViewerController) -> Int {
+    func numerOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
         return self.numberOfItems
     }
 
-    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
+func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> ViewerItem {
         let photos = self.sections[indexPath.section]
         let viewerItem = photos[indexPath.row]
 
@@ -95,11 +95,11 @@ extension RemoteCollectionController: OptionsControllerDelegate {
 }
 
 extension RemoteCollectionController: HeaderViewDelegate {
-    func headerView(headerView: HeaderView, didPressClearButton button: UIButton) {
+    func headerView(_ headerView: HeaderView, didPressClearButton button: UIButton) {
         self.viewerController?.dismiss(nil)
     }
 
-    func headerView(headerView: HeaderView, didPressMenuButton button: UIButton) {
+    func headerView(_ headerView: HeaderView, didPressMenuButton button: UIButton) {
         let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
         self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
         self.optionsController!.controllerDelegate = self
@@ -108,13 +108,13 @@ extension RemoteCollectionController: HeaderViewDelegate {
 }
 
 extension RemoteCollectionController: FooterViewDelegate {
-    func footerView(footerView: FooterView, didPressFavoriteButton button: UIButton) {
-        let alertController = self.alertControllerWithTitle("Favorite pressed")
-        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+    func footerView(_ footerView: FooterView, didPressFavoriteButton button: UIButton) {
+        let alertController = self.alertController(with: "Favorite pressed")
+        self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 
-    func footerView(footerView: FooterView, didPressDeleteButton button: UIButton) {
-        let alertController = self.alertControllerWithTitle("Delete pressed")
-        self.viewerController?.presentViewController(alertController, animated: true, completion: nil)
+    func footerView(_ footerView: FooterView, didPressDeleteButton button: UIButton) {
+        let alertController = self.alertController(with: "Delete pressed")
+        self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 }

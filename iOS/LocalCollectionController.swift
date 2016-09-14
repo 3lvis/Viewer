@@ -31,7 +31,7 @@ class LocalCollectionController: UICollectionViewController {
         layout.itemSize = CGSize(width: size, height: size)
     }
 
-    func alertControllerWithTitle(title: String) -> UIAlertController {
+    func alertController(with title: String) -> UIAlertController {
         let alertController = UIAlertController(title: title, message: nil, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
 
@@ -84,24 +84,24 @@ extension LocalCollectionController: ViewerControllerDataSource {
 }
 
 extension LocalCollectionController: HeaderViewDelegate {
-    func headerView(headerView: HeaderView, didPressClearButton button: UIButton) {
+    func headerView(_ headerView: HeaderView, didPressClearButton button: UIButton) {
         self.viewerController?.dismiss(nil)
     }
 
-    func headerView(headerView: HeaderView, didPressMenuButton button: UIButton) {
-        let alertController = self.alertControllerWithTitle(title: "Options pressed")
+    func headerView(_ headerView: HeaderView, didPressMenuButton button: UIButton) {
+        let alertController = self.alertController(with: "Options pressed")
         self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 }
 
 extension LocalCollectionController: FooterViewDelegate {
-    func footerView(footerView: FooterView, didPressFavoriteButton button: UIButton) {
-        let alertController = self.alertControllerWithTitle(title: "Favorite pressed")
+    func footerView(_ footerView: FooterView, didPressFavoriteButton button: UIButton) {
+        let alertController = self.alertController(with: "Favorite pressed")
         self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 
-    func footerView(footerView: FooterView, didPressDeleteButton button: UIButton) {
-        let alertController = self.alertControllerWithTitle(title: "Delete pressed")
+    func footerView(_ footerView: FooterView, didPressDeleteButton button: UIButton) {
+        let alertController = self.alertController(with: "Delete pressed")
         self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 }

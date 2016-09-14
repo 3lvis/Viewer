@@ -9,7 +9,7 @@ class OptionsController: UITableViewController {
     static let PopoverSize = CGFloat(179)
     weak var controllerDelegate: OptionsControllerDelegate?
     static let RowHeight = CGFloat(60.0)
-    private var options = ["First option", "Second option", "Third option"]
+    fileprivate var options = ["First option", "Second option", "Third option"]
 
     init(sourceView: UIView, sourceRect: CGRect) {
         super.init(nibName: nil, bundle: nil)
@@ -42,11 +42,11 @@ extension OptionsController: UIPopoverPresentationControllerDelegate {
 }
 
 extension OptionsController {
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.options.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: OptionsController.CellIdentifier, for: indexPath as IndexPath)
 
         let option = self.options[indexPath.row]
@@ -55,8 +55,8 @@ extension OptionsController {
         return cell
     }
 
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let option = self.options[indexPath.row]
-        self.controllerDelegate?.optionsController(self, didSelectOption: option)
+        self.controllerDelegate?.optionsController(optionsController: self, didSelectOption: option)
     }
 }
