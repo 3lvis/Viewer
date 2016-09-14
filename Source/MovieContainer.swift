@@ -14,7 +14,7 @@ protocol MovieContainerDelegate: class {
 class MovieContainer: UIView {
     weak var viewDelegate: MovieContainerDelegate?
 
-    fileprivate lazy var playerLayer: AVPlayerLayer = {
+    private lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
         playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
 
@@ -23,22 +23,22 @@ class MovieContainer: UIView {
 
     var image: UIImage?
 
-    fileprivate lazy var loadingIndicator: UIActivityIndicatorView = {
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
         view.autoresizingMask = [.flexibleRightMargin, .flexibleLeftMargin, .flexibleBottomMargin, .flexibleTopMargin]
 
         return view
     }()
 
-    fileprivate lazy var loadingIndicatorBackground: UIImageView = {
+    private lazy var loadingIndicatorBackground: UIImageView = {
         let view = UIImageView(image: UIImage(named: "dark-circle")!)
         view.alpha = 0
 
         return view
     }()
 
-    fileprivate var shouldRegisterForNotifications = true
-    fileprivate var player: AVPlayer?
+    private var shouldRegisterForNotifications = true
+    private var player: AVPlayer?
 
     override init(frame: CGRect) {
         super.init(frame: frame)

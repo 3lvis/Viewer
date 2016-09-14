@@ -145,7 +145,7 @@ public class ViewerController: UIViewController {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        self.present(self.initialIndexPath, completion: nil)
+        self.present(with: self.initialIndexPath, completion: nil)
     }
 }
 
@@ -169,7 +169,7 @@ extension ViewerController {
     }
     #endif
 
-    fileprivate func presentedViewCopy() -> UIImageView {
+    private func presentedViewCopy() -> UIImageView {
         let presentedView = UIImageView()
         presentedView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         presentedView.contentMode = .scaleAspectFill
@@ -212,12 +212,12 @@ extension ViewerController {
         }) 
     }
 
-    fileprivate func fadeButtons(_ alpha: CGFloat) {
+    private func fadeButtons(_ alpha: CGFloat) {
         self.headerView?.alpha = alpha
         self.footerView?.alpha = alpha
     }
 
-    fileprivate func present(_ indexPath: IndexPath, completion: (() -> Void)?) {
+    fileprivate func present(with indexPath: IndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItem(at: indexPath) else { fatalError("Data source not implemented") }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
@@ -275,7 +275,7 @@ extension ViewerController {
         self.dismiss(controller, completion: completion)
     }
 
-    fileprivate func dismiss(_ viewerItemController: ViewerItemController, completion: (() -> Void)?) {
+    private func dismiss(_ viewerItemController: ViewerItemController, completion: (() -> Void)?) {
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewerItemController.indexPath! as IndexPath)?.frame else { fatalError() }
 
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath! as IndexPath)
@@ -390,13 +390,13 @@ extension ViewerController {
         }
     }
 
-    fileprivate func centerElementIfNotVisible(_ indexPath: IndexPath) {
+    private func centerElementIfNotVisible(_ indexPath: IndexPath) {
         if !self.collectionView.indexPathsForVisibleItems.contains(indexPath) {
             self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
         }
     }
 
-    fileprivate func updateHiddenCellsUsingVisibleIndexPath(_ visibleIndexPath: IndexPath) {
+    private func updateHiddenCellsUsingVisibleIndexPath(_ visibleIndexPath: IndexPath) {
         for indexPath in self.collectionView.indexPathsForVisibleItems {
             if let cell = self.collectionView.cellForItem(at: indexPath) {
                 cell.alpha = indexPath == visibleIndexPath ? 0 : 1

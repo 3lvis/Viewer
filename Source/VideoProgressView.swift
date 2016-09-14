@@ -2,13 +2,13 @@ import UIKit
 
 class VideoProgressView: UIView {
     static let Height = CGFloat(55.0)
-    fileprivate static let ProgressBarXMargin = CGFloat(65.0)
-    fileprivate static let ProgressBarYMargin = CGFloat(23.0)
-    fileprivate static let ProgressBarHeight = CGFloat(6.0)
+    private static let ProgressBarXMargin = CGFloat(65.0)
+    private static let ProgressBarYMargin = CGFloat(23.0)
+    private static let ProgressBarHeight = CGFloat(6.0)
 
-    fileprivate static let TextLabelWidth = CGFloat(36.0)
-    fileprivate static let TextLabelHeight = CGFloat(18.0)
-    fileprivate static let TextLabelMargin = CGFloat(18.0)
+    private static let TextLabelWidth = CGFloat(36.0)
+    private static let TextLabelHeight = CGFloat(18.0)
+    private static let TextLabelMargin = CGFloat(18.0)
 
     var duration = 0.0 {
         didSet {

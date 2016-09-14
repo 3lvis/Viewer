@@ -15,7 +15,7 @@ protocol ViewerItemControllerDataSource: class {
 }
 
 class ViewerItemController: UIViewController {
-    fileprivate static let FooterViewHeight = CGFloat(50.0)
+    private static let FooterViewHeight = CGFloat(50.0)
 
     weak var controllerDelegate: ViewerItemControllerDelegate?
     weak var controllerDataSource: ViewerItemControllerDataSource?
