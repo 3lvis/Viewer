@@ -70,18 +70,18 @@ extension IndexPath {
         var count = 0
         let sections = collectionView.numberOfSections
         for section in 0..<sections {
-            if section < (self as NSIndexPath).section {
+            if section < self.section {
                 let rows = collectionView.numberOfItems(inSection: section)
                 count += rows
             }
         }
 
-        return count + (self as NSIndexPath).row
+        return count + self.row
     }
 
     func compareDirection(_ indexPath: IndexPath) -> Direction {
-        let current = (self as NSIndexPath).row * (self as NSIndexPath).section
-        let coming = (indexPath as NSIndexPath).row * (indexPath as NSIndexPath).section
+        let current = self.row * self.section
+        let coming = indexPath.row * indexPath.section
 
         if current == coming {
             return .same
