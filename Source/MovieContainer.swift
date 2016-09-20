@@ -94,7 +94,7 @@ class MovieContainer: UIView {
         }
     }
 
-    weak var timeObserver: AnyObject?
+    var timeObserver: Any?
 
     func start(_ viewerItem: ViewerItem) {
         if let url = viewerItem.url {
@@ -109,7 +109,7 @@ class MovieContainer: UIView {
                 let requestOptions = PHVideoRequestOptions()
                 requestOptions.isNetworkAccessAllowed = true
                 requestOptions.version = .original
-                PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions, resultHandler: { playerItem, info in
+                PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions) { playerItem, info in
                     guard let playerItem = playerItem else { fatalError("Player item was nil: \(info)") }
                     DispatchQueue.main.async(execute: {
                         self.player = AVPlayer(playerItem: playerItem)
@@ -124,7 +124,7 @@ class MovieContainer: UIView {
 
                         if asset.mediaSubtypes == .videoHighFrameRate {
                             let interval = CMTime(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
-                            self.timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil, using: { time in
+                            self.timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { time in
                                 let currentTime = CMTimeGetSeconds(player.currentTime())
                                 if currentTime >= 2 {
                                     if player.rate != 0.000001 {
@@ -133,10 +133,10 @@ class MovieContainer: UIView {
                                 } else if player.rate != 1.0 {
                                     player.rate = 1.0
                                 }
-                            }) as AnyObject?
+                            }
                         }
                     })
-                })
+                }
             #endif
         }
     }
