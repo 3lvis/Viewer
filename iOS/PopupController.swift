@@ -9,16 +9,16 @@ class OptionsController: UITableViewController {
     static let PopoverSize = CGFloat(179)
     weak var controllerDelegate: OptionsControllerDelegate?
     static let RowHeight = CGFloat(60.0)
-    private var options = ["First option", "Second option", "Third option"]
+    fileprivate var options = ["First option", "Second option", "Third option"]
 
     init(sourceView: UIView, sourceRect: CGRect) {
         super.init(nibName: nil, bundle: nil)
 
-        self.modalPresentationStyle = .Popover
+        self.modalPresentationStyle = .popover
         self.preferredContentSize = CGSize(width: OptionsController.PopoverSize, height: OptionsController.PopoverSize)
         self.popoverPresentationController?.delegate = self
-        self.popoverPresentationController?.backgroundColor = UIColor.whiteColor()
-        self.popoverPresentationController?.permittedArrowDirections = [.Any]
+        self.popoverPresentationController?.backgroundColor = UIColor.white
+        self.popoverPresentationController?.permittedArrowDirections = [.any]
         self.popoverPresentationController?.sourceView = sourceView
         self.popoverPresentationController?.sourceRect = sourceRect
     }
@@ -31,23 +31,23 @@ class OptionsController: UITableViewController {
         super.viewDidLoad()
 
         self.tableView.rowHeight = OptionsController.RowHeight
-        self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: OptionsController.CellIdentifier)
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: OptionsController.CellIdentifier)
     }
 }
 
 extension OptionsController: UIPopoverPresentationControllerDelegate {
     func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
-        return .None
+        return .none
     }
 }
 
 extension OptionsController {
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.options.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(OptionsController.CellIdentifier, forIndexPath: indexPath)
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: OptionsController.CellIdentifier, for: indexPath)
 
         let option = self.options[indexPath.row]
         cell.textLabel?.text = option
@@ -55,8 +55,8 @@ extension OptionsController {
         return cell
     }
 
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let option = self.options[indexPath.row]
-        self.controllerDelegate?.optionsController(self, didSelectOption: option)
+        self.controllerDelegate?.optionsController(optionsController: self, didSelectOption: option)
     }
 }

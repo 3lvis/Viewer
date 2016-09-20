@@ -42,7 +42,7 @@ class VideoProgressView: UIView {
 
     lazy var maskBarForRoundedCorners: UIView = {
         let maskView = UIView()
-        maskView.backgroundColor = UIColor.clearColor()
+        maskView.backgroundColor = UIColor.clear
         maskView.layer.cornerRadius = ProgressBarHeight/2
         maskView.clipsToBounds = true
         maskView.layer.masksToBounds = true;
@@ -53,7 +53,7 @@ class VideoProgressView: UIView {
 
     lazy var backgroundBar: UIView = {
         let backgroundBar = UIView()
-        backgroundBar.backgroundColor = UIColor.whiteColor()
+        backgroundBar.backgroundColor = UIColor.white
         backgroundBar.alpha = 0.2
 
         return backgroundBar
@@ -61,7 +61,7 @@ class VideoProgressView: UIView {
 
     lazy var progressBar: UIView = {
         let progressBar = UIView()
-        progressBar.backgroundColor = UIColor.whiteColor()
+        progressBar.backgroundColor = UIColor.white
 
         return progressBar
     }()
@@ -69,7 +69,7 @@ class VideoProgressView: UIView {
     lazy var currentTimeLabel: UILabel = {
         let currentTimeLabel = UILabel()
         currentTimeLabel.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
-        currentTimeLabel.textColor = UIColor.whiteColor()
+        currentTimeLabel.textColor = UIColor.white
 
         return currentTimeLabel
     }()
@@ -77,7 +77,7 @@ class VideoProgressView: UIView {
     lazy var durationTimeLabel: UILabel = {
         let durationTimeLabel = UILabel()
         durationTimeLabel.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
-        durationTimeLabel.textColor = UIColor.whiteColor()
+        durationTimeLabel.textColor = UIColor.white
 
         return durationTimeLabel
     }()
@@ -114,9 +114,9 @@ class VideoProgressView: UIView {
         self.progressBar.frame = CGRect(x: 0, y: 0, width: self.widthForProgressBar, height: VideoProgressView.ProgressBarHeight)
     }
 
-    func timeStringForSeconds(secondValue: Double) -> String {
-       let minutes = Int((secondValue % 3600) / 60)
-       let seconds = Int((secondValue % 3600) % 60)
+    func timeStringForSeconds(_ secondValue: Double) -> String {
+       let minutes = Int((secondValue.truncatingRemainder(dividingBy: 3600)) / 60)
+       let seconds = Int((secondValue.truncatingRemainder(dividingBy: 3600)).truncatingRemainder(dividingBy: 60))
 
         return String(format: "%02d:%02d", minutes, seconds)
     }
