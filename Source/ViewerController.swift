@@ -276,9 +276,9 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewerItemController: ViewerItemController, completion: (() -> Void)?) {
-        guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewerItemController.indexPath! as IndexPath)?.frame else { fatalError() }
+        guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewerItemController.indexPath!)?.frame else { fatalError() }
 
-        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath! as IndexPath)
+        let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath!)
         let image = viewerItem.placeholder
         viewerItemController.imageView.alpha = 0
         viewerItemController.view.backgroundColor = UIColor.clear
@@ -316,7 +316,7 @@ extension ViewerController {
             #endif
             presentedView.frame = self.view.convert(selectedCellFrame, from: self.collectionView)
             }, completion: { completed in
-                if let existingCell = self.collectionView.cellForItem(at: viewerItemController.indexPath! as IndexPath) {
+                if let existingCell = self.collectionView.cellForItem(at: viewerItemController.indexPath!) {
                     existingCell.alpha = 1
                 }
 

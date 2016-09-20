@@ -45,7 +45,7 @@ extension LocalCollectionController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath as IndexPath) as! PhotoCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath) as! PhotoCell
         let photo = self.photos[indexPath.row]
         cell.display(photo as! CALayer)
 
@@ -55,7 +55,7 @@ extension LocalCollectionController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let collectionView = self.collectionView else { return }
 
-        self.viewerController = ViewerController(initialIndexPath: indexPath as IndexPath, collectionView: collectionView)
+        self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
         let headerView = HeaderView()
         headerView.viewDelegate = self
         self.viewerController?.headerView = headerView
@@ -74,7 +74,7 @@ extension LocalCollectionController: ViewerControllerDataSource {
 
     func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> ViewerItem {
         var item = self.photos[indexPath.row]
-        if let cell = self.collectionView?.cellForItem(at: indexPath as IndexPath) as? PhotoCell, let placeholder = cell.imageView.image {
+        if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {
             item.placeholder = placeholder
         }
         self.photos[indexPath.row] = item
