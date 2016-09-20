@@ -53,7 +53,7 @@ extension RemoteCollectionController {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath) as! PhotoCell
         let photos = self.sections[indexPath.section]
         let photo = photos[indexPath.row]
-        cell.display(photo as! CALayer)
+        cell.photo = photo
 
         return cell
     }

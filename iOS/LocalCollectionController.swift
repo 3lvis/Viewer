@@ -47,7 +47,7 @@ extension LocalCollectionController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath) as! PhotoCell
         let photo = self.photos[indexPath.row]
-        cell.display(photo as! CALayer)
+        cell.photo = photo
 
         return cell
     }
