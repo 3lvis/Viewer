@@ -9,7 +9,7 @@
 
 ### Focus
 
-Select an image to enter Lightbox mode.
+Select an image to enter into lightbox mode.
 
 <p align="center">
   <img src="https://github.com/bakkenbaeck/Viewer/raw/master/GitHub/focus.gif"/>
