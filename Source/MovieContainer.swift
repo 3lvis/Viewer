@@ -109,6 +109,7 @@ class MovieContainer: UIView {
                 let requestOptions = PHVideoRequestOptions()
                 requestOptions.isNetworkAccessAllowed = true
                 requestOptions.version = .original
+                requestOptions.deliveryMode = .fastFormat
                 PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions) { playerItem, info in
                     guard let playerItem = playerItem else { fatalError("Player item was nil: \(info)") }
                     DispatchQueue.main.async(execute: {
