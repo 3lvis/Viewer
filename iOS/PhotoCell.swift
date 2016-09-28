@@ -42,11 +42,11 @@ class PhotoCell: UICollectionViewCell {
 
             self.videoIndicator.isHidden = photo.type == .Image
 
-            if photo.isLocal {
-                if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [photo.id], options: nil).firstObject {
-                    Photo.resolveAsset(asset: asset, size: .Small, completion: { image in
+            if let assetID = photo.assetID {
+                if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject {
+                    Photo.resolveAsset(asset: asset, size: .Small) { image in
                         self.imageView.image = image
-                    })
+                    }
                 }
             } else {
                 self.imageView.image = photo.placeholder

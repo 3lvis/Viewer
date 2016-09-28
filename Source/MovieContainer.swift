@@ -102,10 +102,10 @@ class MovieContainer: UIView {
             self.player = AVPlayer(url: steamingURL)
             self.playerLayer.player = self.player
             self.start()
-        } else if viewerItem.isLocal == true {
+        } else if let assetID = viewerItem.assetID {
             #if os(iOS)
-                let result = PHAsset.fetchAssets(withLocalIdentifiers: [viewerItem.id], options: nil)
-                guard let asset = result.firstObject else { fatalError("Couldn't get asset for id: \(viewerItem.id)") }
+                let result = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
+                guard let asset = result.firstObject else { fatalError("Couldn't get asset for id: \(assetID)") }
                 let requestOptions = PHVideoRequestOptions()
                 requestOptions.isNetworkAccessAllowed = true
                 requestOptions.version = .original
