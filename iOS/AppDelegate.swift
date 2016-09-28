@@ -36,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let tabBarController = UITabBarController()
         tabBarController.setViewControllers([remoteNavigationController, localNavigationController], animated: false)
 
-        self.window?.rootViewController = tabBarController
+        self.window!.rootViewController = tabBarController
         self.window!.makeKeyAndVisible()
 
         return true
