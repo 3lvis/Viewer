@@ -40,7 +40,7 @@ public class ViewerController: UIViewController {
         self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.modalPresentationStyle = .overCurrentContext
         #if os(iOS)
-            self.presentingViewController?.modalPresentationCapturesStatusBarAppearance = true
+            self.modalPresentationCapturesStatusBarAppearance = true
         #endif
     }
 
