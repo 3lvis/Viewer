@@ -98,8 +98,8 @@ class MovieContainer: UIView {
 
     func start(_ viewerItem: ViewerItem) {
         if let url = viewerItem.url {
-            let steamingURL = URL(string: url)!
-            self.player = AVPlayer(url: steamingURL)
+            let streamingURL = URL(string: url)!
+            self.player = AVPlayer(url: streamingURL)
             self.playerLayer.player = self.player
             self.start()
         } else if let assetID = viewerItem.assetID {
@@ -148,7 +148,6 @@ class MovieContainer: UIView {
         let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
         player.addPeriodicTimeObserver(forInterval: interval, queue: nil) {
             time in
-
             let duration = CMTimeGetSeconds(currentItem.asset.duration)
             let currentTime = CMTimeGetSeconds(player.currentTime())
 
