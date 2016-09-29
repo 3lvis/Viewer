@@ -293,7 +293,7 @@ extension ViewerItemController: UIScrollViewDelegate {
 }
 
 extension ViewerItemController: VideoViewDelegate {
-    func videoViewDidStartedPlayingMovie(_ videoView: VideoView) {
+    func videoViewDidStartPlayingMovie(_ videoView: VideoView) {
         self.playIfNeeded()
     }
 

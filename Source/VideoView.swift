@@ -7,7 +7,7 @@ import AVKit
 #endif
 
 protocol VideoViewDelegate: class {
-    func videoViewDidStartedPlayingMovie(_ videoView: VideoView)
+    func videoViewDidStartPlayingMovie(_ videoView: VideoView)
     func videoView(_ videoView: VideoView, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
 }
 
@@ -79,7 +79,7 @@ class VideoView: UIView {
         if player.status == .readyToPlay {
             self.stopPlayerAndRemoveObserverIfNecessary()
             player.play()
-            self.viewDelegate?.videoViewDidStartedPlayingMovie(self)
+            self.viewDelegate?.videoViewDidStartPlayingMovie(self)
         }
     }
 
