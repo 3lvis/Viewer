@@ -207,7 +207,7 @@ class ViewerItemController: UIViewController {
 
         if viewerItem.type == .Video {
             self.videoView.start(viewerItem)
-            NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.movieFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         } else {
             viewerItem.media({ image, error in
                 if let image = image {
@@ -218,7 +218,7 @@ class ViewerItemController: UIViewController {
         }
     }
 
-    func movieFinishedPlaying() {
+    func videoFinishedPlaying() {
         self.repeatButton.alpha = 1
         self.pauseButton.alpha = 0
         self.playButton.alpha = 0
@@ -293,11 +293,11 @@ extension ViewerItemController: UIScrollViewDelegate {
 }
 
 extension ViewerItemController: VideoViewDelegate {
-    func videoViewDidStartPlayingMovie(_ videoView: VideoView) {
+    func videoViewDidStartPlaying(_ videoView: VideoView) {
         self.playIfNeeded()
     }
 
-    func videoView(_ movieContainder: VideoView, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
+    func videoView(_ videoView: VideoView, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
        self.videoProgressView.currentTime = currentTime
        self.videoProgressView.duration = duration
     }
