@@ -23,7 +23,7 @@ class ViewerItemController: UIViewController {
 
     var indexPath: IndexPath?
 
-    lazy var scrollView: UIScrollView = {
+    lazy var zoomingScrollView: UIScrollView = {
         let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
         scrollView.backgroundColor = UIColor.clear
@@ -131,10 +131,11 @@ class ViewerItemController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.view.backgroundColor = UIColor.black
 
-        self.scrollView.addSubview(self.imageView)
-        self.view.addSubview(self.scrollView)
+        self.zoomingScrollView.addSubview(self.imageView)
+        self.view.addSubview(self.zoomingScrollView)
 
         self.view.addSubview(self.videoView)
 
@@ -145,6 +146,30 @@ class ViewerItemController: UIViewController {
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewerItemController.tapAction))
         self.view.addGestureRecognizer(tapRecognizer)
+    }
+
+    // In iOS 10 going into landscape provides a very strange animation. Basically you'll see the other
+    // viewer items animating on top of the focused one. Horrible. This is a workaround that hides the
+    // non-visible viewer items to avoid that. Also we hide the placeholder image view (zoomingScrollView)
+    // because it was animating at a different timing than the video view and it looks bad.
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        guard let viewerItem = self.viewerItem else { return }
+
+        let isFocused = self.controllerDataSource?.viewerItemControllerIsFocused(self)
+        if viewerItem.type == .Video || isFocused == false {
+            self.view.backgroundColor = .clear
+            self.zoomingScrollView.isHidden = true
+        }
+        coordinator.animate(alongsideTransition: { context in
+
+            }) { completionContext in
+                if viewerItem.type == .Video || isFocused == false  {
+                    self.view.backgroundColor = .black
+                    self.zoomingScrollView.isHidden = false
+                }
+        }
     }
 
     func tapAction() {
@@ -191,7 +216,7 @@ class ViewerItemController: UIViewController {
             viewerItem.media({ image, error in
                 if let image = image {
                     self.imageView.image = image
-                    self.scrollView.maximumZoomScale = self.maxZoomScale()
+                    self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
                 }
             })
         }
