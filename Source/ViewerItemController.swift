@@ -226,12 +226,14 @@ class ViewerItemController: UIViewController {
         self.repeatButton.alpha = 1
         self.pauseButton.alpha = 0
         self.playButton.alpha = 0
+        self.videoProgressView.alpha = 0
     }
 
     func pauseAction() {
         self.videoView.pause()
         self.pauseButton.alpha = 0
         self.playButton.alpha = 1
+        self.videoProgressView.alpha = 1
     }
 
     func playAction() {
@@ -265,6 +267,7 @@ class ViewerItemController: UIViewController {
 
     var shouldDimPause: Bool = false
     var shouldDimPlay: Bool = false
+    var shouldDimVideoProgress: Bool = false
     func dimControls(_ alpha: CGFloat) {
         if self.pauseButton.alpha == 1.0 {
             self.shouldDimPause = true
@@ -272,6 +275,10 @@ class ViewerItemController: UIViewController {
 
         if self.playButton.alpha == 1.0 {
             self.shouldDimPlay = true
+        }
+
+        if self.videoProgressView.alpha == 1.0 {
+            self.shouldDimVideoProgress = true
         }
 
         if self.shouldDimPause {
@@ -282,9 +289,14 @@ class ViewerItemController: UIViewController {
             self.playButton.alpha = alpha
         }
 
+        if self.shouldDimVideoProgress {
+            self.videoProgressView.alpha = alpha
+        }
+
         if alpha == 1.0 {
             self.shouldDimPause = false
             self.shouldDimPlay = false
+            self.shouldDimVideoProgress = false
         }
     }
 }
