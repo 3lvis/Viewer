@@ -74,7 +74,7 @@ extension RemoteCollectionController {
 }
 
 extension RemoteCollectionController: ViewerControllerDataSource {
-    func numerOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
+    func numberOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
         return self.numberOfItems
     }
 

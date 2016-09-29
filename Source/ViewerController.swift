@@ -8,7 +8,7 @@ import CoreData
  */
 
 public protocol ViewerControllerDataSource: class {
-    func numerOfItemsInViewerController(_ viewerController: ViewerController) -> Int
+    func numberOfItemsInViewerController(_ viewerController: ViewerController) -> Int
     func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> ViewerItem
 }
 
@@ -455,7 +455,7 @@ extension ViewerController: UIGestureRecognizerDelegate {
 
 extension ViewerController: PaginatedScrollViewDataSource {
     func numberOfPagesInPaginatedScrollView(_ paginatedScrollView: PaginatedScrollView) -> Int {
-        return self.controllerDataSource?.numerOfItemsInViewerController(self) ?? 0
+        return self.controllerDataSource?.numberOfItemsInViewerController(self) ?? 0
     }
 
     func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
