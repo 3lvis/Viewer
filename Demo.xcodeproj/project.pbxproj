@@ -51,8 +51,8 @@
 		14D081381C18579700E3FFC3 /* 1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081351C18579700E3FFC3 /* 1.jpg */; };
 		14D081391C18579700E3FFC3 /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14D081361C18579700E3FFC3 /* 2.jpg */; };
 		14D33A861C6203FA00A8BE11 /* LocalCollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D33A851C6203FA00A8BE11 /* LocalCollectionController.swift */; };
-		14EC47B81C58F6BC0028A0CD /* MovieContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */; };
-		14EC47B91C58F6C00028A0CD /* MovieContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */; };
+		14EC47B81C58F6BC0028A0CD /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* VideoView.swift */; };
+		14EC47B91C58F6C00028A0CD /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* VideoView.swift */; };
 		E6D592831D226528006EF238 /* VideoProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D592821D226528006EF238 /* VideoProgressView.swift */; };
 		E6D592841D226528006EF238 /* VideoProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D592821D226528006EF238 /* VideoProgressView.swift */; };
 		E6D592891D22A2B8006EF238 /* DINNextLTPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */; };
@@ -105,7 +105,7 @@
 		14D081351C18579700E3FFC3 /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
 		14D081361C18579700E3FFC3 /* 2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2.jpg; sourceTree = "<group>"; };
 		14D33A851C6203FA00A8BE11 /* LocalCollectionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalCollectionController.swift; sourceTree = "<group>"; };
-		14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieContainer.swift; sourceTree = "<group>"; };
+		14EC47B71C58F6BC0028A0CD /* VideoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		E6D592821D226528006EF238 /* VideoProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoProgressView.swift; sourceTree = "<group>"; };
 		E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DINNextLTPro-Regular.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -198,7 +198,7 @@
 				143803391C2452A1003CA252 /* ViewerItem.swift */,
 				1438033A1C2452A1003CA252 /* ViewerItemController.swift */,
 				E6D592821D226528006EF238 /* VideoProgressView.swift */,
-				14EC47B71C58F6BC0028A0CD /* MovieContainer.swift */,
+				14EC47B71C58F6BC0028A0CD /* VideoView.swift */,
 				14C327B71CBE69F800CC0F98 /* PaginatedScrollView.swift */,
 			);
 			path = Source;
@@ -382,7 +382,7 @@
 				147EE85B1C92F10E00A7B449 /* ViewerItemController.swift in Sources */,
 				147EE8571C92F10300A7B449 /* NSIndexPath+Contiguous.swift in Sources */,
 				147EE8561C92F0FF00A7B449 /* UIImage+CenteredFrame.swift in Sources */,
-				14EC47B81C58F6BC0028A0CD /* MovieContainer.swift in Sources */,
+				14EC47B81C58F6BC0028A0CD /* VideoView.swift in Sources */,
 				147EE85A1C92F10C00A7B449 /* ViewerItem.swift in Sources */,
 				14A139B41AEFC72B00AD732F /* Tests.swift in Sources */,
 			);
@@ -398,7 +398,7 @@
 				143803421C2452A1003CA252 /* UIViewController+Window.swift in Sources */,
 				143B5C3F1C0EF76E000B6A18 /* Photo.swift in Sources */,
 				14C984001C0DE79200B5E515 /* AppDelegate.swift in Sources */,
-				14EC47B91C58F6C00028A0CD /* MovieContainer.swift in Sources */,
+				14EC47B91C58F6C00028A0CD /* VideoView.swift in Sources */,
 				143B5C3B1C0EED51000B6A18 /* PhotoCell.swift in Sources */,
 				1438033E1C2452A1003CA252 /* NSIndexPath+Contiguous.swift in Sources */,
 				E6D592841D226528006EF238 /* VideoProgressView.swift in Sources */,

@@ -12,6 +12,7 @@ protocol ViewerItemControllerDelegate: class {
 
 protocol ViewerItemControllerDataSource: class {
     func overlayIsHidden() -> Bool
+    func viewerItemControllerIsFocused(viewerItemController: ViewerItemController) -> Bool
 }
 
 class ViewerItemController: UIViewController {
@@ -47,8 +48,8 @@ class ViewerItemController: UIViewController {
         return view
     }()
 
-    lazy var movieContainer: MovieContainer = {
-        let view = MovieContainer()
+    lazy var videoView: VideoView = {
+        let view = VideoView()
         view.viewDelegate = self
 
         return view
@@ -103,9 +104,9 @@ class ViewerItemController: UIViewController {
             guard let viewerItem = self.viewerItem else { return }
 
             if self.changed {
-                self.movieContainer.image = viewerItem.placeholder
+                self.videoView.image = viewerItem.placeholder
                 self.imageView.image = viewerItem.placeholder
-                self.movieContainer.frame = viewerItem.placeholder.centeredFrame()
+                self.videoView.frame = viewerItem.placeholder.centeredFrame()
 
                 self.changed = false
             }
@@ -134,9 +135,9 @@ class ViewerItemController: UIViewController {
         self.view.backgroundColor = UIColor.black
 
         self.scrollView.addSubview(self.imageView)
-
         self.view.addSubview(self.scrollView)
-        self.view.addSubview(self.movieContainer)
+
+        self.view.addSubview(self.videoView)
 
         self.view.addSubview(self.playButton)
         self.view.addSubview(self.repeatButton)
@@ -147,8 +148,28 @@ class ViewerItemController: UIViewController {
         self.view.addGestureRecognizer(tapRecognizer)
     }
 
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        guard let viewerItem = self.viewerItem else { return }
+
+        let isFocused = self.controllerDataSource?.viewerItemControllerIsFocused(viewerItemController: self)
+        if viewerItem.type == .Video || isFocused == false {
+            self.view.backgroundColor = .clear
+            self.scrollView.isHidden = true
+        }
+        coordinator.animate(alongsideTransition: { context in
+
+            }) { completionContext in
+                if viewerItem.type == .Video || isFocused == false  {
+                    self.view.backgroundColor = .black
+                    self.scrollView.isHidden = false
+                }
+        }
+    }
+
     func tapAction() {
-        if self.movieContainer.isPlaying() {
+        if self.videoView.isPlaying() {
             UIView.animate(withDuration: 0.3, animations: {
                 self.pauseButton.alpha = self.pauseButton.alpha == 0 ? 1 : 0
                 self.videoProgressView.alpha = self.videoProgressView.alpha == 0 ? 1 : 0
@@ -175,8 +196,8 @@ class ViewerItemController: UIViewController {
         guard let viewerItem = self.viewerItem else { return }
 
         if viewerItem.type == .Video {
-            self.movieContainer.stopPlayerAndRemoveObserverIfNecessary()
-            self.movieContainer.stop()
+            self.videoView.stopPlayerAndRemoveObserverIfNecessary()
+            self.videoView.stop()
             NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         }
     }
@@ -185,7 +206,7 @@ class ViewerItemController: UIViewController {
         guard let viewerItem = self.viewerItem else { return }
 
         if viewerItem.type == .Video {
-            self.movieContainer.start(viewerItem)
+            self.videoView.start(viewerItem)
             NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.movieFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         } else {
             viewerItem.media({ image, error in
@@ -204,13 +225,13 @@ class ViewerItemController: UIViewController {
     }
 
     func pauseAction() {
-        self.movieContainer.pause()
+        self.videoView.pause()
         self.pauseButton.alpha = 0
         self.playButton.alpha = 1
     }
 
     func playAction() {
-        self.movieContainer.play()
+        self.videoView.play()
         self.pauseButton.alpha = 0
         self.playButton.alpha = 0
         self.videoProgressView.alpha = 0
@@ -224,8 +245,8 @@ class ViewerItemController: UIViewController {
             self.pauseButton.alpha = 1
         }
 
-        self.movieContainer.stop()
-        self.movieContainer.play()
+        self.videoView.stop()
+        self.videoView.play()
     }
 
     func playIfNeeded() {
@@ -271,12 +292,12 @@ extension ViewerItemController: UIScrollViewDelegate {
     }
 }
 
-extension ViewerItemController: MovieContainerDelegate {
-    func movieContainerDidStartedPlayingMovie(_ movieContainer: MovieContainer) {
+extension ViewerItemController: VideoViewDelegate {
+    func videoViewDidStartedPlayingMovie(_ videoView: VideoView) {
         self.playIfNeeded()
     }
 
-    func movieContainer(_ movieContainder: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
+    func videoView(_ movieContainder: VideoView, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
        self.videoProgressView.currentTime = currentTime
        self.videoProgressView.duration = duration
     }

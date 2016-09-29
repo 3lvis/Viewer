@@ -6,13 +6,13 @@ import AVKit
     import Photos
 #endif
 
-protocol MovieContainerDelegate: class {
-    func movieContainerDidStartedPlayingMovie(_ movieContainer: MovieContainer)
-    func movieContainer(_ movieContainer: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
+protocol VideoViewDelegate: class {
+    func videoViewDidStartedPlayingMovie(_ videoView: VideoView)
+    func videoView(_ videoView: VideoView, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
 }
 
-class MovieContainer: UIView {
-    weak var viewDelegate: MovieContainerDelegate?
+class VideoView: UIView {
+    weak var viewDelegate: VideoViewDelegate?
 
     private lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
@@ -25,7 +25,7 @@ class MovieContainer: UIView {
 
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
-        view.autoresizingMask = [.flexibleRightMargin, .flexibleLeftMargin, .flexibleBottomMargin, .flexibleTopMargin]
+        view.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin]
 
         return view
     }()
@@ -42,7 +42,7 @@ class MovieContainer: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.autoresizingMask = [.flexibleRightMargin, .flexibleLeftMargin, .flexibleBottomMargin, .flexibleTopMargin]
+        self.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin]
         self.isUserInteractionEnabled = false
         self.layer.addSublayer(self.playerLayer)
         self.addSubview(self.loadingIndicatorBackground)
@@ -79,7 +79,7 @@ class MovieContainer: UIView {
         if player.status == .readyToPlay {
             self.stopPlayerAndRemoveObserverIfNecessary()
             player.play()
-            self.viewDelegate?.movieContainerDidStartedPlayingMovie(self)
+            self.viewDelegate?.videoViewDidStartedPlayingMovie(self)
         }
     }
 
@@ -196,6 +196,6 @@ class MovieContainer: UIView {
     }
 
     func updateProgressBar(forDuration duration: Double, currentTime: Double) {
-        self.viewDelegate?.movieContainer(self, didRequestToUpdateProgressBar: duration, currentTime: currentTime)
+        self.viewDelegate?.videoView(self, didRequestToUpdateProgressBar: duration, currentTime: currentTime)
     }
 }
