@@ -70,7 +70,7 @@ extension LocalCollectionController {
 }
 
 extension LocalCollectionController: ViewerControllerDataSource {
-    func numerOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
+    func numberOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
         return self.photos.count
     }
 
