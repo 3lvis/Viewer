@@ -11,7 +11,7 @@ protocol ViewerItemControllerDelegate: class {
 }
 
 protocol ViewerItemControllerDataSource: class {
-    func viewerItemControllerIsOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool
+    func isViewerItemControllerOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool
     func viewerItemControllerIsFocused(_ viewerItemController: ViewerItemController) -> Bool
 }
 
@@ -241,7 +241,7 @@ class ViewerItemController: UIViewController {
     func repeatAction() {
         self.repeatButton.alpha = 0
 
-        if let overlayIsHidden = self.controllerDataSource?.viewerItemControllerIsOverlayHidden(self), !overlayIsHidden {
+        if let overlayIsHidden = self.controllerDataSource?.isViewerItemControllerOverlayHidden(self), !overlayIsHidden {
             self.pauseButton.alpha = 1
         }
 
@@ -250,7 +250,7 @@ class ViewerItemController: UIViewController {
     }
 
     func playIfNeeded() {
-        let overlayIsHidden = self.controllerDataSource?.viewerItemControllerIsOverlayHidden(self) ?? false
+        let overlayIsHidden = self.controllerDataSource?.isViewerItemControllerOverlayHidden(self) ?? false
         if overlayIsHidden == false {
             self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
         }

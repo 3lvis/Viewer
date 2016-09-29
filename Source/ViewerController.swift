@@ -428,7 +428,7 @@ extension ViewerController: ViewerItemControllerDelegate {
 }
 
 extension ViewerController: ViewerItemControllerDataSource {
-    func viewerItemControllerIsOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool {
+    func isViewerItemControllerOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool {
         return !self.buttonsAreVisible
     }
 
