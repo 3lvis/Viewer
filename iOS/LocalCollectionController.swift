@@ -16,8 +16,10 @@ class LocalCollectionController: UICollectionViewController {
         super.viewDidAppear(animated)
 
         Photo.checkAuthorizationStatus { success in
-            self.photos = Photo.constructLocalElements()
-            self.collectionView?.reloadData()
+            if success {
+                self.photos = Photo.constructLocalElements()
+                self.collectionView?.reloadData()
+            }
         }
     }
 
