@@ -25,7 +25,7 @@ extension IndexPath {
         var found = false
         let indexPaths = self.indexPaths(collectionView)
         for indexPath in  indexPaths {
-            if found == true {
+            if found {
                 return indexPath
             }
 

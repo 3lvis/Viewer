@@ -358,7 +358,7 @@ extension ViewerController {
         controller.imageView.center = translatedPoint
         controller.view.backgroundColor = UIColor.black.withAlphaComponent(alpha)
 
-        if self.buttonsAreVisible == true {
+        if self.buttonsAreVisible {
             self.fadeButtons(alpha)
         }
 
@@ -374,7 +374,7 @@ extension ViewerController {
                     controller.view.backgroundColor = UIColor.black
                     controller.dimControls(1.0)
 
-                    if self.buttonsAreVisible == true {
+                    if self.buttonsAreVisible {
                         self.fadeButtons(1)
                     }
                     }, completion: { completed in
