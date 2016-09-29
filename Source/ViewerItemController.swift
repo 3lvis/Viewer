@@ -131,7 +131,6 @@ class ViewerItemController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.view.backgroundColor = UIColor.black
 
         self.scrollView.addSubview(self.imageView)
@@ -146,26 +145,6 @@ class ViewerItemController: UIViewController {
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewerItemController.tapAction))
         self.view.addGestureRecognizer(tapRecognizer)
-    }
-
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-
-        guard let viewerItem = self.viewerItem else { return }
-
-        let isFocused = self.controllerDataSource?.viewerItemControllerIsFocused(self)
-        if viewerItem.type == .Video || isFocused == false {
-            self.view.backgroundColor = .clear
-            self.scrollView.isHidden = true
-        }
-        coordinator.animate(alongsideTransition: { context in
-
-            }) { completionContext in
-                if viewerItem.type == .Video || isFocused == false  {
-                    self.view.backgroundColor = .black
-                    self.scrollView.isHidden = false
-                }
-        }
     }
 
     func tapAction() {
