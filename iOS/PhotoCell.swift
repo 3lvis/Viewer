@@ -15,7 +15,7 @@ class PhotoCell: UICollectionViewCell {
         super.init(frame: frame)
 
         self.clipsToBounds = true
-        self.backgroundColor = UIColor.black
+        self.backgroundColor = .black
         self.addSubview(self.imageView)
         self.addSubview(self.videoIndicator)
     }

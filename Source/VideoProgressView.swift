@@ -42,7 +42,7 @@ class VideoProgressView: UIView {
 
     lazy var maskBarForRoundedCorners: UIView = {
         let maskView = UIView()
-        maskView.backgroundColor = UIColor.clear
+        maskView.backgroundColor = .clear
         maskView.layer.cornerRadius = ProgressBarHeight/2
         maskView.clipsToBounds = true
         maskView.layer.masksToBounds = true;
@@ -53,7 +53,7 @@ class VideoProgressView: UIView {
 
     lazy var backgroundBar: UIView = {
         let backgroundBar = UIView()
-        backgroundBar.backgroundColor = UIColor.white
+        backgroundBar.backgroundColor = .white
         backgroundBar.alpha = 0.2
 
         return backgroundBar
@@ -61,7 +61,7 @@ class VideoProgressView: UIView {
 
     lazy var progressBar: UIView = {
         let progressBar = UIView()
-        progressBar.backgroundColor = UIColor.white
+        progressBar.backgroundColor = .white
 
         return progressBar
     }()
@@ -69,7 +69,7 @@ class VideoProgressView: UIView {
     lazy var currentTimeLabel: UILabel = {
         let currentTimeLabel = UILabel()
         currentTimeLabel.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
-        currentTimeLabel.textColor = UIColor.white
+        currentTimeLabel.textColor = .white
 
         return currentTimeLabel
     }()
@@ -77,7 +77,7 @@ class VideoProgressView: UIView {
     lazy var durationTimeLabel: UILabel = {
         let durationTimeLabel = UILabel()
         durationTimeLabel.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
-        durationTimeLabel.textColor = UIColor.white
+        durationTimeLabel.textColor = .white
 
         return durationTimeLabel
     }()

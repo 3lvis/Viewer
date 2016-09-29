@@ -9,7 +9,7 @@ class RemoteCollectionController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.collectionView?.backgroundColor = UIColor.white
+        self.collectionView?.backgroundColor = .white
         self.collectionView?.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
 
         var count = 0

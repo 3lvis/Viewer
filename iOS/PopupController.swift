@@ -17,7 +17,7 @@ class OptionsController: UITableViewController {
         self.modalPresentationStyle = .popover
         self.preferredContentSize = CGSize(width: OptionsController.PopoverSize, height: OptionsController.PopoverSize)
         self.popoverPresentationController?.delegate = self
-        self.popoverPresentationController?.backgroundColor = UIColor.white
+        self.popoverPresentationController?.backgroundColor = .white
         self.popoverPresentationController?.permittedArrowDirections = [.any]
         self.popoverPresentationController?.sourceView = sourceView
         self.popoverPresentationController?.sourceRect = sourceRect

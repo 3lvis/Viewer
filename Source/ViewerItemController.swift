@@ -26,7 +26,7 @@ class ViewerItemController: UIViewController {
     lazy var zoomingScrollView: UIScrollView = {
         let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
-        scrollView.backgroundColor = UIColor.clear
+        scrollView.backgroundColor = .clear
         scrollView.alwaysBounceVertical = false
         scrollView.alwaysBounceHorizontal = false
         scrollView.showsVerticalScrollIndicator = true
@@ -40,7 +40,7 @@ class ViewerItemController: UIViewController {
 
     lazy var imageView: UIImageView = {
         let view = UIImageView(frame: UIScreen.main.bounds)
-        view.backgroundColor = UIColor.clear
+        view.backgroundColor = .clear
         view.contentMode = .scaleAspectFit
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.isUserInteractionEnabled = true
@@ -132,7 +132,7 @@ class ViewerItemController: UIViewController {
         super.viewDidLoad()
 
         self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.view.backgroundColor = UIColor.black
+        self.view.backgroundColor = .black
 
         self.zoomingScrollView.addSubview(self.imageView)
         self.view.addSubview(self.zoomingScrollView)

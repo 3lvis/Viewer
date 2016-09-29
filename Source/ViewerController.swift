@@ -36,7 +36,7 @@ public class ViewerController: UIViewController {
 
         super.init(nibName: nil, bundle: nil)
 
-        self.view.backgroundColor = UIColor.clear
+        self.view.backgroundColor = .clear
         self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.modalPresentationStyle = .overCurrentContext
         #if os(iOS)
@@ -103,7 +103,7 @@ public class ViewerController: UIViewController {
 
     fileprivate lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.main.bounds)
-        view.backgroundColor = UIColor.black
+        view.backgroundColor = .black
         view.alpha = 0
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
@@ -118,7 +118,7 @@ public class ViewerController: UIViewController {
         let view = PaginatedScrollView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
         view.viewDataSource = self
         view.viewDelegate = self
-        view.backgroundColor = UIColor.clear
+        view.backgroundColor = .clear
 
         return view
     }()
@@ -261,7 +261,7 @@ extension ViewerController {
                 self.currentIndexPath = indexPath
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
-                self.view.backgroundColor = UIColor.black
+                self.view.backgroundColor = .black
                 self.presented = true
                 let item = self.findOrCreateViewerItemController(indexPath)
                 item.didFocused()
@@ -281,7 +281,7 @@ extension ViewerController {
         let viewerItem = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewerItemController.indexPath!)
         let image = viewerItem.placeholder
         viewerItemController.imageView.alpha = 0
-        viewerItemController.view.backgroundColor = UIColor.clear
+        viewerItemController.view.backgroundColor = .clear
         viewerItemController.willDismiss()
 
         self.view.alpha = 0
@@ -342,7 +342,7 @@ extension ViewerController {
             #if os(iOS)
                 self.setNeedsStatusBarAppearanceUpdate()
             #endif
-            self.view.backgroundColor = UIColor.clear
+            self.view.backgroundColor = .clear
             self.originalDraggedCenter = controller.imageView.center
             self.isDragging = true
             self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
@@ -371,7 +371,7 @@ extension ViewerController {
                 self.isDragging = false
                 UIView.animate(withDuration: 0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
-                    controller.view.backgroundColor = UIColor.black
+                    controller.view.backgroundColor = .black
                     controller.dimControls(1.0)
 
                     if self.buttonsAreVisible {
