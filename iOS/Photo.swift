@@ -74,7 +74,7 @@ struct Photo: ViewerItem {
         let fetchOptions = PHFetchOptions()
         let authorizationStatus = PHPhotoLibrary.authorizationStatus()
 
-        guard authorizationStatus == .authorized else { abort() }
+        guard authorizationStatus == .authorized else { fatalError("Camera Roll not authorized") }
 
         let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
         if fetchResult.count > 0 {
