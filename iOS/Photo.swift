@@ -56,7 +56,7 @@ struct Photo: ViewerItem {
                     break
                 case 5:
                     photo.placeholder = UIImage(named: "5.png")!
-                    photo.url = "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4"
+                    photo.url = "http://techslides.com/demos/sample-videos/small.mp4"
                     photo.type = .Video
                 default: break
                 }

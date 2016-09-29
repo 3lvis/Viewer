@@ -428,8 +428,14 @@ extension ViewerController: ViewerItemControllerDelegate {
 }
 
 extension ViewerController: ViewerItemControllerDataSource {
-    func overlayIsHidden() -> Bool {
+    func isViewerItemControllerOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool {
         return !self.buttonsAreVisible
+    }
+
+    func viewerItemControllerIsFocused(_ viewerItemController: ViewerItemController) -> Bool {
+        let focusedViewerItemController = self.findOrCreateViewerItemController(self.currentIndexPath)
+
+        return viewerItemController == focusedViewerItemController
     }
 }
 
@@ -465,13 +471,13 @@ extension ViewerController: PaginatedScrollViewDelegate {
         self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
         self.currentIndexPath = indexPath
         self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
-        let viewerItem = self.findOrCreateViewerItemController(indexPath)
-        viewerItem.didFocused()
+        let viewerItemController = self.findOrCreateViewerItemController(indexPath)
+        viewerItemController.didFocused()
     }
 
     func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, didMoveFromIndex index: Int) {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
-        let viewerItem = self.findOrCreateViewerItemController(indexPath)
-        viewerItem.willDismiss()
+        let viewerItemController = self.findOrCreateViewerItemController(indexPath)
+        viewerItemController.willDismiss()
     }
 }

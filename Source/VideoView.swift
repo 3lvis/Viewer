@@ -6,13 +6,13 @@ import AVKit
     import Photos
 #endif
 
-protocol MovieContainerDelegate: class {
-    func movieContainerDidStartedPlayingMovie(_ movieContainer: MovieContainer)
-    func movieContainer(_ movieContainer: MovieContainer, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
+protocol VideoViewDelegate: class {
+    func videoViewDidStartPlaying(_ videoView: VideoView)
+    func videoView(_ videoView: VideoView, didRequestToUpdateProgressBar duration: Double, currentTime: Double)
 }
 
-class MovieContainer: UIView {
-    weak var viewDelegate: MovieContainerDelegate?
+class VideoView: UIView {
+    weak var viewDelegate: VideoViewDelegate?
 
     private lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
@@ -25,7 +25,7 @@ class MovieContainer: UIView {
 
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
-        view.autoresizingMask = [.flexibleRightMargin, .flexibleLeftMargin, .flexibleBottomMargin, .flexibleTopMargin]
+        view.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin]
 
         return view
     }()
@@ -38,11 +38,11 @@ class MovieContainer: UIView {
     }()
 
     private var shouldRegisterForNotifications = true
-    private var player: AVPlayer?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
+        self.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin]
         self.isUserInteractionEnabled = false
         self.layer.addSublayer(self.playerLayer)
         self.addSubview(self.loadingIndicatorBackground)
@@ -79,17 +79,17 @@ class MovieContainer: UIView {
         if player.status == .readyToPlay {
             self.stopPlayerAndRemoveObserverIfNecessary()
             player.play()
-            self.viewDelegate?.movieContainerDidStartedPlayingMovie(self)
+            self.viewDelegate?.videoViewDidStartPlaying(self)
         }
     }
 
     func stopPlayerAndRemoveObserverIfNecessary() {
         self.loadingIndicator.stopAnimating()
         self.loadingIndicatorBackground.alpha = 0
-        self.player?.pause()
+        self.playerLayer.player?.pause()
 
         if self.shouldRegisterForNotifications == false {
-            self.player?.removeObserver(self, forKeyPath: "status")
+            self.playerLayer.player?.removeObserver(self, forKeyPath: "status")
             self.shouldRegisterForNotifications = true
         }
     }
@@ -99,8 +99,7 @@ class MovieContainer: UIView {
     func start(_ viewerItem: ViewerItem) {
         if let url = viewerItem.url {
             let streamingURL = URL(string: url)!
-            self.player = AVPlayer(url: streamingURL)
-            self.playerLayer.player = self.player
+            self.playerLayer.player = AVPlayer(url: streamingURL)
             self.start()
         } else if let assetID = viewerItem.assetID {
             #if os(iOS)
@@ -113,8 +112,7 @@ class MovieContainer: UIView {
                 PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions) { playerItem, info in
                     guard let playerItem = playerItem else { fatalError("Player item was nil: \(info)") }
                     DispatchQueue.main.async(execute: {
-                        self.player = AVPlayer(playerItem: playerItem)
-                        guard let player = self.player else { fatalError("Couldn't create player from playerItem: \(playerItem)") }
+                        let player = AVPlayer(playerItem: playerItem)
                         player.rate = Float(playerItem.preferredPeakBitRate)
                         self.playerLayer.player = player
                         self.start()
@@ -143,7 +141,7 @@ class MovieContainer: UIView {
     }
 
     func start() {
-        guard let player = self.player, let currentItem = player.currentItem else { return }
+        guard let player = self.playerLayer.player, let currentItem = player.currentItem else { return }
 
         let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
         player.addPeriodicTimeObserver(forInterval: interval, queue: nil) {
@@ -157,7 +155,7 @@ class MovieContainer: UIView {
         self.playerLayer.isHidden = false
 
         if self.shouldRegisterForNotifications {
-            guard let player = self.player else { fatalError("No player item was found") }
+            guard let player = self.playerLayer.player else { fatalError("No player item was found") }
 
             if player.status == .unknown {
                 self.loadingIndicator.startAnimating()
@@ -171,25 +169,25 @@ class MovieContainer: UIView {
 
     func stop() {
         self.playerLayer.isHidden = true
-        self.player?.pause()
-        self.player?.seek(to: kCMTimeZero)
+        self.playerLayer.player?.pause()
+        self.playerLayer.player?.seek(to: kCMTimeZero)
         self.playerLayer.player = nil
         if let timeObserver = self.timeObserver {
-            self.player?.removeTimeObserver(timeObserver)
+            self.playerLayer.player?.removeTimeObserver(timeObserver)
         }
     }
 
     func play() {
-        self.player?.play()
+        self.playerLayer.player?.play()
         self.playerLayer.isHidden = false
     }
 
     func pause() {
-        self.player?.pause()
+        self.playerLayer.player?.pause()
     }
 
     func isPlaying() -> Bool {
-        if let player = self.player {
+        if let player = self.playerLayer.player {
             let isPlaying = player.rate != 0 && player.error == nil
             return isPlaying
         }
@@ -198,6 +196,6 @@ class MovieContainer: UIView {
     }
 
     func updateProgressBar(forDuration duration: Double, currentTime: Double) {
-        self.viewDelegate?.movieContainer(self, didRequestToUpdateProgressBar: duration, currentTime: currentTime)
+        self.viewDelegate?.videoView(self, didRequestToUpdateProgressBar: duration, currentTime: currentTime)
     }
 }
