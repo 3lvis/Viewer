@@ -428,11 +428,11 @@ extension ViewerController: ViewerItemControllerDelegate {
 }
 
 extension ViewerController: ViewerItemControllerDataSource {
-    func overlayIsHidden() -> Bool {
+    func viewerItemControllerIsOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool {
         return !self.buttonsAreVisible
     }
 
-    func viewerItemControllerIsFocused(viewerItemController: ViewerItemController) -> Bool {
+    func viewerItemControllerIsFocused(_ viewerItemController: ViewerItemController) -> Bool {
         let focusedViewerItemController = self.findOrCreateViewerItemController(self.currentIndexPath)
 
         return viewerItemController == focusedViewerItemController

@@ -11,8 +11,8 @@ protocol ViewerItemControllerDelegate: class {
 }
 
 protocol ViewerItemControllerDataSource: class {
-    func overlayIsHidden() -> Bool
-    func viewerItemControllerIsFocused(viewerItemController: ViewerItemController) -> Bool
+    func viewerItemControllerIsOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool
+    func viewerItemControllerIsFocused(_ viewerItemController: ViewerItemController) -> Bool
 }
 
 class ViewerItemController: UIViewController {
@@ -153,7 +153,7 @@ class ViewerItemController: UIViewController {
 
         guard let viewerItem = self.viewerItem else { return }
 
-        let isFocused = self.controllerDataSource?.viewerItemControllerIsFocused(viewerItemController: self)
+        let isFocused = self.controllerDataSource?.viewerItemControllerIsFocused(self)
         if viewerItem.type == .Video || isFocused == false {
             self.view.backgroundColor = .clear
             self.scrollView.isHidden = true
@@ -241,7 +241,7 @@ class ViewerItemController: UIViewController {
     func repeatAction() {
         self.repeatButton.alpha = 0
 
-        if let overlayIsHidden = self.controllerDataSource?.overlayIsHidden() , !overlayIsHidden {
+        if let overlayIsHidden = self.controllerDataSource?.viewerItemControllerIsOverlayHidden(self), !overlayIsHidden {
             self.pauseButton.alpha = 1
         }
 
@@ -250,7 +250,7 @@ class ViewerItemController: UIViewController {
     }
 
     func playIfNeeded() {
-        let overlayIsHidden = self.controllerDataSource?.overlayIsHidden() ?? false
+        let overlayIsHidden = self.controllerDataSource?.viewerItemControllerIsOverlayHidden(self) ?? false
         if overlayIsHidden == false {
             self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
         }
