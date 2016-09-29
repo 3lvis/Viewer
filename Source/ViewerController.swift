@@ -377,14 +377,16 @@ extension ViewerController {
                     if self.buttonsAreVisible {
                         self.fadeButtons(1)
                     }
+
+                    self.shouldHideStatusBar = !self.buttonsAreVisible
+                    self.shouldUseLightStatusBar = true
+
+                    #if os(iOS)
+                        self.setNeedsStatusBarAppearanceUpdate()
+                    #endif
                     }, completion: { completed in
                         controller.didFocused()
-                        self.shouldHideStatusBar = false
-                        self.shouldUseLightStatusBar = true
-                        #if os(iOS)
-                            self.setNeedsStatusBarAppearanceUpdate()
-                        #endif
-                        self.view.backgroundColor = UIColor.black
+                        self.view.backgroundColor = .black
                 }) 
             }
         }
