@@ -42,6 +42,7 @@ class MovieContainer: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
+        self.autoresizingMask = [.flexibleRightMargin, .flexibleLeftMargin, .flexibleBottomMargin, .flexibleTopMargin]
         self.isUserInteractionEnabled = false
         self.layer.addSublayer(self.playerLayer)
         self.addSubview(self.loadingIndicatorBackground)
