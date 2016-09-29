@@ -167,6 +167,11 @@ class VideoView: UIView {
         }
     }
 
+    func `repeat`() {
+        self.playerLayer.player?.seek(to: kCMTimeZero)
+        self.playerLayer.player?.play()
+    }
+
     func stop() {
         self.playerLayer.isHidden = true
         self.playerLayer.player?.pause()

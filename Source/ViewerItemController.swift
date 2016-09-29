@@ -245,12 +245,15 @@ class ViewerItemController: UIViewController {
     func repeatAction() {
         self.repeatButton.alpha = 0
 
-        if let overlayIsHidden = self.controllerDataSource?.isViewerItemControllerOverlayHidden(self), !overlayIsHidden {
+        let overlayIsHidden = self.controllerDataSource?.isViewerItemControllerOverlayHidden(self) ?? false
+        if overlayIsHidden {
+            self.videoProgressView.alpha = 0
+        } else {
             self.pauseButton.alpha = 1
+            self.videoProgressView.alpha = 1
         }
 
-        self.videoView.stop()
-        self.videoView.play()
+        self.videoView.repeat()
     }
 
     func playIfNeeded() {
