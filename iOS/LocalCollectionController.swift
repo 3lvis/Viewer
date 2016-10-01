@@ -10,10 +10,6 @@ class LocalCollectionController: UICollectionViewController {
 
         self.collectionView?.backgroundColor = .white
         self.collectionView?.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
 
         Photo.checkAuthorizationStatus { success in
             if success {
