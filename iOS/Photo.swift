@@ -99,7 +99,7 @@ struct Photo: ViewerItem {
         let requestOptions = PHImageRequestOptions()
         requestOptions.isNetworkAccessAllowed = true
         requestOptions.isSynchronous = false
-        requestOptions.deliveryMode = .fastFormat
+        requestOptions.deliveryMode = .opportunistic
         requestOptions.resizeMode = .fast
 
         if size == .small {
