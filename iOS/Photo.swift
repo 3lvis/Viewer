@@ -3,7 +3,8 @@ import Photos
 
 struct Photo: ViewerItem {
     enum Size {
-        case Small, Large
+        case small
+        case large
     }
 
     var type: ViewerItemType = .Image
@@ -20,7 +21,7 @@ struct Photo: ViewerItem {
     func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> ()) {
         if let assetID = self.assetID {
             if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject {
-                Photo.resolveAsset(asset: asset, size: .Large) { image in
+                Photo.image(for: asset, size: .large) { image in
                     completion(image, nil)
                 }
             }
@@ -93,24 +94,33 @@ struct Photo: ViewerItem {
         return elements
     }
 
-    static func resolveAsset(asset: PHAsset, size: Photo.Size, completion: @escaping (_ image: UIImage?) -> Void) {
+    static func image(for asset: PHAsset, size: Photo.Size, completion: @escaping (_ image: UIImage?) -> Void) {
         let imageManager = PHImageManager.default()
         let requestOptions = PHImageRequestOptions()
         requestOptions.isNetworkAccessAllowed = true
-        if size == .Small {
-            let targetSize = CGSize(width: 300, height: 300)
-            imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: PHImageContentMode.aspectFill, options: requestOptions) { image, info in
-                if let info = info , info["PHImageFileUTIKey"] == nil {
+        requestOptions.isSynchronous = false
+        requestOptions.deliveryMode = .fastFormat
+        requestOptions.resizeMode = .fast
+
+        if size == .small {
+            let targetSize = CGSize(width: 150, height: 150)
+            imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, info in
+                // WARNING: This could fail if your phone doesn't have enough storage. Since the photo is probably
+                // stored in iCloud downloading it to your phone will take most of the space left making this feature fail.
+                // guard let image = image else { fatalError("Couldn't get photo data for asset \(asset)") }
+                DispatchQueue.main.async {
                     completion(image)
                 }
             }
         } else {
-            requestOptions.version = .original
-            imageManager.requestImageData(for: asset, options: requestOptions) { data, _, _, _ in
-                if let data = data, let image = UIImage(data: data) {
+            let bounds = UIScreen.main.bounds.size
+            let targetSize = CGSize(width: bounds.width * 2, height: bounds.height * 2)
+            imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, info in
+                // WARNING: This could fail if your phone doesn't have enough storage. Since the photo is probably
+                // stored in iCloud downloading it to your phone will take most of the space left making this feature fail.
+                // guard let image = image else { fatalError("Couldn't get photo data for asset \(asset)") }
+                DispatchQueue.main.async {
                     completion(image)
-                } else {
-                    fatalError("Couldn't get photo")
                 }
             }
         }

@@ -44,7 +44,7 @@ class PhotoCell: UICollectionViewCell {
 
             if let assetID = photo.assetID {
                 if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject {
-                    Photo.resolveAsset(asset: asset, size: .Small) { image in
+                    Photo.image(for: asset, size: .small) { image in
                         self.imageView.image = image
                     }
                 }
