@@ -9,20 +9,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         self.window = UIWindow(frame: UIScreen.main.bounds)
 
-        let numberOfColumns = CGFloat(4)
-        let layout = UICollectionViewFlowLayout()
-        let bounds = UIScreen.main.bounds
-        layout.minimumLineSpacing = 1
-        layout.minimumInteritemSpacing = 1
-        let size = (bounds.width - numberOfColumns) / numberOfColumns
-        layout.itemSize = CGSize(width: size, height: size)
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
-
-        let remoteController = RemoteCollectionController(collectionViewLayout: layout)
+        let remoteControllerLayout = AppDelegate.layout()
+        let remoteController = RemoteCollectionController(collectionViewLayout: remoteControllerLayout)
         remoteController.title = "Remote"
         let remoteNavigationController = UINavigationController(rootViewController: remoteController)
 
-        let localController = LocalCollectionController(collectionViewLayout: layout)
+        let localControllerLayout = AppDelegate.layout()
+        let localController = LocalCollectionController(collectionViewLayout: localControllerLayout)
         localController.title = "Local"
         let localNavigationController = UINavigationController(rootViewController: localController)
 
@@ -34,11 +27,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         let tabBarController = UITabBarController()
-        tabBarController.setViewControllers([remoteNavigationController, localNavigationController], animated: false)
+        tabBarController.setViewControllers([localNavigationController, remoteNavigationController], animated: false)
 
         self.window!.rootViewController = tabBarController
         self.window!.makeKeyAndVisible()
 
         return true
+    }
+
+    static func layout() -> UICollectionViewFlowLayout {
+        let numberOfColumns = CGFloat(4)
+        let layout = UICollectionViewFlowLayout()
+        let bounds = UIScreen.main.bounds
+        layout.minimumLineSpacing = 1
+        layout.minimumInteritemSpacing = 1
+        let size = (bounds.width - numberOfColumns) / numberOfColumns
+        layout.itemSize = CGSize(width: size, height: size)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+
+        return layout
     }
 }
