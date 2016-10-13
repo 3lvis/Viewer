@@ -97,11 +97,7 @@ class VideoView: UIView {
     var timeObserver: Any?
 
     func start(_ viewerItem: ViewerItem) {
-        if let url = viewerItem.url {
-            let streamingURL = URL(string: url)!
-            self.playerLayer.player = AVPlayer(url: streamingURL)
-            self.start()
-        } else if let assetID = viewerItem.assetID {
+        if let assetID = viewerItem.assetID {
             #if os(iOS)
                 let result = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
                 guard let asset = result.firstObject else { fatalError("Couldn't get asset for id: \(assetID)") }
@@ -137,6 +133,10 @@ class VideoView: UIView {
                     })
                 }
             #endif
+        } else if let url = viewerItem.url {
+            let streamingURL = URL(string: url)!
+            self.playerLayer.player = AVPlayer(url: streamingURL)
+            self.start()
         }
     }
 
