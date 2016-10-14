@@ -52,6 +52,11 @@ public class ViewerController: UIViewController {
     public weak var controllerDataSource: ViewerControllerDataSource?
 
     /**
+     Flag that tells the viewer controller to autoplay videos on focus
+     */
+    public var autoplayVideos: Bool = false
+
+    /**
      Cache for the reused ViewerItemControllers
      */
     fileprivate let viewerItemControllerCache = NSCache<NSString, ViewerItemController>()
@@ -438,6 +443,10 @@ extension ViewerController: ViewerItemControllerDataSource {
         let focusedViewerItemController = self.findOrCreateViewerItemController(self.currentIndexPath)
 
         return viewerItemController == focusedViewerItemController
+    }
+
+    func viewerItemControllerShouldAutoplayVideo(_ viewerItemController: ViewerItemController) -> Bool {
+        return self.autoplayVideos
     }
 }
 

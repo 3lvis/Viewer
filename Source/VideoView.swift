@@ -23,6 +23,8 @@ class VideoView: UIView {
 
     var image: UIImage?
 
+    var autoplay = false
+
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
         view.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin]
@@ -78,8 +80,11 @@ class VideoView: UIView {
 
         if player.status == .readyToPlay {
             self.stopPlayerAndRemoveObserverIfNecessary()
-            player.play()
-            self.viewDelegate?.videoViewDidStartPlaying(self)
+
+            if self.autoplay {
+                player.play()
+                self.viewDelegate?.videoViewDidStartPlaying(self)
+            }
         }
     }
 
@@ -96,7 +101,9 @@ class VideoView: UIView {
 
     var timeObserver: Any?
 
-    func start(_ viewerItem: ViewerItem) {
+    func start(_ viewerItem: ViewerItem, autoplay: Bool) {
+        self.autoplay = autoplay
+
         if let assetID = viewerItem.assetID {
             #if os(iOS)
                 let result = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
@@ -152,12 +159,14 @@ class VideoView: UIView {
             self.updateProgressBar(forDuration: duration, currentTime: currentTime)
         }
 
-        self.playerLayer.isHidden = false
+        if self.autoplay {
+            self.playerLayer.isHidden = false
+        }
 
         if self.shouldRegisterForNotifications {
             guard let player = self.playerLayer.player else { fatalError("No player item was found") }
 
-            if player.status == .unknown {
+            if self.autoplay && player.status == .unknown {
                 self.loadingIndicator.startAnimating()
                 self.loadingIndicatorBackground.alpha = 1
             }
