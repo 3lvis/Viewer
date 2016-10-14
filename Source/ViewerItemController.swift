@@ -13,6 +13,7 @@ protocol ViewerItemControllerDelegate: class {
 protocol ViewerItemControllerDataSource: class {
     func isViewerItemControllerOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool
     func viewerItemControllerIsFocused(_ viewerItemController: ViewerItemController) -> Bool
+    func viewerItemControllerShouldAutoplayVideo(_ viewerItemController: ViewerItemController) -> Bool
 }
 
 class ViewerItemController: UIViewController {
@@ -209,16 +210,20 @@ class ViewerItemController: UIViewController {
     func didFocus() {
         guard let viewerItem = self.viewerItem else { return }
 
-        if viewerItem.type == .Video {
-            self.videoView.start(viewerItem)
-            NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
-        } else {
-            viewerItem.media({ image, error in
+        switch viewerItem.type {
+        case .image:
+            viewerItem.media { image, error in
                 if let image = image {
                     self.imageView.image = image
                     self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
                 }
-            })
+            }
+        case .video:
+            let shouldAutoplayVideo = self.controllerDataSource?.viewerItemControllerShouldAutoplayVideo(self) ?? false
+            if shouldAutoplayVideo {
+                self.videoView.start(viewerItem)
+                NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+            }
         }
     }
 
