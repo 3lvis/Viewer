@@ -206,7 +206,7 @@ class ViewerItemController: UIViewController {
         }
     }
 
-    func didFocused() {
+    func didFocus() {
         guard let viewerItem = self.viewerItem else { return }
 
         if viewerItem.type == .Video {

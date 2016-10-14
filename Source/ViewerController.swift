@@ -264,7 +264,7 @@ extension ViewerController {
                 self.view.backgroundColor = .black
                 self.presented = true
                 let item = self.findOrCreateViewerItemController(indexPath)
-                item.didFocused()
+                item.didFocus()
 
                 completion?()
         }) 
@@ -385,7 +385,7 @@ extension ViewerController {
                         self.setNeedsStatusBarAppearanceUpdate()
                     #endif
                     }, completion: { completed in
-                        controller.didFocused()
+                        controller.didFocus()
                         self.view.backgroundColor = .black
                 }) 
             }
@@ -474,7 +474,7 @@ extension ViewerController: PaginatedScrollViewDelegate {
         self.currentIndexPath = indexPath
         self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
         let viewerItemController = self.findOrCreateViewerItemController(indexPath)
-        viewerItemController.didFocused()
+        viewerItemController.didFocus()
     }
 
     func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, didMoveFromIndex index: Int) {
