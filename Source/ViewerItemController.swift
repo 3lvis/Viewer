@@ -158,14 +158,14 @@ class ViewerItemController: UIViewController {
         guard let viewerItem = self.viewerItem else { return }
 
         let isFocused = self.controllerDataSource?.viewerItemControllerIsFocused(self)
-        if viewerItem.type == .Video || isFocused == false {
+        if viewerItem.type == .video || isFocused == false {
             self.view.backgroundColor = .clear
             self.zoomingScrollView.isHidden = true
         }
         coordinator.animate(alongsideTransition: { context in
 
             }) { completionContext in
-                if viewerItem.type == .Video || isFocused == false  {
+                if viewerItem.type == .video || isFocused == false  {
                     self.view.backgroundColor = .black
                     self.zoomingScrollView.isHidden = false
                 }
@@ -199,7 +199,7 @@ class ViewerItemController: UIViewController {
     func willDismiss() {
         guard let viewerItem = self.viewerItem else { return }
 
-        if viewerItem.type == .Video {
+        if viewerItem.type == .video {
             self.videoView.stopPlayerAndRemoveObserverIfNecessary()
             self.videoView.stop()
             NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
@@ -303,7 +303,7 @@ class ViewerItemController: UIViewController {
 
 extension ViewerItemController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        if self.viewerItem?.type == .Image {
+        if self.viewerItem?.type == .image {
             return self.imageView
         } else {
             return nil

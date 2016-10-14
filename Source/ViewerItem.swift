@@ -1,8 +1,8 @@
 import UIKit
 
 public enum ViewerItemType: String {
-    case Image = "image"
-    case Video = "video"
+    case image
+    case video
 }
 
 public protocol ViewerItem {

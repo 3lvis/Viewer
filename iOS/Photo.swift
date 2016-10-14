@@ -7,7 +7,7 @@ struct Photo: ViewerItem {
         case large
     }
 
-    var type: ViewerItemType = .Image
+    var type: ViewerItemType = .image
     var id: String
     var placeholder = UIImage(named: "clear.png")!
     var url: String?
@@ -58,7 +58,7 @@ struct Photo: ViewerItem {
                 case 5:
                     photo.placeholder = UIImage(named: "5.png")!
                     photo.url = "http://techslides.com/demos/sample-videos/small.mp4"
-                    photo.type = .Video
+                    photo.type = .video
                 default: break
                 }
                 elements.append(photo)
@@ -84,7 +84,7 @@ struct Photo: ViewerItem {
                 photo.assetID = asset.localIdentifier
 
                 if asset.duration > 0 {
-                    photo.type = .Video
+                    photo.type = .video
                 }
 
                 elements.append(photo)
