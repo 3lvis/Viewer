@@ -54,7 +54,7 @@ public class ViewerController: UIViewController {
     /**
      Flag that tells the viewer controller to autoplay videos on focus
      */
-    public var autoplayVideos: Bool = true
+    public var autoplayVideos: Bool = false
 
     /**
      Cache for the reused ViewerItemControllers
