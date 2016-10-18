@@ -203,6 +203,8 @@ class ViewerItemController: UIViewController {
         if viewerItem.type == .video {
             self.videoView.stopPlayerAndRemoveObserverIfNecessary()
             self.videoView.stop()
+            self.resetButtonStates()
+
             NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         }
     }
@@ -228,9 +230,15 @@ class ViewerItemController: UIViewController {
                 } else {
                     self.playButton.alpha = 1
                 }
-
             }
         }
+    }
+
+    func resetButtonStates() {
+        self.repeatButton.alpha = 0
+        self.pauseButton.alpha = 0
+        self.playButton.alpha = 1
+        self.videoProgressView.alpha = 0
     }
 
     func videoFinishedPlaying() {
@@ -241,18 +249,22 @@ class ViewerItemController: UIViewController {
     }
 
     func pauseAction() {
-        self.videoView.pause()
+        self.repeatButton.alpha = 0
         self.pauseButton.alpha = 0
         self.playButton.alpha = 1
         self.videoProgressView.alpha = 1
+
+        self.videoView.pause()
     }
 
     func playAction() {
-        self.videoView.play()
+        self.repeatButton.alpha = 0
         self.pauseButton.alpha = 0
         self.playButton.alpha = 0
         self.videoProgressView.alpha = 0
-        self.playIfNeeded()
+
+        self.videoView.play()
+        self.requestToHideOverlayIfNeeded()
     }
 
     func repeatAction() {
@@ -269,7 +281,7 @@ class ViewerItemController: UIViewController {
         self.videoView.repeat()
     }
 
-    func playIfNeeded() {
+    func requestToHideOverlayIfNeeded() {
         let overlayIsHidden = self.controllerDataSource?.isViewerItemControllerOverlayHidden(self) ?? false
         if overlayIsHidden == false {
             self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
@@ -324,7 +336,7 @@ extension ViewerItemController: UIScrollViewDelegate {
 
 extension ViewerItemController: VideoViewDelegate {
     func videoViewDidStartPlaying(_ videoView: VideoView) {
-        self.playIfNeeded()
+        self.requestToHideOverlayIfNeeded()
     }
 
     func videoView(_ videoView: VideoView, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
