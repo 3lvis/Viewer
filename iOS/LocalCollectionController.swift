@@ -46,6 +46,7 @@ extension LocalCollectionController {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath) as! PhotoCell
         let photo = self.photos[indexPath.row]
         cell.photo = photo
+        cell.photo?.placeholder = cell.imageView.image ?? UIImage()
 
         return cell
     }
@@ -71,13 +72,13 @@ extension LocalCollectionController: ViewerControllerDataSource {
     }
 
     func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> ViewerItem {
-        var item = self.photos[indexPath.row]
+        var viewerItem = self.photos[indexPath.row]
         if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {
-            item.placeholder = placeholder
+            viewerItem.placeholder = placeholder
         }
-        self.photos[indexPath.row] = item
+        self.photos[indexPath.row] = viewerItem
 
-        return self.photos[indexPath.row]
+        return viewerItem
     }
 }
 

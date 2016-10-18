@@ -8,9 +8,9 @@ public enum ViewerItemType: String {
 public protocol ViewerItem {
     var type: ViewerItemType { get }
     var id: String { get }
-    var placeholder: UIImage { get set }
     var assetID: String? { get }
     var url: String? { get }
+    var placeholder: UIImage { get set }
 
     func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> ())
 }
