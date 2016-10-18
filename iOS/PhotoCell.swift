@@ -43,11 +43,9 @@ class PhotoCell: UICollectionViewCell {
             self.videoIndicator.isHidden = photo.type == .image
 
             if let assetID = photo.assetID {
-                if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject {
-                    Photo.thumbnail(for: asset) { image in
-                        self.imageView.image = image
-                    }
-                }
+                let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject!
+                let image = Photo.thumbnail(for: asset)!
+                self.imageView.image = image
             } else {
                 self.imageView.image = photo.placeholder
             }

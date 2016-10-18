@@ -2,6 +2,8 @@ import UIKit
 import Photos
 
 struct Photo: ViewerItem {
+    var placeholder = UIImage()
+
     enum Size {
         case small
         case large
@@ -9,7 +11,6 @@ struct Photo: ViewerItem {
 
     var type: ViewerItemType = .image
     var id: String
-    var placeholder = UIImage(named: "clear.png")!
     var url: String?
     var assetID: String?
     static let NumberOfSections = 20
@@ -17,6 +18,15 @@ struct Photo: ViewerItem {
     init(id: String) {
         self.id = id
     }
+
+//    func placeholder(_ completion: @escaping (_ image: UIImage?) -> ()) {
+//        if let assetID = assetID {
+//            let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject!
+//            completion(Photo.thumbnail(for: asset))
+//        } else {
+//            completion(UIImage(named: self.filename))
+//        }
+//    }
 
     func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> ()) {
         if let assetID = self.assetID {
@@ -94,23 +104,27 @@ struct Photo: ViewerItem {
         return elements
     }
 
-    static func thumbnail(for asset: PHAsset, completion: @escaping (_ image: UIImage?) -> Void) {
+    static func thumbnail(for asset: PHAsset) -> UIImage? {
         let imageManager = PHImageManager.default()
         let requestOptions = PHImageRequestOptions()
         requestOptions.isNetworkAccessAllowed = true
-        requestOptions.isSynchronous = false
-        requestOptions.deliveryMode = .opportunistic
+        requestOptions.isSynchronous = true
+        requestOptions.deliveryMode = .fastFormat
         requestOptions.resizeMode = .fast
 
-        let targetSize = CGSize(width: 150, height: 150)
+        var returnedImage: UIImage?
+        let scaleFactor = UIScreen.main.scale
+        let itemSize = CGSize(width: 150, height: 150)
+        let targetSize = CGSize(width: itemSize.width * scaleFactor, height: itemSize.height * scaleFactor)
         imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, info in
             // WARNING: This could fail if your phone doesn't have enough storage. Since the photo is probably
             // stored in iCloud downloading it to your phone will take most of the space left making this feature fail.
             // guard let image = image else { fatalError("Couldn't get photo data for asset \(asset)") }
-            DispatchQueue.main.async {
-                completion(image)
-            }
+
+            returnedImage = image
         }
+
+        return returnedImage
     }
 
     static func image(for asset: PHAsset, completion: @escaping (_ image: UIImage?) -> Void) {
