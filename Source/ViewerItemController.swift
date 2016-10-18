@@ -219,11 +219,16 @@ class ViewerItemController: UIViewController {
                 }
             }
         case .video:
-            let autoplayVideo = self.controllerDataSource?.viewerItemControllerShouldAutoplayVideo(self) ?? false
-            self.videoView.start(viewerItem, autoplay: autoplayVideo)
-            NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
-            if autoplayVideo == false {
-                self.playButton.alpha = 1
+            self.videoView.prepare(using: viewerItem) {
+                NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+
+                let autoplayVideo = self.controllerDataSource?.viewerItemControllerShouldAutoplayVideo(self) ?? false
+                if autoplayVideo {
+                    self.videoView.play()
+                } else {
+                    self.playButton.alpha = 1
+                }
+
             }
         }
     }
