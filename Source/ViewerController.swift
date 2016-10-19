@@ -22,6 +22,11 @@ public protocol ViewerControllerDelegate: class {
      When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate
      */
     func viewerControllerDidDismiss(_ viewerController: ViewerController)
+
+    /**
+     When the video playback fails
+     */
+    func viewerControllerDidFailPlayingVideo(_ viewerController: ViewerController, viewable: Viewable, indexPath: IndexPath, error: NSError)
 }
 
 public class ViewerController: UIViewController {
@@ -431,6 +436,10 @@ extension ViewerController: ViewableControllerDelegate {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
         self.toggleButtons(self.buttonsAreVisible)
+    }
+
+    func viewableControllerDidFailPlayingVideo(_ viewableController: ViewableController, viewable: Viewable, error: NSError) {
+        self.delegate?.viewerControllerDidFailPlayingVideo(self, viewable: viewable, indexPath: self.currentIndexPath, error: error)
     }
 }
 
