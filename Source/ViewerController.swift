@@ -48,8 +48,8 @@ public class ViewerController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public weak var controllerDelegate: ViewerControllerDelegate?
-    public weak var controllerDataSource: ViewerControllerDataSource?
+    public weak var delegate: ViewerControllerDelegate?
+    public weak var dataSource: ViewerControllerDataSource?
 
     /**
      Flag that tells the viewer controller to autoplay videos on focus
@@ -184,15 +184,15 @@ extension ViewerController {
     }
 
     fileprivate func findOrCreateViewableController(_ indexPath: IndexPath) -> ViewableController {
-        let viewable = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
+        let viewable = self.dataSource!.viewerController(self, itemAtIndexPath: indexPath)
         var viewableController: ViewableController
 
         if let cachedController = self.viewableControllerCache.object(forKey: viewable.id as NSString) {
             viewableController = cachedController
         } else {
             viewableController = ViewableController()
-            viewableController.controllerDelegate = self
-            viewableController.controllerDataSource = self
+            viewableController.delegate = self
+            viewableController.dataSource = self
 
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
             gesture.delegate = self
@@ -225,7 +225,7 @@ extension ViewerController {
     fileprivate func present(with indexPath: IndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItem(at: indexPath) else { fatalError("Data source not implemented") }
 
-        let viewable = self.controllerDataSource!.viewerController(self, itemAtIndexPath: indexPath)
+        let viewable = self.dataSource!.viewerController(self, itemAtIndexPath: indexPath)
         let image = viewable.placeholder
         selectedCell.alpha = 0
 
@@ -283,7 +283,7 @@ extension ViewerController {
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewableController.indexPath!)?.frame else { fatalError() }
 
-        let viewable = self.controllerDataSource!.viewerController(self, itemAtIndexPath: viewableController.indexPath!)
+        let viewable = self.dataSource!.viewerController(self, itemAtIndexPath: viewableController.indexPath!)
         let image = viewable.placeholder
         viewableController.imageView.alpha = 0
         viewableController.view.backgroundColor = .clear
@@ -330,7 +330,7 @@ extension ViewerController {
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
                 self.dismiss(animated: false, completion: nil)
-                self.controllerDelegate?.viewerControllerDidDismiss(self)
+                self.delegate?.viewerControllerDidDismiss(self)
 
                 completion?()
         }) 
@@ -466,7 +466,7 @@ extension ViewerController: UIGestureRecognizerDelegate {
 
 extension ViewerController: PaginatedScrollViewDataSource {
     func numberOfPagesInPaginatedScrollView(_ paginatedScrollView: PaginatedScrollView) -> Int {
-        return self.controllerDataSource?.numberOfItemsInViewerController(self) ?? 0
+        return self.dataSource?.numberOfItemsInViewerController(self) ?? 0
     }
 
     func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
@@ -481,7 +481,7 @@ extension ViewerController: PaginatedScrollViewDelegate {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
         self.currentIndexPath = indexPath
-        self.controllerDelegate?.viewerController(self, didChangeIndexPath: indexPath)
+        self.delegate?.viewerController(self, didChangeIndexPath: indexPath)
         let viewableController = self.findOrCreateViewableController(indexPath)
         viewableController.didFocus()
     }

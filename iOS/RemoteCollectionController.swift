@@ -69,7 +69,7 @@ extension RemoteCollectionController {
         let footerView = FooterView()
         footerView.viewDelegate = self
         self.viewerController?.footerView = footerView
-        self.viewerController!.controllerDataSource = self
+        self.viewerController!.dataSource = self
         self.present(self.viewerController!, animated: false, completion: nil)
     }
 }
@@ -108,7 +108,7 @@ extension RemoteCollectionController: HeaderViewDelegate {
     func headerView(_ headerView: HeaderView, didPressMenuButton button: UIButton) {
         let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
         self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
-        self.optionsController!.controllerDelegate = self
+        self.optionsController!.delegate = self
         self.viewerController?.present(self.optionsController!, animated: true, completion: nil)
     }
 }

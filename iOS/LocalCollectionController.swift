@@ -61,7 +61,7 @@ extension LocalCollectionController {
         let footerView = FooterView()
         footerView.viewDelegate = self
         self.viewerController?.footerView = footerView
-        self.viewerController!.controllerDataSource = self
+        self.viewerController!.dataSource = self
         self.present(self.viewerController!, animated: false, completion: nil)
     }
 }

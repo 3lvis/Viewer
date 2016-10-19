@@ -19,8 +19,8 @@ protocol ViewableControllerDataSource: class {
 class ViewableController: UIViewController {
     private static let FooterViewHeight = CGFloat(50.0)
 
-    weak var controllerDelegate: ViewableControllerDelegate?
-    weak var controllerDataSource: ViewableControllerDataSource?
+    weak var delegate: ViewableControllerDelegate?
+    weak var dataSource: ViewableControllerDataSource?
 
     var indexPath: IndexPath?
 
@@ -158,7 +158,7 @@ class ViewableController: UIViewController {
 
         guard let viewable = self.viewable else { return }
 
-        let isFocused = self.controllerDataSource?.viewableControllerIsFocused(self)
+        let isFocused = self.dataSource?.viewableControllerIsFocused(self)
         if viewable.type == .video || isFocused == false {
             self.view.backgroundColor = .clear
             self.zoomingScrollView.isHidden = true
@@ -181,7 +181,7 @@ class ViewableController: UIViewController {
             }) 
         }
 
-        self.controllerDelegate?.viewableControllerDidTapItem(self, completion: nil)
+        self.delegate?.viewableControllerDidTapItem(self, completion: nil)
     }
 
     override func viewWillLayoutSubviews() {
@@ -224,7 +224,7 @@ class ViewableController: UIViewController {
             self.videoView.prepare(using: viewable) {
                 NotificationCenter.default.addObserver(self, selector: #selector(ViewableController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
 
-                let autoplayVideo = self.controllerDataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
+                let autoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
                 if autoplayVideo {
                     self.videoView.play()
                 } else {
@@ -270,7 +270,7 @@ class ViewableController: UIViewController {
     func repeatAction() {
         self.repeatButton.alpha = 0
 
-        let overlayIsHidden = self.controllerDataSource?.isViewableControllerOverlayHidden(self) ?? false
+        let overlayIsHidden = self.dataSource?.isViewableControllerOverlayHidden(self) ?? false
         if overlayIsHidden {
             self.videoProgressView.alpha = 0
         } else {
@@ -282,9 +282,9 @@ class ViewableController: UIViewController {
     }
 
     func requestToHideOverlayIfNeeded() {
-        let overlayIsHidden = self.controllerDataSource?.isViewableControllerOverlayHidden(self) ?? false
+        let overlayIsHidden = self.dataSource?.isViewableControllerOverlayHidden(self) ?? false
         if overlayIsHidden == false {
-            self.controllerDelegate?.viewableControllerDidTapItem(self, completion: nil)
+            self.delegate?.viewableControllerDidTapItem(self, completion: nil)
         }
     }
 

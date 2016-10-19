@@ -7,7 +7,7 @@ protocol OptionsControllerDelegate: class {
 class OptionsController: UITableViewController {
     static let CellIdentifier = "CellIdentifier"
     static let PopoverSize = CGFloat(179)
-    weak var controllerDelegate: OptionsControllerDelegate?
+    weak var delegate: OptionsControllerDelegate?
     static let RowHeight = CGFloat(60.0)
     fileprivate var options = ["First option", "Second option", "Third option"]
 
@@ -57,6 +57,6 @@ extension OptionsController {
 
     override public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let option = self.options[indexPath.row]
-        self.controllerDelegate?.optionsController(optionsController: self, didSelectOption: option)
+        self.delegate?.optionsController(optionsController: self, didSelectOption: option)
     }
 }
