@@ -1,7 +1,7 @@
 import UIKit
 import Photos
 
-struct Photo: ViewerItem {
+struct Photo: Viewable {
     var placeholder = UIImage()
 
     enum Size {
@@ -9,7 +9,7 @@ struct Photo: ViewerItem {
         case large
     }
 
-    var type: ViewerItemType = .image
+    var type: ViewableType = .image
     var id: String
     var url: String?
     var assetID: String?
@@ -40,11 +40,11 @@ struct Photo: ViewerItem {
         }
     }
 
-    static func constructRemoteElements() -> [[ViewerItem]] {
-        var sections = [[ViewerItem]]()
+    static func constructRemoteElements() -> [[Viewable]] {
+        var sections = [[Viewable]]()
 
         for section in 0..<Photo.NumberOfSections {
-            var elements = [ViewerItem]()
+            var elements = [Viewable]()
             for row in 0..<10 {
                 var photo = Photo(id: "\(section)-\(row)")
 
@@ -79,8 +79,8 @@ struct Photo: ViewerItem {
         return sections
     }
 
-    static func constructLocalElements() -> [ViewerItem] {
-        var elements = [ViewerItem]()
+    static func constructLocalElements() -> [Viewable] {
+        var elements = [Viewable]()
 
         let fetchOptions = PHFetchOptions()
         let authorizationStatus = PHPhotoLibrary.authorizationStatus()

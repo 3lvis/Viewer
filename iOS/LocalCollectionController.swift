@@ -2,7 +2,7 @@ import UIKit
 import Photos
 
 class LocalCollectionController: UICollectionViewController {
-    var photos = [ViewerItem]()
+    var photos = [Viewable]()
     var viewerController: ViewerController?
 
     override func viewDidLoad() {
@@ -71,14 +71,14 @@ extension LocalCollectionController: ViewerControllerDataSource {
         return self.photos.count
     }
 
-    func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> ViewerItem {
-        var viewerItem = self.photos[indexPath.row]
+    func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> Viewable {
+        var viewable = self.photos[indexPath.row]
         if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {
-            viewerItem.placeholder = placeholder
+            viewable.placeholder = placeholder
         }
-        self.photos[indexPath.row] = viewerItem
+        self.photos[indexPath.row] = viewable
 
-        return viewerItem
+        return viewable
     }
 }
 

@@ -121,8 +121,8 @@ class VideoView: UIView {
         }
     }
 
-    func prepare(using viewerItem: ViewerItem, completion: @escaping (Void) -> Void) {
-        self.addPlayer(using: viewerItem) {
+    func prepare(using viewable: Viewable, completion: @escaping (Void) -> Void) {
+        self.addPlayer(using: viewable) {
             if self.shouldRegisterForStatusNotifications {
                 guard let player = self.playerLayer.player else { fatalError("No player item was found") }
 
@@ -140,9 +140,9 @@ class VideoView: UIView {
         }
     }
 
-    func addPlayer(using viewerItem: ViewerItem, completion: @escaping (Void) -> Void) {
+    func addPlayer(using viewable: Viewable, completion: @escaping (Void) -> Void) {
         DispatchQueue.global(qos: .background).async {
-            if let assetID = viewerItem.assetID {
+            if let assetID = viewable.assetID {
                 #if os(iOS)
                     let result = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
                     guard let asset = result.firstObject else { fatalError("Couldn't get asset for id: \(assetID)") }
@@ -181,7 +181,7 @@ class VideoView: UIView {
                         }
                     }
                 #endif
-            } else if let url = viewerItem.url {
+            } else if let url = viewable.url {
                 let streamingURL = URL(string: url)!
                 self.playerLayer.player = AVPlayer(url: streamingURL)
                 self.playerLayer.isHidden = true

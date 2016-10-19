@@ -59,7 +59,7 @@ override func collectionView(collectionView: UICollectionView, didSelectItemAtIn
 }
 
 extension CollectionController: ViewerControllerDataSource {
-    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
+    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> Viewable {
         return self.photos[indexPath.row]
     }
 }
