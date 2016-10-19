@@ -85,6 +85,7 @@ class VideoView: UIView {
         if let error = playerItem.error {
             self.delegate?.videoViewDidFinishPlaying(self, error: error as NSError?)
             self.stopPlayerAndRemoveObserverIfNecessary()
+            self.cleanUpObservers()
         } else {
             guard let player = self.playerLayer.player else { fatalError("Player not found") }
 
@@ -166,26 +167,31 @@ class VideoView: UIView {
                     requestOptions.deliveryMode = .fastFormat
                     PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions) { playerItem, info in
                         guard let playerItem = playerItem else { fatalError("Player item was nil: \(info)") }
-                        let player = AVPlayer(playerItem: playerItem)
-                        player.rate = Float(playerItem.preferredPeakBitRate)
-                        self.playerLayer.player = player
-                        self.playerLayer.isHidden = true
 
-                        if let slowMotionTimeObserver = self.slowMotionTimeObserver {
-                            player.removeTimeObserver(slowMotionTimeObserver)
-                            self.slowMotionTimeObserver = nil
-                        }
+                        if let player = self.playerLayer.player {
+                            player.replaceCurrentItem(with: playerItem)
+                        } else {
+                            let player = AVPlayer(playerItem: playerItem)
+                            player.rate = Float(playerItem.preferredPeakBitRate)
+                            self.playerLayer.player = player
+                            self.playerLayer.isHidden = true
 
-                        if asset.mediaSubtypes == .videoHighFrameRate {
-                            let interval = CMTime(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
-                            self.slowMotionTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { time in
-                                let currentTime = CMTimeGetSeconds(player.currentTime())
-                                if currentTime >= 2 {
-                                    if player.rate != 0.000001 {
-                                        player.rate = 0.000001
+                            if let slowMotionTimeObserver = self.slowMotionTimeObserver {
+                                player.removeTimeObserver(slowMotionTimeObserver)
+                                self.slowMotionTimeObserver = nil
+                            }
+
+                            if asset.mediaSubtypes == .videoHighFrameRate {
+                                let interval = CMTime(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
+                                self.slowMotionTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { time in
+                                    let currentTime = CMTimeGetSeconds(player.currentTime())
+                                    if currentTime >= 2 {
+                                        if player.rate != 0.000001 {
+                                            player.rate = 0.000001
+                                        }
+                                    } else if player.rate != 1.0 {
+                                        player.rate = 1.0
                                     }
-                                } else if player.rate != 1.0 {
-                                    player.rate = 1.0
                                 }
                             }
                         }
@@ -197,8 +203,13 @@ class VideoView: UIView {
                 #endif
             } else if let url = viewable.url {
                 let streamingURL = URL(string: url)!
-                self.playerLayer.player = AVPlayer(url: streamingURL)
-                self.playerLayer.isHidden = true
+
+                if let player = self.playerLayer.player {
+                    player.replaceCurrentItem(with: AVPlayerItem(url: streamingURL))
+                } else {
+                    self.playerLayer.player = AVPlayer(url: streamingURL)
+                    self.playerLayer.isHidden = true
+                }
 
                 DispatchQueue.main.async {
                     completion()

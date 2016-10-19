@@ -144,7 +144,7 @@ public class ViewerController: UIViewController {
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
-        if presented {
+        if self.presented {
             self.scrollView.configure()
             if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
                 self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
@@ -156,6 +156,11 @@ public class ViewerController: UIViewController {
         super.viewDidAppear(animated)
 
         self.present(with: self.initialIndexPath, completion: nil)
+    }
+
+    public func reload(at indexPath: IndexPath) {
+        let viewableController = self.findOrCreateViewableController(indexPath)
+        viewableController.display()
     }
 }
 
@@ -274,7 +279,7 @@ extension ViewerController {
                 self.view.backgroundColor = .black
                 self.presented = true
                 let item = self.findOrCreateViewableController(indexPath)
-                item.didFocus()
+                item.display()
 
                 completion?()
         }) 
@@ -395,7 +400,7 @@ extension ViewerController {
                         self.setNeedsStatusBarAppearanceUpdate()
                     #endif
                     }, completion: { completed in
-                        controller.didFocus()
+                        controller.display()
                         self.view.backgroundColor = .black
                 }) 
             }
@@ -492,7 +497,7 @@ extension ViewerController: PaginatedScrollViewDelegate {
         self.currentIndexPath = indexPath
         self.delegate?.viewerController(self, didMoveTo: indexPath)
         let viewableController = self.findOrCreateViewableController(indexPath)
-        viewableController.didFocus()
+        viewableController.display()
     }
 
     func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, didMoveFromIndex index: Int) {

@@ -136,7 +136,11 @@ extension RemoteCollectionController: ViewerControllerDelegate {
     }
 
     func viewerController(_ viewerController: ViewerController, didFailPlayingVideoAt indexPath: IndexPath, error: NSError) {
-        let alertController = self.alertController(with: "Failed to load video")
-        self.viewerController?.present(alertController, animated: true, completion: nil)
+        var photos = self.sections[indexPath.section]
+        var viewable = photos[indexPath.row] as! Photo
+        viewable.url = "http://techslides.com/demos/sample-videos/small.mp4"
+        photos[indexPath.row] = viewable
+        self.sections[indexPath.section] = photos
+        viewerController.reload(at: indexPath)
     }
 }

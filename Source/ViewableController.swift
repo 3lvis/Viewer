@@ -208,7 +208,7 @@ class ViewableController: UIViewController {
         }
     }
 
-    func didFocus() {
+    func display() {
         guard let viewable = self.viewable else { return }
 
         switch viewable.type {
@@ -337,10 +337,11 @@ extension ViewableController: VideoViewDelegate {
     func videoViewDidFinishPlaying(_ videoView: VideoView, error: NSError?) {
         if let error = error {
             self.delegate?.viewableController(self, didFailPlayingVideoWith: error)
+        } else {
+            self.repeatButton.alpha = 1
+            self.pauseButton.alpha = 0
+            self.playButton.alpha = 0
+            self.videoProgressView.alpha = 0
         }
-        self.repeatButton.alpha = 1
-        self.pauseButton.alpha = 0
-        self.playButton.alpha = 0
-        self.videoProgressView.alpha = 0
     }
 }
