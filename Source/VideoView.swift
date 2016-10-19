@@ -37,7 +37,8 @@ class VideoView: UIView {
         return view
     }()
 
-    private var shouldRegisterForNotifications = true
+    private var shouldRegisterForStatusNotifications = true
+    private var shouldRegisterForPlayerItemNotifications = true
 
     var slowMotionTimeObserver: Any?
 
@@ -80,31 +81,33 @@ class VideoView: UIView {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         guard let player = object as? AVPlayer else { return }
 
-        if player.status == .readyToPlay {
-            self.stopPlayerAndRemoveObserverIfNecessary()
+        if keyPath == "status" {
+            if player.status == .readyToPlay {
+                self.stopPlayerAndRemoveObserverIfNecessary()
 
-            if self.playerLayer.isHidden == false {
-                player.play()
-                self.viewDelegate?.videoViewDidStartPlaying(self)
-            }
+                if self.playerLayer.isHidden == false {
+                    player.play()
+                    self.viewDelegate?.videoViewDidStartPlaying(self)
+                }
 
-            guard let player = self.playerLayer.player, let currentItem = player.currentItem else { return }
+                guard let player = self.playerLayer.player, let currentItem = player.currentItem else { return }
 
-            if let playbackProgressTimeObserver = self.playbackProgressTimeObserver {
-                player.removeTimeObserver(playbackProgressTimeObserver)
-                self.playbackProgressTimeObserver = nil
-            }
+                if let playbackProgressTimeObserver = self.playbackProgressTimeObserver {
+                    player.removeTimeObserver(playbackProgressTimeObserver)
+                    self.playbackProgressTimeObserver = nil
+                }
 
-            let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
-            self.playbackProgressTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) {
-                time in
-                self.loadingIndicator.stopAnimating()
-                self.loadingIndicatorBackground.alpha = 0
+                let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
+                self.playbackProgressTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) {
+                    time in
+                    self.loadingIndicator.stopAnimating()
+                    self.loadingIndicatorBackground.alpha = 0
 
-                let duration = CMTimeGetSeconds(currentItem.asset.duration)
-                let currentTime = CMTimeGetSeconds(player.currentTime())
+                    let duration = CMTimeGetSeconds(currentItem.asset.duration)
+                    let currentTime = CMTimeGetSeconds(player.currentTime())
 
-                self.updateProgressBar(forDuration: duration, currentTime: currentTime)
+                    self.updateProgressBar(forDuration: duration, currentTime: currentTime)
+                }
             }
         }
     }
@@ -112,19 +115,25 @@ class VideoView: UIView {
     func stopPlayerAndRemoveObserverIfNecessary() {
         self.playerLayer.player?.pause()
 
-        if self.shouldRegisterForNotifications == false {
+        if self.shouldRegisterForStatusNotifications == false {
             self.playerLayer.player?.removeObserver(self, forKeyPath: "status")
-            self.shouldRegisterForNotifications = true
+            self.shouldRegisterForStatusNotifications = true
         }
     }
 
     func prepare(using viewerItem: ViewerItem, completion: @escaping (Void) -> Void) {
         self.addPlayer(using: viewerItem) {
-            if self.shouldRegisterForNotifications {
+            if self.shouldRegisterForStatusNotifications {
                 guard let player = self.playerLayer.player else { fatalError("No player item was found") }
 
                 player.addObserver(self, forKeyPath: "status", options: [], context: nil)
-                self.shouldRegisterForNotifications = false
+                self.shouldRegisterForStatusNotifications = false
+            }
+
+            if self.shouldRegisterForPlayerItemNotifications {
+                NotificationCenter.default.addObserver(self, selector: #selector(self.itemPlaybackStalled), name: NSNotification.Name.AVPlayerItemPlaybackStalled, object: nil)
+
+                self.shouldRegisterForPlayerItemNotifications = false
             }
 
             completion()
@@ -189,12 +198,10 @@ class VideoView: UIView {
         self.playerLayer.player?.play()
     }
 
-    func stop() {
-        self.playerLayer.isHidden = true
-
+    func cleanUpObservers() {
         if let slowMotionTimeObserver = self.slowMotionTimeObserver {
             self.playerLayer.player?.removeTimeObserver(slowMotionTimeObserver)
-             self.slowMotionTimeObserver = nil
+            self.slowMotionTimeObserver = nil
         }
 
         if let playbackProgressTimeObserver = self.playbackProgressTimeObserver {
@@ -202,6 +209,17 @@ class VideoView: UIView {
             self.playbackProgressTimeObserver = nil
         }
 
+        if self.shouldRegisterForPlayerItemNotifications == false {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemPlaybackStalled, object: nil)
+
+            self.shouldRegisterForPlayerItemNotifications = true
+        }
+    }
+
+    func stop() {
+        self.cleanUpObservers()
+
+        self.playerLayer.isHidden = true
         self.playerLayer.player?.pause()
         self.playerLayer.player?.seek(to: kCMTimeZero)
         self.playerLayer.player = nil
@@ -234,5 +252,17 @@ class VideoView: UIView {
 
     func updateProgressBar(forDuration duration: Double, currentTime: Double) {
         self.viewDelegate?.videoView(self, didRequestToUpdateProgressBar: duration, currentTime: currentTime)
+    }
+
+    func itemPlaybackStalled() {
+        // When the video is having troubles buffering it might trigger the "AVPlayerItemPlaybackStalled" notification
+        // the ideal scenario here, is that we'll pause the video, display the loading indicator for a while,
+        // then continue the play back.
+        // The current workaround just pauses the video and tries to play again, this might cause a shuddering video playback,
+        // is not perfect but does the job for now.
+        if let player = self.playerLayer.player {
+            player.pause()
+            player.play()
+        }
     }
 }
