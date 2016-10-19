@@ -79,40 +79,34 @@ class VideoView: UIView {
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        print(keyPath)
+        guard let player = object as? AVPlayer else { return }
 
-        if keyPath == "isPlaybackLikelyToKeepUp" || keyPath == "isPlaybackBufferFull" {
-            print("isPlaybackLikelyToKeepUp changed")
-        } else {
-            guard let player = object as? AVPlayer else { return }
+        if keyPath == "status" {
+            if player.status == .readyToPlay {
+                self.stopPlayerAndRemoveObserverIfNecessary()
 
-            if keyPath == "status" {
-                if player.status == .readyToPlay {
-                    self.stopPlayerAndRemoveObserverIfNecessary()
+                if self.playerLayer.isHidden == false {
+                    player.play()
+                    self.viewDelegate?.videoViewDidStartPlaying(self)
+                }
 
-                    if self.playerLayer.isHidden == false {
-                        player.play()
-                        self.viewDelegate?.videoViewDidStartPlaying(self)
-                    }
+                guard let player = self.playerLayer.player, let currentItem = player.currentItem else { return }
 
-                    guard let player = self.playerLayer.player, let currentItem = player.currentItem else { return }
+                if let playbackProgressTimeObserver = self.playbackProgressTimeObserver {
+                    player.removeTimeObserver(playbackProgressTimeObserver)
+                    self.playbackProgressTimeObserver = nil
+                }
 
-                    if let playbackProgressTimeObserver = self.playbackProgressTimeObserver {
-                        player.removeTimeObserver(playbackProgressTimeObserver)
-                        self.playbackProgressTimeObserver = nil
-                    }
+                let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
+                self.playbackProgressTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) {
+                    time in
+                    self.loadingIndicator.stopAnimating()
+                    self.loadingIndicatorBackground.alpha = 0
 
-                    let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
-                    self.playbackProgressTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) {
-                        time in
-                        self.loadingIndicator.stopAnimating()
-                        self.loadingIndicatorBackground.alpha = 0
+                    let duration = CMTimeGetSeconds(currentItem.asset.duration)
+                    let currentTime = CMTimeGetSeconds(player.currentTime())
 
-                        let duration = CMTimeGetSeconds(currentItem.asset.duration)
-                        let currentTime = CMTimeGetSeconds(player.currentTime())
-                        
-                        self.updateProgressBar(forDuration: duration, currentTime: currentTime)
-                    }
+                    self.updateProgressBar(forDuration: duration, currentTime: currentTime)
                 }
             }
         }
@@ -137,12 +131,8 @@ class VideoView: UIView {
             }
 
             if self.shouldRegisterForPlayerItemNotifications {
-                guard let playerItem = self.playerLayer.player?.currentItem else { fatalError("current item not found") }
-
                 NotificationCenter.default.addObserver(self, selector: #selector(self.itemPlaybackStalled), name: NSNotification.Name.AVPlayerItemPlaybackStalled, object: nil)
 
-                playerItem.addObserver(self, forKeyPath: "isPlaybackLikelyToKeepUp", options: [], context: nil)
-                playerItem.addObserver(self, forKeyPath: "isPlaybackBufferFull", options: [], context: nil)
                 self.shouldRegisterForPlayerItemNotifications = false
             }
 
@@ -223,8 +213,6 @@ class VideoView: UIView {
             guard let playerItem = self.playerLayer.player?.currentItem else { fatalError("current item not found") }
             NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemPlaybackStalled, object: nil)
 
-            playerItem.removeObserver(self, forKeyPath: "isPlaybackLikelyToKeepUp")
-            playerItem.removeObserver(self, forKeyPath: "isPlaybackBufferFull")
             self.shouldRegisterForPlayerItemNotifications = true
         }
     }
