@@ -210,7 +210,6 @@ class VideoView: UIView {
         }
 
         if self.shouldRegisterForPlayerItemNotifications == false {
-            guard let playerItem = self.playerLayer.player?.currentItem else { fatalError("current item not found") }
             NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemPlaybackStalled, object: nil)
 
             self.shouldRegisterForPlayerItemNotifications = true
@@ -256,6 +255,11 @@ class VideoView: UIView {
     }
 
     func itemPlaybackStalled() {
+        // When the video is having troubles buffering it might trigger the "AVPlayerItemPlaybackStalled" notification
+        // the ideal scenario here, is that we'll pause the video, display the loading indicator for a while,
+        // then continue the play back.
+        // The current workaround just pauses the video and tries to play again, this might cause a shuddering video playback,
+        // is not perfect but does the job for now.
         if let player = self.playerLayer.player {
             player.pause()
             player.play()
