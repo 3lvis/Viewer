@@ -7,8 +7,8 @@ import AVKit
 #endif
 
 protocol ViewableControllerDelegate: class {
-    func viewableControllerDidTapItem(_ viewableController: ViewableController, completion: (() -> Void)?)
-    func viewableControllerDidFailPlayingVideo(_ viewableController: ViewableController, viewable: Viewable, error: NSError)
+    func viewableControllerDidTapItem(_ viewableController: ViewableController)
+    func viewableController(_ viewableController: ViewableController, didFailPlayingVideoWith error: NSError)
 }
 
 protocol ViewableControllerDataSource: class {
@@ -182,7 +182,7 @@ class ViewableController: UIViewController {
             }) 
         }
 
-        self.delegate?.viewableControllerDidTapItem(self, completion: nil)
+        self.delegate?.viewableControllerDidTapItem(self)
     }
 
     override func viewWillLayoutSubviews() {
@@ -274,7 +274,7 @@ class ViewableController: UIViewController {
     func requestToHideOverlayIfNeeded() {
         let overlayIsHidden = self.dataSource?.isViewableControllerOverlayHidden(self) ?? false
         if overlayIsHidden == false {
-            self.delegate?.viewableControllerDidTapItem(self, completion: nil)
+            self.delegate?.viewableControllerDidTapItem(self)
         }
     }
 
@@ -336,7 +336,7 @@ extension ViewableController: VideoViewDelegate {
 
     func videoViewDidFinishPlaying(_ videoView: VideoView, error: NSError?) {
         if let error = error {
-            self.delegate?.viewableControllerDidFailPlayingVideo(self, viewable: self.viewable!, error: error)
+            self.delegate?.viewableController(self, didFailPlayingVideoWith: error)
         }
         self.repeatButton.alpha = 1
         self.pauseButton.alpha = 0

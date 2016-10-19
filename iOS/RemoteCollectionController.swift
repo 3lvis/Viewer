@@ -63,6 +63,7 @@ extension RemoteCollectionController {
         guard let collectionView = self.collectionView else { return }
 
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+        self.viewerController?.delegate = self
         let headerView = HeaderView()
         headerView.viewDelegate = self
         self.viewerController?.headerView = headerView
@@ -121,6 +122,21 @@ extension RemoteCollectionController: FooterViewDelegate {
 
     func footerView(_ footerView: FooterView, didPressDeleteButton button: UIButton) {
         let alertController = self.alertController(with: "Delete pressed")
+        self.viewerController?.present(alertController, animated: true, completion: nil)
+    }
+}
+
+extension RemoteCollectionController: ViewerControllerDelegate {
+    func viewerController(_ viewerController: ViewerController, didMoveTo indexPath: IndexPath) {
+
+    }
+
+    func viewerControllerDidDismiss(_ viewerController: ViewerController) {
+
+    }
+
+    func viewerController(_ viewerController: ViewerController, didFailPlayingVideoAt indexPath: IndexPath, error: NSError) {
+        let alertController = self.alertController(with: "Failed to load video")
         self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 }

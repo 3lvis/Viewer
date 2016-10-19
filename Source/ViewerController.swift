@@ -16,7 +16,7 @@ public protocol ViewerControllerDelegate: class {
     /**
      When the ViewerController jumps between photos it triggers a call to the viewerController:didChangeIndexPath: delegate
      */
-    func viewerController(_ viewerController: ViewerController, didChangeIndexPath indexPath: IndexPath)
+    func viewerController(_ viewerController: ViewerController, didMoveTo indexPath: IndexPath)
 
     /**
      When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate
@@ -26,7 +26,7 @@ public protocol ViewerControllerDelegate: class {
     /**
      When the video playback fails
      */
-    func viewerControllerDidFailPlayingVideo(_ viewerController: ViewerController, viewable: Viewable, indexPath: IndexPath, error: NSError)
+    func viewerController(_ viewerController: ViewerController, didFailPlayingVideoAt indexPath: IndexPath, error: NSError)
 }
 
 public class ViewerController: UIViewController {
@@ -432,14 +432,14 @@ extension ViewerController {
 }
 
 extension ViewerController: ViewableControllerDelegate {
-    func viewableControllerDidTapItem(_ viewableController: ViewableController, completion: (() -> Void)?) {
+    func viewableControllerDidTapItem(_ viewableController: ViewableController) {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
         self.toggleButtons(self.buttonsAreVisible)
     }
 
-    func viewableControllerDidFailPlayingVideo(_ viewableController: ViewableController, viewable: Viewable, error: NSError) {
-        self.delegate?.viewerControllerDidFailPlayingVideo(self, viewable: viewable, indexPath: self.currentIndexPath, error: error)
+    func viewableController(_ viewableController: ViewableController, didFailPlayingVideoWith error: NSError) {
+        self.delegate?.viewerController(self, didFailPlayingVideoAt: self.currentIndexPath, error: error)
     }
 }
 
@@ -490,7 +490,7 @@ extension ViewerController: PaginatedScrollViewDelegate {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
         self.currentIndexPath = indexPath
-        self.delegate?.viewerController(self, didChangeIndexPath: indexPath)
+        self.delegate?.viewerController(self, didMoveTo: indexPath)
         let viewableController = self.findOrCreateViewableController(indexPath)
         viewableController.didFocus()
     }
