@@ -33,7 +33,7 @@ class PhotoCell: UICollectionViewCell {
         return view
     }()
 
-    var photo: ViewerItem? {
+    var photo: Viewable? {
         didSet {
             guard let photo = self.photo else {
                 self.imageView.image = nil

@@ -54,12 +54,12 @@ override func collectionView(collectionView: UICollectionView, didSelectItemAtIn
     let footerView = FooterView()
     footerView.viewDelegate = self
     self.viewerController?.footerView = footerView
-    viewerController.controllerDataSource = self
+    viewerController.dataSource = self
     self.presentViewController(viewerController, animated: false, completion: nil)
 }
 
 extension CollectionController: ViewerControllerDataSource {
-    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
+    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> Viewable {
         return self.photos[indexPath.row]
     }
 }

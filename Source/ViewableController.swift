@@ -6,21 +6,21 @@ import AVKit
     import Photos
 #endif
 
-protocol ViewerItemControllerDelegate: class {
-    func viewerItemControllerDidTapItem(_ viewerItemController: ViewerItemController, completion: (() -> Void)?)
+protocol ViewableControllerDelegate: class {
+    func viewableControllerDidTapItem(_ viewableController: ViewableController, completion: (() -> Void)?)
 }
 
-protocol ViewerItemControllerDataSource: class {
-    func isViewerItemControllerOverlayHidden(_ viewerItemController: ViewerItemController) -> Bool
-    func viewerItemControllerIsFocused(_ viewerItemController: ViewerItemController) -> Bool
-    func viewerItemControllerShouldAutoplayVideo(_ viewerItemController: ViewerItemController) -> Bool
+protocol ViewableControllerDataSource: class {
+    func isViewableControllerOverlayHidden(_ viewableController: ViewableController) -> Bool
+    func viewableControllerIsFocused(_ viewableController: ViewableController) -> Bool
+    func viewableControllerShouldAutoplayVideo(_ viewableController: ViewableController) -> Bool
 }
 
-class ViewerItemController: UIViewController {
+class ViewableController: UIViewController {
     private static let FooterViewHeight = CGFloat(50.0)
 
-    weak var controllerDelegate: ViewerItemControllerDelegate?
-    weak var controllerDataSource: ViewerItemControllerDataSource?
+    weak var delegate: ViewableControllerDelegate?
+    weak var dataSource: ViewableControllerDataSource?
 
     var indexPath: IndexPath?
 
@@ -61,7 +61,7 @@ class ViewerItemController: UIViewController {
         let image = UIImage(named: "play")!
         button.setImage(image, for: UIControlState())
         button.alpha = 0
-        button.addTarget(self, action: #selector(ViewerItemController.playAction), for: .touchUpInside)
+        button.addTarget(self, action: #selector(ViewableController.playAction), for: .touchUpInside)
 
         return button
     }()
@@ -71,7 +71,7 @@ class ViewerItemController: UIViewController {
         let image = UIImage(named: "repeat")!
         button.setImage(image, for: UIControlState())
         button.alpha = 0
-        button.addTarget(self, action: #selector(ViewerItemController.repeatAction), for: .touchUpInside)
+        button.addTarget(self, action: #selector(ViewableController.repeatAction), for: .touchUpInside)
 
         return button
     }()
@@ -81,7 +81,7 @@ class ViewerItemController: UIViewController {
         let image = UIImage(named: "pause")!
         button.setImage(image, for: UIControlState())
         button.alpha = 0
-        button.addTarget(self, action: #selector(ViewerItemController.pauseAction), for: .touchUpInside)
+        button.addTarget(self, action: #selector(ViewableController.pauseAction), for: .touchUpInside)
 
         return button
     }()
@@ -94,20 +94,20 @@ class ViewerItemController: UIViewController {
     }()
 
     var changed = false
-    var viewerItem: ViewerItem? {
+    var viewable: Viewable? {
         willSet {
-            if self.viewerItem?.id != newValue?.id {
+            if self.viewable?.id != newValue?.id {
                 self.changed = true
             }
         }
 
         didSet {
-            guard let viewerItem = self.viewerItem else { return }
+            guard let viewable = self.viewable else { return }
 
             if self.changed {
-                self.videoView.image = viewerItem.placeholder
-                self.imageView.image = viewerItem.placeholder
-                self.videoView.frame = viewerItem.placeholder.centeredFrame()
+                self.videoView.image = viewable.placeholder
+                self.imageView.image = viewable.placeholder
+                self.videoView.frame = viewable.placeholder.centeredFrame()
 
                 self.changed = false
             }
@@ -145,7 +145,7 @@ class ViewerItemController: UIViewController {
         self.view.addSubview(self.pauseButton)
         self.view.addSubview(self.videoProgressView)
 
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewerItemController.tapAction))
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.tapAction))
         self.view.addGestureRecognizer(tapRecognizer)
     }
 
@@ -156,17 +156,17 @@ class ViewerItemController: UIViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        guard let viewerItem = self.viewerItem else { return }
+        guard let viewable = self.viewable else { return }
 
-        let isFocused = self.controllerDataSource?.viewerItemControllerIsFocused(self)
-        if viewerItem.type == .video || isFocused == false {
+        let isFocused = self.dataSource?.viewableControllerIsFocused(self)
+        if viewable.type == .video || isFocused == false {
             self.view.backgroundColor = .clear
             self.zoomingScrollView.isHidden = true
         }
         coordinator.animate(alongsideTransition: { context in
 
             }) { completionContext in
-                if viewerItem.type == .video || isFocused == false  {
+                if viewable.type == .video || isFocused == false  {
                     self.view.backgroundColor = .black
                     self.zoomingScrollView.isHidden = false
                 }
@@ -181,7 +181,7 @@ class ViewerItemController: UIViewController {
             }) 
         }
 
-        self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
+        self.delegate?.viewableControllerDidTapItem(self, completion: nil)
     }
 
     override func viewWillLayoutSubviews() {
@@ -194,13 +194,13 @@ class ViewerItemController: UIViewController {
         self.repeatButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
         self.pauseButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
 
-        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - ViewerItemController.FooterViewHeight - VideoProgressView.Height), width: self.view.frame.width, height: VideoProgressView.Height)
+        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - ViewableController.FooterViewHeight - VideoProgressView.Height), width: self.view.frame.width, height: VideoProgressView.Height)
     }
 
     func willDismiss() {
-        guard let viewerItem = self.viewerItem else { return }
+        guard let viewable = self.viewable else { return }
 
-        if viewerItem.type == .video {
+        if viewable.type == .video {
             self.videoView.stopPlayerAndRemoveObserverIfNecessary()
             self.videoView.stop()
             self.resetButtonStates()
@@ -210,21 +210,21 @@ class ViewerItemController: UIViewController {
     }
 
     func didFocus() {
-        guard let viewerItem = self.viewerItem else { return }
+        guard let viewable = self.viewable else { return }
 
-        switch viewerItem.type {
+        switch viewable.type {
         case .image:
-            viewerItem.media { image, error in
+            viewable.media { image, error in
                 if let image = image {
                     self.imageView.image = image
                     self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
                 }
             }
         case .video:
-            self.videoView.prepare(using: viewerItem) {
-                NotificationCenter.default.addObserver(self, selector: #selector(ViewerItemController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+            self.videoView.prepare(using: viewable) {
+                NotificationCenter.default.addObserver(self, selector: #selector(ViewableController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
 
-                let autoplayVideo = self.controllerDataSource?.viewerItemControllerShouldAutoplayVideo(self) ?? false
+                let autoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
                 if autoplayVideo {
                     self.videoView.play()
                 } else {
@@ -270,7 +270,7 @@ class ViewerItemController: UIViewController {
     func repeatAction() {
         self.repeatButton.alpha = 0
 
-        let overlayIsHidden = self.controllerDataSource?.isViewerItemControllerOverlayHidden(self) ?? false
+        let overlayIsHidden = self.dataSource?.isViewableControllerOverlayHidden(self) ?? false
         if overlayIsHidden {
             self.videoProgressView.alpha = 0
         } else {
@@ -282,9 +282,9 @@ class ViewerItemController: UIViewController {
     }
 
     func requestToHideOverlayIfNeeded() {
-        let overlayIsHidden = self.controllerDataSource?.isViewerItemControllerOverlayHidden(self) ?? false
+        let overlayIsHidden = self.dataSource?.isViewableControllerOverlayHidden(self) ?? false
         if overlayIsHidden == false {
-            self.controllerDelegate?.viewerItemControllerDidTapItem(self, completion: nil)
+            self.delegate?.viewableControllerDidTapItem(self, completion: nil)
         }
     }
 
@@ -324,9 +324,9 @@ class ViewerItemController: UIViewController {
     }
 }
 
-extension ViewerItemController: UIScrollViewDelegate {
+extension ViewableController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        if self.viewerItem?.type == .image {
+        if self.viewable?.type == .image {
             return self.imageView
         } else {
             return nil
@@ -334,7 +334,7 @@ extension ViewerItemController: UIScrollViewDelegate {
     }
 }
 
-extension ViewerItemController: VideoViewDelegate {
+extension ViewableController: VideoViewDelegate {
     func videoViewDidStartPlaying(_ videoView: VideoView) {
         self.requestToHideOverlayIfNeeded()
     }
