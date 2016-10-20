@@ -63,7 +63,6 @@ extension RemoteCollectionController {
         guard let collectionView = self.collectionView else { return }
 
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
-        self.viewerController?.delegate = self
         let headerView = HeaderView()
         headerView.viewDelegate = self
         self.viewerController?.headerView = headerView
@@ -123,24 +122,5 @@ extension RemoteCollectionController: FooterViewDelegate {
     func footerView(_ footerView: FooterView, didPressDeleteButton button: UIButton) {
         let alertController = self.alertController(with: "Delete pressed")
         self.viewerController?.present(alertController, animated: true, completion: nil)
-    }
-}
-
-extension RemoteCollectionController: ViewerControllerDelegate {
-    func viewerController(_ viewerController: ViewerController, didMoveTo indexPath: IndexPath) {
-
-    }
-
-    func viewerControllerDidDismiss(_ viewerController: ViewerController) {
-
-    }
-
-    func viewerController(_ viewerController: ViewerController, didFailPlayingVideoAt indexPath: IndexPath, error: NSError) {
-        var photos = self.sections[indexPath.section]
-        var viewable = photos[indexPath.row] as! Photo
-        viewable.url = "http://techslides.com/demos/sample-videos/small.mp4"
-        photos[indexPath.row] = viewable
-        self.sections[indexPath.section] = photos
-        viewerController.reload(at: indexPath)
     }
 }
