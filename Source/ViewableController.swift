@@ -328,7 +328,7 @@ extension ViewableController: VideoViewDelegate {
         self.requestToHideOverlayIfNeeded()
     }
 
-    func videoView(_ videoView: VideoView, didChangedProgress progress: Double, duration: Double) {
+    func videoView(_ videoView: VideoView, didChangeProgress progress: Double, duration: Double) {
        self.videoProgressView.progress = progress
        self.videoProgressView.duration = duration
     }

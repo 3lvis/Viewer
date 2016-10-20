@@ -8,7 +8,7 @@ import AVKit
 
 protocol VideoViewDelegate: class {
     func videoViewDidStartPlaying(_ videoView: VideoView)
-    func videoView(_ videoView: VideoView, didChangedProgress progress: Double, duration: Double)
+    func videoView(_ videoView: VideoView, didChangeProgress progress: Double, duration: Double)
     func videoViewDidFinishPlaying(_ videoView: VideoView, error: NSError?)
 }
 
@@ -113,7 +113,7 @@ class VideoView: UIView {
                 let duration = CMTimeGetSeconds(playerItem.asset.duration)
                 let currentTime = CMTimeGetSeconds(player.currentTime())
 
-                self.delegate?.videoView(self, didChangedProgress: currentTime, duration: duration)
+                self.delegate?.videoView(self, didChangeProgress: currentTime, duration: duration)
             }
         }
     }
