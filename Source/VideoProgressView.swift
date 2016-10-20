@@ -17,19 +17,19 @@ class VideoProgressView: UIView {
             }
         }
     }
-    var currentTime = 0.0 {
+    var progress = 0.0 {
         didSet {
-            self.currentTimeLabel.text = self.timeStringForSeconds(self.currentTime)
+            self.currentTimeLabel.text = self.timeStringForSeconds(self.progress)
             self.setFrameForProgressBar()
         }
     }
 
     var progressPercentage: Double {
-        guard self.currentTime != 0.0 && self.duration != 0.0 else {
+        guard self.progress != 0.0 && self.duration != 0.0 else {
             return 0.0
         }
 
-        return currentTime/duration
+        return progress/duration
     }
 
     var widthForBar: CGFloat {
