@@ -31,11 +31,11 @@ struct Photo: Viewable {
         }
     }
 
-    static func constructRemoteElements() -> [[Viewable]] {
-        var sections = [[Viewable]]()
+    static func constructRemoteElements() -> [[Photo]] {
+        var sections = [[Photo]]()
 
         for section in 0..<Photo.NumberOfSections {
-            var elements = [Viewable]()
+            var elements = [Photo]()
             for row in 0..<10 {
                 var photo = Photo(id: "\(section)-\(row)")
 
@@ -70,8 +70,8 @@ struct Photo: Viewable {
         return sections
     }
 
-    static func constructLocalElements() -> [Viewable] {
-        var elements = [Viewable]()
+    static func constructLocalElements() -> [Photo] {
+        var elements = [Photo]()
 
         let fetchOptions = PHFetchOptions()
         let authorizationStatus = PHPhotoLibrary.authorizationStatus()
