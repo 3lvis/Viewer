@@ -7,7 +7,8 @@ import AVKit
 #endif
 
 protocol ViewableControllerDelegate: class {
-    func viewableControllerDidTapItem(_ viewableController: ViewableController, completion: (() -> Void)?)
+    func viewableControllerDidTapItem(_ viewableController: ViewableController)
+    func viewableController(_ viewableController: ViewableController, didFailPlayingVideoWith error: NSError)
 }
 
 protocol ViewableControllerDataSource: class {
@@ -51,7 +52,7 @@ class ViewableController: UIViewController {
 
     lazy var videoView: VideoView = {
         let view = VideoView()
-        view.viewDelegate = self
+        view.delegate = self
 
         return view
     }()
@@ -181,7 +182,7 @@ class ViewableController: UIViewController {
             }) 
         }
 
-        self.delegate?.viewableControllerDidTapItem(self, completion: nil)
+        self.delegate?.viewableControllerDidTapItem(self)
     }
 
     override func viewWillLayoutSubviews() {
@@ -204,12 +205,10 @@ class ViewableController: UIViewController {
             self.videoView.stopPlayerAndRemoveObserverIfNecessary()
             self.videoView.stop()
             self.resetButtonStates()
-
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         }
     }
 
-    func didFocus() {
+    func display() {
         guard let viewable = self.viewable else { return }
 
         switch viewable.type {
@@ -222,8 +221,6 @@ class ViewableController: UIViewController {
             }
         case .video:
             self.videoView.prepare(using: viewable) {
-                NotificationCenter.default.addObserver(self, selector: #selector(ViewableController.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
-
                 let autoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
                 if autoplayVideo {
                     self.videoView.play()
@@ -238,13 +235,6 @@ class ViewableController: UIViewController {
         self.repeatButton.alpha = 0
         self.pauseButton.alpha = 0
         self.playButton.alpha = 1
-        self.videoProgressView.alpha = 0
-    }
-
-    func videoFinishedPlaying() {
-        self.repeatButton.alpha = 1
-        self.pauseButton.alpha = 0
-        self.playButton.alpha = 0
         self.videoProgressView.alpha = 0
     }
 
@@ -284,7 +274,7 @@ class ViewableController: UIViewController {
     func requestToHideOverlayIfNeeded() {
         let overlayIsHidden = self.dataSource?.isViewableControllerOverlayHidden(self) ?? false
         if overlayIsHidden == false {
-            self.delegate?.viewableControllerDidTapItem(self, completion: nil)
+            self.delegate?.viewableControllerDidTapItem(self)
         }
     }
 
@@ -342,5 +332,16 @@ extension ViewableController: VideoViewDelegate {
     func videoView(_ videoView: VideoView, didRequestToUpdateProgressBar duration: Double, currentTime: Double) {
        self.videoProgressView.currentTime = currentTime
        self.videoProgressView.duration = duration
+    }
+
+    func videoViewDidFinishPlaying(_ videoView: VideoView, error: NSError?) {
+        if let error = error {
+            self.delegate?.viewableController(self, didFailPlayingVideoWith: error)
+        } else {
+            self.repeatButton.alpha = 1
+            self.pauseButton.alpha = 0
+            self.playButton.alpha = 0
+            self.videoProgressView.alpha = 0
+        }
     }
 }
