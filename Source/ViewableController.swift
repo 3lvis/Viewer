@@ -202,7 +202,6 @@ class ViewableController: UIViewController {
         guard let viewable = self.viewable else { return }
 
         if viewable.type == .video {
-            self.videoView.stopPlayerAndRemoveObserverIfNecessary()
             self.videoView.stop()
             self.resetButtonStates()
         }

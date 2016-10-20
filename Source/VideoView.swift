@@ -15,7 +15,7 @@ protocol VideoViewDelegate: class {
 class VideoView: UIView {
     weak var delegate: VideoViewDelegate?
 
-    private lazy var playerLayer: AVPlayerLayer = {
+    fileprivate lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
         playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
 
@@ -38,8 +38,8 @@ class VideoView: UIView {
         return view
     }()
 
-    private var shouldRegisterForStatusNotifications = true
-    private var shouldRegisterForPlayerItemNotifications = true
+    fileprivate var shouldRegisterForStatusNotifications = true
+    fileprivate var shouldRegisterForPlayerItemNotifications = true
 
     var slowMotionTimeObserver: Any?
 
@@ -119,19 +119,6 @@ class VideoView: UIView {
         }
     }
 
-    func stopPlayerAndRemoveObserverIfNecessary() {
-        self.playerLayer.player?.pause()
-
-        if self.shouldRegisterForStatusNotifications == false {
-            self.shouldRegisterForStatusNotifications = true
-
-            guard let player = self.playerLayer.player else { fatalError("No player item was found") }
-            guard let currentItem = player.currentItem else { return }
-
-            currentItem.removeObserver(self, forKeyPath: "status")
-        }
-    }
-
     func prepare(using viewable: Viewable, completion: @escaping (Void) -> Void) {
         self.addPlayer(using: viewable) {
             if self.shouldRegisterForStatusNotifications {
@@ -146,16 +133,89 @@ class VideoView: UIView {
             if self.shouldRegisterForPlayerItemNotifications {
                 self.shouldRegisterForPlayerItemNotifications = false
 
-                NotificationCenter.default.addObserver(self, selector: #selector(self.videoFinishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
-
-                NotificationCenter.default.addObserver(self, selector: #selector(self.itemPlaybackStalled), name: NSNotification.Name.AVPlayerItemPlaybackStalled, object: nil)
+                NotificationCenter.default.addObserver(self, selector: #selector(self.videoFinishedPlaying), name: .AVPlayerItemDidPlayToEndTime, object: nil)
+                NotificationCenter.default.addObserver(self, selector: #selector(self.itemPlaybackStalled), name: .AVPlayerItemPlaybackStalled, object: nil)
             }
 
             completion()
         }
     }
 
-    func addPlayer(using viewable: Viewable, completion: @escaping (Void) -> Void) {
+    func `repeat`() {
+        self.playerLayer.player?.seek(to: kCMTimeZero)
+        self.playerLayer.player?.play()
+    }
+
+    func stop() {
+        self.stopPlayerAndRemoveObserverIfNecessary()
+        self.cleanUpObservers()
+
+        self.playerLayer.isHidden = true
+        self.playerLayer.player?.pause()
+        self.playerLayer.player?.seek(to: kCMTimeZero)
+        self.playerLayer.player = nil
+    }
+
+    func play() {
+        guard let player = self.playerLayer.player else { fatalError("No player item was found") }
+
+        if player.status == .unknown {
+            self.loadingIndicator.startAnimating()
+            self.loadingIndicatorBackground.alpha = 1
+        }
+
+        self.playerLayer.player?.play()
+        self.playerLayer.isHidden = false
+    }
+
+    func pause() {
+        self.playerLayer.player?.pause()
+    }
+
+    func isPlaying() -> Bool {
+        if let player = self.playerLayer.player {
+            let isPlaying = player.rate != 0 && player.error == nil
+            return isPlaying
+        }
+
+        return false
+    }
+}
+
+extension VideoView {
+    fileprivate func stopPlayerAndRemoveObserverIfNecessary() {
+        self.playerLayer.player?.pause()
+
+        if self.shouldRegisterForStatusNotifications == false {
+            self.shouldRegisterForStatusNotifications = true
+
+            guard let player = self.playerLayer.player else { fatalError("No player item was found") }
+            guard let currentItem = player.currentItem else { return }
+
+            currentItem.removeObserver(self, forKeyPath: "status")
+        }
+    }
+
+    fileprivate func cleanUpObservers() {
+        if let slowMotionTimeObserver = self.slowMotionTimeObserver {
+            self.playerLayer.player?.removeTimeObserver(slowMotionTimeObserver)
+            self.slowMotionTimeObserver = nil
+        }
+
+        if let playbackProgressTimeObserver = self.playbackProgressTimeObserver {
+            self.playerLayer.player?.removeTimeObserver(playbackProgressTimeObserver)
+            self.playbackProgressTimeObserver = nil
+        }
+
+        if self.shouldRegisterForPlayerItemNotifications == false {
+            self.shouldRegisterForPlayerItemNotifications = true
+
+            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemPlaybackStalled, object: nil)
+            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        }
+    }
+
+    fileprivate func addPlayer(using viewable: Viewable, completion: @escaping (Void) -> Void) {
         if let assetID = viewable.assetID {
             #if os(iOS)
                 let result = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
@@ -213,82 +273,23 @@ class VideoView: UIView {
         }
     }
 
-    func `repeat`() {
-        self.playerLayer.player?.seek(to: kCMTimeZero)
-        self.playerLayer.player?.play()
-    }
-
-    func cleanUpObservers() {
-        if let slowMotionTimeObserver = self.slowMotionTimeObserver {
-            self.playerLayer.player?.removeTimeObserver(slowMotionTimeObserver)
-            self.slowMotionTimeObserver = nil
-        }
-
-        if let playbackProgressTimeObserver = self.playbackProgressTimeObserver {
-            self.playerLayer.player?.removeTimeObserver(playbackProgressTimeObserver)
-            self.playbackProgressTimeObserver = nil
-        }
-
-        if self.shouldRegisterForPlayerItemNotifications == false {
-            self.shouldRegisterForPlayerItemNotifications = true
-
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemPlaybackStalled, object: nil)
-
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
-        }
-    }
-
-    func stop() {
-        self.cleanUpObservers()
-
-        self.playerLayer.isHidden = true
-        self.playerLayer.player?.pause()
-        self.playerLayer.player?.seek(to: kCMTimeZero)
-        self.playerLayer.player = nil
-    }
-
-    func play() {
-        guard let player = self.playerLayer.player else { fatalError("No player item was found") }
-
-        if player.status == .unknown {
-            self.loadingIndicator.startAnimating()
-            self.loadingIndicatorBackground.alpha = 1
-        }
-
-        self.playerLayer.player?.play()
-        self.playerLayer.isHidden = false
-    }
-
-    func pause() {
-        self.playerLayer.player?.pause()
-    }
-
-    func isPlaying() -> Bool {
-        if let player = self.playerLayer.player {
-            let isPlaying = player.rate != 0 && player.error == nil
-            return isPlaying
-        }
-
-        return false
-    }
-
-    func updateProgressBar(forDuration duration: Double, currentTime: Double) {
+    fileprivate func updateProgressBar(forDuration duration: Double, currentTime: Double) {
         self.delegate?.videoView(self, didRequestToUpdateProgressBar: duration, currentTime: currentTime)
     }
 
-    func itemPlaybackStalled() {
-        // When the video is having troubles buffering it might trigger the "AVPlayerItemPlaybackStalled" notification
-        // the ideal scenario here, is that we'll pause the video, display the loading indicator for a while,
-        // then continue the play back.
-        // The current workaround just pauses the video and tries to play again, this might cause a shuddering video playback,
-        // is not perfect but does the job for now.
+    // When the video is having troubles buffering it might trigger the "AVPlayerItemPlaybackStalled" notification
+    // the ideal scenario here, is that we'll pause the video, display the loading indicator for a while,
+    // then continue the play back.
+    // The current workaround just pauses the video and tries to play again, this might cause a shuddering video playback,
+    // is not perfect but does the job for now.
+    @objc fileprivate func itemPlaybackStalled() {
         if let player = self.playerLayer.player {
             player.pause()
             player.play()
         }
     }
-
-    func videoFinishedPlaying() {
+    
+    @objc fileprivate func videoFinishedPlaying() {
         self.delegate?.videoViewDidFinishPlaying(self, error: nil)
     }
 }
