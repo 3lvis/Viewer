@@ -44,7 +44,7 @@ Pinch-to-zoom works seamlessly in images.
 From your UICollectionView:
 
 ```swift
-override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: IndexPath) {
     guard let collectionView = self.collectionView else { return }
 
     let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
@@ -59,7 +59,7 @@ override func collectionView(collectionView: UICollectionView, didSelectItemAtIn
 }
 
 extension CollectionController: ViewerControllerDataSource {
-    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> Viewable {
+    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> Viewable {
         return self.photos[indexPath.row]
     }
 }

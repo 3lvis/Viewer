@@ -16,12 +16,17 @@ public protocol ViewerControllerDelegate: class {
     /**
      When the ViewerController jumps between photos it triggers a call to the viewerController:didChangeIndexPath: delegate
      */
-    func viewerController(_ viewerController: ViewerController, didChangeIndexPath indexPath: IndexPath)
+    func viewerController(_ viewerController: ViewerController, didMoveTo indexPath: IndexPath)
 
     /**
      When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate
      */
     func viewerControllerDidDismiss(_ viewerController: ViewerController)
+
+    /**
+     When the video playback fails
+     */
+    func viewerController(_ viewerController: ViewerController, didFailPlayingVideoAt indexPath: IndexPath, error: NSError)
 }
 
 public class ViewerController: UIViewController {
@@ -139,7 +144,7 @@ public class ViewerController: UIViewController {
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
-        if presented {
+        if self.presented {
             self.scrollView.configure()
             if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
                 self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
@@ -151,6 +156,11 @@ public class ViewerController: UIViewController {
         super.viewDidAppear(animated)
 
         self.present(with: self.initialIndexPath, completion: nil)
+    }
+
+    public func reload(at indexPath: IndexPath) {
+        let viewableController = self.findOrCreateViewableController(indexPath)
+        viewableController.display()
     }
 }
 
@@ -269,7 +279,7 @@ extension ViewerController {
                 self.view.backgroundColor = .black
                 self.presented = true
                 let item = self.findOrCreateViewableController(indexPath)
-                item.didFocus()
+                item.display()
 
                 completion?()
         }) 
@@ -390,7 +400,7 @@ extension ViewerController {
                         self.setNeedsStatusBarAppearanceUpdate()
                     #endif
                     }, completion: { completed in
-                        controller.didFocus()
+                        controller.display()
                         self.view.backgroundColor = .black
                 }) 
             }
@@ -427,10 +437,14 @@ extension ViewerController {
 }
 
 extension ViewerController: ViewableControllerDelegate {
-    func viewableControllerDidTapItem(_ viewableController: ViewableController, completion: (() -> Void)?) {
+    func viewableControllerDidTapItem(_ viewableController: ViewableController) {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
         self.toggleButtons(self.buttonsAreVisible)
+    }
+
+    func viewableController(_ viewableController: ViewableController, didFailPlayingVideoWith error: NSError) {
+        self.delegate?.viewerController(self, didFailPlayingVideoAt: self.currentIndexPath, error: error)
     }
 }
 
@@ -481,9 +495,9 @@ extension ViewerController: PaginatedScrollViewDelegate {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
         self.currentIndexPath = indexPath
-        self.delegate?.viewerController(self, didChangeIndexPath: indexPath)
+        self.delegate?.viewerController(self, didMoveTo: indexPath)
         let viewableController = self.findOrCreateViewableController(indexPath)
-        viewableController.didFocus()
+        viewableController.display()
     }
 
     func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, didMoveFromIndex index: Int) {
