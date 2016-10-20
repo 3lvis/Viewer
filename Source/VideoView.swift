@@ -201,25 +201,13 @@ class VideoView: UIView {
                 }
             #endif
         } else if let url = viewable.url {
-            let streamingURL = URL(string: url)!
-
-            if let player = self.playerLayer.player {
-                // This will be triggered in the main queue because loading it from the
-                // background doesn't work.
-                player.replaceCurrentItem(with: AVPlayerItem(url: streamingURL))
+            DispatchQueue.global(qos: .background).async {
+                let streamingURL = URL(string: url)!
+                self.playerLayer.player = AVPlayer(url: streamingURL)
                 self.playerLayer.isHidden = true
 
                 DispatchQueue.main.async {
                     completion()
-                }
-            } else {
-                DispatchQueue.global(qos: .background).async {
-                    self.playerLayer.player = AVPlayer(url: streamingURL)
-                    self.playerLayer.isHidden = true
-
-                    DispatchQueue.main.async {
-                        completion()
-                    }
                 }
             }
         }
