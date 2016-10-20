@@ -2,7 +2,7 @@ import UIKit
 import Photos
 
 class LocalCollectionController: UICollectionViewController {
-    var photos = [Viewable]()
+    var photos = [Photo]()
     var viewerController: ViewerController?
 
     override func viewDidLoad() {
