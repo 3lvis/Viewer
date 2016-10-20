@@ -79,7 +79,7 @@ extension RemoteCollectionController: ViewerControllerDataSource {
         return self.numberOfItems
     }
 
-    func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> Viewable {
+    func viewerController(_ viewerController: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
         var photos = self.sections[indexPath.section]
         var viewable = photos[indexPath.row]
         if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {

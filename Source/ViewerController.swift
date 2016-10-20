@@ -9,22 +9,22 @@ import CoreData
 
 public protocol ViewerControllerDataSource: class {
     func numberOfItemsInViewerController(_ viewerController: ViewerController) -> Int
-    func viewerController(_ viewerController: ViewerController, itemAtIndexPath indexPath: IndexPath) -> Viewable
+    func viewerController(_ viewerController: ViewerController, viewableAt indexPath: IndexPath) -> Viewable
 }
 
 public protocol ViewerControllerDelegate: class {
     /**
-     When the ViewerController jumps between photos it triggers a call to the viewerController:didChangeIndexPath: delegate
+     Called when the ViewerController changes focus.
      */
-    func viewerController(_ viewerController: ViewerController, didMoveTo indexPath: IndexPath)
+    func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath)
 
     /**
-     When the ViewerController is dismissed it triggers a call to the viewerControllerDidDismiss: delegate
+     Called when the ViewerController is dismissed.
      */
     func viewerControllerDidDismiss(_ viewerController: ViewerController)
 
     /**
-     When the video playback fails
+     Called when the video playback fails.
      */
     func viewerController(_ viewerController: ViewerController, didFailPlayingVideoAt indexPath: IndexPath, error: NSError)
 }
@@ -194,7 +194,7 @@ extension ViewerController {
     }
 
     fileprivate func findOrCreateViewableController(_ indexPath: IndexPath) -> ViewableController {
-        let viewable = self.dataSource!.viewerController(self, itemAtIndexPath: indexPath)
+        let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
         var viewableController: ViewableController
 
         if let cachedController = self.viewableControllerCache.object(forKey: viewable.id as NSString) {
@@ -235,7 +235,7 @@ extension ViewerController {
     fileprivate func present(with indexPath: IndexPath, completion: (() -> Void)?) {
         guard let selectedCell = self.collectionView.cellForItem(at: indexPath) else { fatalError("Data source not implemented") }
 
-        let viewable = self.dataSource!.viewerController(self, itemAtIndexPath: indexPath)
+        let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
         let image = viewable.placeholder
         selectedCell.alpha = 0
 
@@ -293,7 +293,7 @@ extension ViewerController {
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewableController.indexPath!)?.frame else { fatalError() }
 
-        let viewable = self.dataSource!.viewerController(self, itemAtIndexPath: viewableController.indexPath!)
+        let viewable = self.dataSource!.viewerController(self, viewableAt: viewableController.indexPath!)
         let image = viewable.placeholder
         viewableController.imageView.alpha = 0
         viewableController.view.backgroundColor = .clear
@@ -449,8 +449,8 @@ extension ViewerController: ViewableControllerDelegate {
 }
 
 extension ViewerController: ViewableControllerDataSource {
-    func isViewableControllerOverlayHidden(_ viewableController: ViewableController) -> Bool {
-        return !self.buttonsAreVisible
+    func viewableControllerOverlayIsVisible(_ viewableController: ViewableController) -> Bool {
+        return self.buttonsAreVisible
     }
 
     func viewableControllerIsFocused(_ viewableController: ViewableController) -> Bool {
@@ -495,7 +495,7 @@ extension ViewerController: PaginatedScrollViewDelegate {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
         self.currentIndexPath = indexPath
-        self.delegate?.viewerController(self, didMoveTo: indexPath)
+        self.delegate?.viewerController(self, didChangeFocusTo: indexPath)
         let viewableController = self.findOrCreateViewableController(indexPath)
         viewableController.display()
     }

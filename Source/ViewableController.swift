@@ -12,7 +12,7 @@ protocol ViewableControllerDelegate: class {
 }
 
 protocol ViewableControllerDataSource: class {
-    func isViewableControllerOverlayHidden(_ viewableController: ViewableController) -> Bool
+    func viewableControllerOverlayIsVisible(_ viewableController: ViewableController) -> Bool
     func viewableControllerIsFocused(_ viewableController: ViewableController) -> Bool
     func viewableControllerShouldAutoplayVideo(_ viewableController: ViewableController) -> Bool
 }
@@ -259,20 +259,20 @@ class ViewableController: UIViewController {
     func repeatAction() {
         self.repeatButton.alpha = 0
 
-        let overlayIsHidden = self.dataSource?.isViewableControllerOverlayHidden(self) ?? false
-        if overlayIsHidden {
-            self.videoProgressView.alpha = 0
-        } else {
+        let overlayIsVisible = self.dataSource?.viewableControllerOverlayIsVisible(self) ?? false
+        if overlayIsVisible {
             self.pauseButton.alpha = 1
             self.videoProgressView.alpha = 1
+        } else {
+            self.videoProgressView.alpha = 0
         }
 
         self.videoView.repeat()
     }
 
     func requestToHideOverlayIfNeeded() {
-        let overlayIsHidden = self.dataSource?.isViewableControllerOverlayHidden(self) ?? false
-        if overlayIsHidden == false {
+        let overlayIsVisible = self.dataSource?.viewableControllerOverlayIsVisible(self) ?? false
+        if overlayIsVisible {
             self.delegate?.viewableControllerDidTapItem(self)
         }
     }
