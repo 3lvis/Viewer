@@ -19,15 +19,6 @@ struct Photo: Viewable {
         self.id = id
     }
 
-//    func placeholder(_ completion: @escaping (_ image: UIImage?) -> ()) {
-//        if let assetID = assetID {
-//            let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject!
-//            completion(Photo.thumbnail(for: asset))
-//        } else {
-//            completion(UIImage(named: self.filename))
-//        }
-//    }
-
     func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> ()) {
         if let assetID = self.assetID {
             if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject {
