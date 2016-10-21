@@ -1,30 +1,47 @@
 import UIKit
 
-class LocalCollectionController: UICollectionViewController {
-    var sections = [Section]()
+class PhotosController: UICollectionViewController {
+    var useLocalPhotos: Bool
     var viewerController: ViewerController?
     var optionsController: OptionsController?
     var numberOfItems = 0
+    var sections = [Section]() {
+        didSet {
+            var count = 0
+            for i in 0..<self.sections.count {
+                let section = self.sections[i]
+                count += section.photos.count
+            }
+            self.numberOfItems = count
+        }
+    }
+
+    init(useLocalPhotos: Bool, layout: UICollectionViewLayout) {
+        self.useLocalPhotos = useLocalPhotos
+
+        super.init(collectionViewLayout: layout)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         self.collectionView?.backgroundColor = .white
         self.collectionView?.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
 
-        Photo.checkAuthorizationStatus { success in
-            if success {
-                self.sections = Photo.constructLocalElements()
-                self.collectionView?.reloadData()
+        if self.useLocalPhotos {
+            Photo.checkAuthorizationStatus { success in
+                if success {
+                    self.sections = Photo.constructLocalElements()
+                    self.collectionView?.reloadData()
+                }
             }
+        } else {
+            self.sections = Photo.constructRemoteElements()
+            self.collectionView?.reloadData()
         }
-
-        var count = 0
-        for i in 0..<self.sections.count {
-            let section = self.sections[i]
-            count += section.photos.count
-        }
-        self.numberOfItems = count
     }
 
     override func viewWillLayoutSubviews() {
@@ -45,7 +62,7 @@ class LocalCollectionController: UICollectionViewController {
     }
 }
 
-extension LocalCollectionController {
+extension PhotosController {
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return self.sections.count
     }
@@ -81,7 +98,7 @@ extension LocalCollectionController {
     }
 }
 
-extension LocalCollectionController: ViewerControllerDataSource {
+extension PhotosController: ViewerControllerDataSource {
     func numberOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
         return self.numberOfItems
     }
@@ -99,7 +116,7 @@ extension LocalCollectionController: ViewerControllerDataSource {
     }
 }
 
-extension LocalCollectionController: OptionsControllerDelegate {
+extension PhotosController: OptionsControllerDelegate {
     func optionsController(optionsController: OptionsController, didSelectOption option: String) {
         self.optionsController?.dismiss(animated: true) {
             self.viewerController?.dismiss(nil)
@@ -107,7 +124,7 @@ extension LocalCollectionController: OptionsControllerDelegate {
     }
 }
 
-extension LocalCollectionController: HeaderViewDelegate {
+extension PhotosController: HeaderViewDelegate {
     func headerView(_ headerView: HeaderView, didPressClearButton button: UIButton) {
         self.viewerController?.dismiss(nil)
     }
@@ -120,7 +137,7 @@ extension LocalCollectionController: HeaderViewDelegate {
     }
 }
 
-extension LocalCollectionController: FooterViewDelegate {
+extension PhotosController: FooterViewDelegate {
     func footerView(_ footerView: FooterView, didPressFavoriteButton button: UIButton) {
         let alertController = self.alertController(with: "Favorite pressed")
         self.viewerController?.present(alertController, animated: true, completion: nil)
