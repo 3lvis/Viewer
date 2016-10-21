@@ -1,9 +1,10 @@
 import UIKit
-import Photos
 
 class LocalCollectionController: UICollectionViewController {
-    var photos = [Photo]()
+    var sections = [Section]()
     var viewerController: ViewerController?
+    var optionsController: OptionsController?
+    var numberOfItems = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -13,10 +14,17 @@ class LocalCollectionController: UICollectionViewController {
 
         Photo.checkAuthorizationStatus { success in
             if success {
-                self.photos = Photo.constructLocalElements()
+                self.sections = Photo.constructLocalElements()
                 self.collectionView?.reloadData()
             }
         }
+
+        var count = 0
+        for i in 0..<self.sections.count {
+            let section = self.sections[i]
+            count += section.photos.count
+        }
+        self.numberOfItems = count
     }
 
     override func viewWillLayoutSubviews() {
@@ -38,20 +46,27 @@ class LocalCollectionController: UICollectionViewController {
 }
 
 extension LocalCollectionController {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return self.sections.count
+    }
+
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.photos.count
+        let section = self.sections[section]
+
+        return section.photos.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath) as! PhotoCell
-        let photo = self.photos[indexPath.row]
+        let section = self.sections[indexPath.section]
+        let photo = section.photos[indexPath.row]
         cell.photo = photo
         cell.photo?.placeholder = cell.imageView.image ?? UIImage()
 
         return cell
     }
 
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let collectionView = self.collectionView else { return }
 
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
@@ -68,17 +83,27 @@ extension LocalCollectionController {
 
 extension LocalCollectionController: ViewerControllerDataSource {
     func numberOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
-        return self.photos.count
+        return self.numberOfItems
     }
 
     func viewerController(_ viewerController: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
-        var viewable = self.photos[indexPath.row]
+        var section = self.sections[indexPath.section]
+        var viewable = section.photos[indexPath.row]
         if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {
             viewable.placeholder = placeholder
         }
-        self.photos[indexPath.row] = viewable
+        section.photos[indexPath.row] = viewable
+        self.sections[indexPath.section] = section
 
         return viewable
+    }
+}
+
+extension LocalCollectionController: OptionsControllerDelegate {
+    func optionsController(optionsController: OptionsController, didSelectOption option: String) {
+        self.optionsController?.dismiss(animated: true) {
+            self.viewerController?.dismiss(nil)
+        }
     }
 }
 
@@ -88,8 +113,10 @@ extension LocalCollectionController: HeaderViewDelegate {
     }
 
     func headerView(_ headerView: HeaderView, didPressMenuButton button: UIButton) {
-        let alertController = self.alertController(with: "Options pressed")
-        self.viewerController?.present(alertController, animated: true, completion: nil)
+        let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
+        self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
+        self.optionsController!.delegate = self
+        self.viewerController?.present(self.optionsController!, animated: true, completion: nil)
     }
 }
 

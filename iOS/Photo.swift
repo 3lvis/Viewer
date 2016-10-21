@@ -1,6 +1,15 @@
 import UIKit
 import Photos
 
+struct Section {
+    var photos = [Photo]()
+    let groupedDate: String
+
+    init(groupedDate: String) {
+        self.groupedDate = groupedDate
+    }
+}
+
 struct Photo: Viewable {
     var placeholder = UIImage()
 
@@ -13,7 +22,6 @@ struct Photo: Viewable {
     var id: String
     var url: String?
     var assetID: String?
-    static let NumberOfSections = 20
 
     init(id: String) {
         self.id = id
@@ -31,13 +39,14 @@ struct Photo: Viewable {
         }
     }
 
-    static func constructRemoteElements() -> [[Photo]] {
-        var sections = [[Photo]]()
+    static func constructRemoteElements() -> [Section] {
+        var sections = [Section]()
+        let numberOfSections = 20
 
-        for section in 0..<Photo.NumberOfSections {
-            var elements = [Photo]()
+        for sectionIndex in 10..<numberOfSections {
+            var photos = [Photo]()
             for row in 0..<10 {
-                var photo = Photo(id: "\(section)-\(row)")
+                var photo = Photo(id: "\(sectionIndex)-\(row)")
 
                 let index = Int(arc4random_uniform(6))
                 switch index {
@@ -62,16 +71,20 @@ struct Photo: Viewable {
                     photo.type = .video
                 default: break
                 }
-                elements.append(photo)
+                photos.append(photo)
             }
-            sections.append(elements)
+
+            let groupedDate = "\(sectionIndex)-12-2016"
+            var section = Section(groupedDate: groupedDate)
+            section.photos = photos
+            sections.append(section)
         }
 
         return sections
     }
 
-    static func constructLocalElements() -> [Photo] {
-        var elements = [Photo]()
+    static func constructLocalElements() -> [Section] {
+        var sections = [Section]()
 
         let fetchOptions = PHFetchOptions()
         let authorizationStatus = PHPhotoLibrary.authorizationStatus()
@@ -81,6 +94,16 @@ struct Photo: Viewable {
         let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
         if fetchResult.count > 0 {
             fetchResult.enumerateObjects ({ asset, index, stop in
+                let groupedDate = asset.creationDate?.groupedDateString() ?? ""
+                var foundSection = Section(groupedDate: groupedDate)
+                var foundIndex: Int?
+                for (index, section) in sections.enumerated() {
+                    if section.groupedDate == groupedDate {
+                        foundSection = section
+                        foundIndex = index
+                    }
+                }
+
                 var photo = Photo(id: UUID().uuidString)
                 photo.assetID = asset.localIdentifier
 
@@ -88,11 +111,16 @@ struct Photo: Viewable {
                     photo.type = .video
                 }
 
-                elements.append(photo)
+                foundSection.photos.append(photo)
+                if let foundIndex = foundIndex {
+                    sections[foundIndex] = foundSection
+                } else {
+                    sections.append(foundSection)
+                }
             })
         }
 
-        return elements
+        return sections
     }
 
     static func thumbnail(for asset: PHAsset) -> UIImage? {
@@ -155,5 +183,17 @@ struct Photo: Viewable {
                 }
             }
         }
+    }
+}
+
+extension Date {
+    func groupedDateString() -> String {
+        let noTimeDate = Calendar.current.startOfDay(for: self)
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let groupedDateString = dateFormatter.string(from: noTimeDate)
+
+        return groupedDateString
     }
 }

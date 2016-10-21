@@ -14,8 +14,8 @@ class RemoteCollectionController: UICollectionViewController {
 
         var count = 0
         for i in 0..<self.sections.count {
-            let photos = self.sections[i]
-            count += photos.count
+            let section = self.sections[i]
+            count += section.photos.count
         }
         self.numberOfItems = count
     }
@@ -44,15 +44,15 @@ extension RemoteCollectionController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let photos = self.sections[section]
+        let section = self.sections[section]
 
-        return photos.count
+        return section.photos.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath) as! PhotoCell
-        let photos = self.sections[indexPath.section]
-        let photo = photos[indexPath.row]
+        let section = self.sections[indexPath.section]
+        let photo = section.photos[indexPath.row]
         cell.photo = photo
         cell.photo?.placeholder = cell.imageView.image ?? UIImage()
 
@@ -80,13 +80,13 @@ extension RemoteCollectionController: ViewerControllerDataSource {
     }
 
     func viewerController(_ viewerController: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
-        var photos = self.sections[indexPath.section]
-        var viewable = photos[indexPath.row]
+        var section = self.sections[indexPath.section]
+        var viewable = section.photos[indexPath.row]
         if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {
             viewable.placeholder = placeholder
         }
-        photos[indexPath.row] = viewable
-        self.sections[indexPath.section] = photos
+        section.photos[indexPath.row] = viewable
+        self.sections[indexPath.section] = section
 
         return viewable
     }
