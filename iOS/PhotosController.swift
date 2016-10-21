@@ -16,8 +16,17 @@ class PhotosController: UICollectionViewController {
         }
     }
 
-    init(useLocalPhotos: Bool, layout: UICollectionViewLayout) {
+    init(useLocalPhotos: Bool) {
         self.useLocalPhotos = useLocalPhotos
+
+        let numberOfColumns = CGFloat(4)
+        let layout = UICollectionViewFlowLayout()
+        let bounds = UIScreen.main.bounds
+        layout.minimumLineSpacing = 1
+        layout.minimumInteritemSpacing = 1
+        let size = (bounds.width - numberOfColumns) / numberOfColumns
+        layout.itemSize = CGSize(width: size, height: size)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
 
         super.init(collectionViewLayout: layout)
     }

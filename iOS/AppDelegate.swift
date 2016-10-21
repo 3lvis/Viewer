@@ -9,11 +9,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         self.window = UIWindow(frame: UIScreen.main.bounds)
 
-        let remoteController = PhotosController(useLocalPhotos: false, layout: AppDelegate.layout())
+        let remoteController = PhotosController(useLocalPhotos: false)
         remoteController.title = "Photos"
         let remoteNavigationController = UINavigationController(rootViewController: remoteController)
 
-        let localController = PhotosController(useLocalPhotos: true, layout: AppDelegate.layout())
+        let localController = PhotosController(useLocalPhotos: true)
         localController.title = "Local"
         let localNavigationController = UINavigationController(rootViewController: localController)
 
@@ -31,18 +31,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.makeKeyAndVisible()
 
         return true
-    }
-
-    static func layout() -> UICollectionViewFlowLayout {
-        let numberOfColumns = CGFloat(4)
-        let layout = UICollectionViewFlowLayout()
-        let bounds = UIScreen.main.bounds
-        layout.minimumLineSpacing = 1
-        layout.minimumInteritemSpacing = 1
-        let size = (bounds.width - numberOfColumns) / numberOfColumns
-        layout.itemSize = CGSize(width: size, height: size)
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
-
-        return layout
     }
 }
