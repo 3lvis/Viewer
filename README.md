@@ -52,11 +52,11 @@ override public func collectionView(_ collectionView: UICollectionView, didSelec
 
     let headerView = HeaderView()
     headerView.viewDelegate = self
-    self.viewerController?.headerView = headerView
+    viewerController.headerView = headerView
 
     let footerView = FooterView()
     footerView.viewDelegate = self
-    self.viewerController?.footerView = footerView
+    viewerController.footerView = footerView
 
     self.presentViewController(viewerController, animated: false, completion: nil)
 }
