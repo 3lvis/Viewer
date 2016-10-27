@@ -62,9 +62,17 @@ public class ViewerController: UIViewController {
     public var autoplayVideos: Bool = false
 
     /**
-     Cache for the reused ViewableControllers
+     ViewableControllers Queues
      */
-    fileprivate let viewableControllerCache = NSCache<NSString, ViewableController>()
+    fileprivate var reuseQueue = [ViewableController]()
+
+    fileprivate var usedQueue = [ViewableController]() {
+        didSet {
+            print("Adding vieweable controller #\(self.usedQueue.count).")
+        }
+    }
+
+    fileprivate var isRecycling = false
 
     /**
      Temporary variable used to present the initial controller on viewDidAppear
@@ -193,28 +201,51 @@ extension ViewerController {
         return presentedView
     }
 
+    fileprivate func recycleUsedControllers() {
+        self.isRecycling = true
+
+        var removedIndices = [Int]()
+        let usedQueue = self.usedQueue
+
+        for (index, item) in usedQueue.enumerated() {
+            if !self.view.frame.intersects(item.view.frame) {
+                item.view.removeFromSuperview()
+                removedIndices.append(index)
+
+                if self.reuseQueue.count < 10 {
+                    self.reuseQueue.append(item)
+                }
+            }
+        }
+
+        for index in removedIndices.reversed() {
+            self.usedQueue.remove(at: index)
+        }
+
+        self.isRecycling = false
+        print("Recycled views. Used: \(self.usedQueue.count); Reusable queue: \(self.reuseQueue.count).")
+    }
+
     fileprivate func findOrCreateViewableController(_ indexPath: IndexPath) -> ViewableController {
         let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
-        var viewableController: ViewableController
+        var viewableController = self.reuseQueue.popLast()
 
-        if let cachedController = self.viewableControllerCache.object(forKey: viewable.id as NSString) {
-            viewableController = cachedController
-        } else {
+        if viewableController == nil {
             viewableController = ViewableController()
-            viewableController.delegate = self
-            viewableController.dataSource = self
+            viewableController?.delegate = self
+            viewableController?.dataSource = self
 
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
             gesture.delegate = self
-            viewableController.imageView.addGestureRecognizer(gesture)
-
-            self.viewableControllerCache.setObject(viewableController, forKey: viewable.id as NSString)
+            viewableController?.imageView.addGestureRecognizer(gesture)
         }
 
-        viewableController.viewable = viewable
-        viewableController.indexPath = indexPath
+        self.usedQueue.append(viewableController!)
 
-        return viewableController
+        viewableController!.viewable = viewable
+        viewableController!.indexPath = indexPath
+
+        return viewableController!
     }
 
     fileprivate func toggleButtons(_ shouldShow: Bool) {
@@ -504,5 +535,6 @@ extension ViewerController: PaginatedScrollViewDelegate {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         let viewableController = self.findOrCreateViewableController(indexPath)
         viewableController.willDismiss()
+        self.recycleUsedControllers()
     }
 }

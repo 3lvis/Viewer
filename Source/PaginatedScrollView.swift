@@ -79,32 +79,28 @@ class PaginatedScrollView: UIScrollView {
         bounds.origin.y = 0
         self.scrollRectToVisible(bounds, animated: animated)
     }
-
-    var shoudEvaluate = false
 }
 
 extension PaginatedScrollView: UIScrollViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.shoudEvaluate = true
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        self.scrollViewDidFinishScrolling(scrollView)
     }
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.shoudEvaluate = false
+        self.scrollViewDidFinishScrolling(scrollView)
     }
 
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.shoudEvaluate {
-            let pageWidth = self.frame.size.width
-            let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
-            if page != self.currentPage {
-                self.viewDelegate?.paginatedScrollView(self, didMoveToIndex: page)
-                self.viewDelegate?.paginatedScrollView(self, didMoveFromIndex: self.currentPage)
-            }
-            self.currentPage = page
-
-            self.loadScrollViewWithPage(page - 1)
-            self.loadScrollViewWithPage(page)
-            self.loadScrollViewWithPage(page + 1)
+    func scrollViewDidFinishScrolling(_ scrollView: UIScrollView) {
+        let pageWidth = self.frame.size.width
+        let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
+        if page != self.currentPage {
+            self.viewDelegate?.paginatedScrollView(self, didMoveToIndex: page)
+            self.viewDelegate?.paginatedScrollView(self, didMoveFromIndex: self.currentPage)
         }
+        self.currentPage = page
+
+        self.loadScrollViewWithPage(page - 1)
+        self.loadScrollViewWithPage(page)
+        self.loadScrollViewWithPage(page + 1)
     }
 }
