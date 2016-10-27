@@ -9,13 +9,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         self.window = UIWindow(frame: UIScreen.main.bounds)
 
-        let remoteController = PhotosController(useLocalPhotos: false)
-        remoteController.title = "Photos"
-        let remoteNavigationController = UINavigationController(rootViewController: remoteController)
-
         let localController = PhotosController(useLocalPhotos: true)
         localController.title = "Local"
         let localNavigationController = UINavigationController(rootViewController: localController)
+
+        let remoteController = PhotosController(useLocalPhotos: false)
+        remoteController.title = "Remote"
+        let remoteNavigationController = UINavigationController(rootViewController: remoteController)
 
         if AppDelegate.IsLightStatusBar {
             UINavigationBar.appearance().barTintColor = .orange
