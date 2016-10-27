@@ -158,7 +158,7 @@ public class ViewerController: UIViewController {
         self.present(with: self.initialIndexPath, completion: nil)
     }
 
-    public func reload(at indexPath: IndexPath) {
+    public func reloadViewable(at indexPath: IndexPath) {
         let viewableController = self.findOrCreateViewableController(indexPath)
         viewableController.display()
     }
