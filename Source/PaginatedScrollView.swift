@@ -86,11 +86,19 @@ extension PaginatedScrollView: UIScrollViewDelegate {
         self.scrollViewDidFinishScrolling(scrollView)
     }
 
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.loadPageWithAdjacent()
+    }
+
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         self.scrollViewDidFinishScrolling(scrollView)
     }
 
     func scrollViewDidFinishScrolling(_ scrollView: UIScrollView) {
+        self.loadPageWithAdjacent()
+    }
+
+    func loadPageWithAdjacent() {
         let pageWidth = self.frame.size.width
         let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
         if page != self.currentPage {

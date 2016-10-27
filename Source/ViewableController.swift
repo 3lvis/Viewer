@@ -103,7 +103,12 @@ class ViewableController: UIViewController {
         }
 
         didSet {
-            guard let viewable = self.viewable else { return }
+            guard let viewable = self.viewable else {
+                self.videoView.image = nil
+                self.imageView.image = nil
+
+                return
+            }
 
             if self.changed {
                 self.videoView.image = viewable.placeholder
@@ -310,6 +315,10 @@ class ViewableController: UIViewController {
             self.shouldDimPlay = false
             self.shouldDimVideoProgress = false
         }
+    }
+
+    func prepareForReuse() {
+        self.viewable = nil
     }
 }
 

@@ -2,6 +2,18 @@ import UIKit
 import CoreData
 
 /**
+ Describe the index path as a simple string, so we can use it as a key for our queueing dictionary
+ */
+extension IndexPath {
+    var indexPathString: String {
+        get {
+            return String((self as NSIndexPath).section) + "-" + String((self as NSIndexPath).row)
+        }
+    }
+}
+
+
+/**
  The ViewerController takes care of displaying the user's photos/videos in full-screen.
 
  You can swipe right or left to navigate between photos.
@@ -66,7 +78,7 @@ public class ViewerController: UIViewController {
      */
     fileprivate var reuseQueue = [ViewableController]()
 
-    fileprivate var usedQueue = [ViewableController]() {
+    fileprivate var usedQueue = [String: ViewableController]() {
         didSet {
             print("Adding vieweable controller #\(self.usedQueue.count).")
         }
@@ -117,7 +129,16 @@ public class ViewerController: UIViewController {
     /**
      A helper to prevent the paginated scroll view to be set up twice when is presented
      */
-    fileprivate var presented = false
+    fileprivate var isPresented = false {
+        didSet {
+            if self.isPresented {
+                self.scrollView.configure()
+                if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
+                    self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
+                }
+            }
+        }
+    }
 
     fileprivate lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.main.bounds)
@@ -147,17 +168,6 @@ public class ViewerController: UIViewController {
         super.viewDidLoad()
 
         self.view.addSubview(self.scrollView)
-    }
-
-    public override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-
-        if self.presented {
-            self.scrollView.configure()
-            if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
-                self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
-            }
-        }
     }
 
     public override func viewDidAppear(_ animated: Bool) {
@@ -202,15 +212,17 @@ extension ViewerController {
     }
 
     fileprivate func recycleUsedControllers() {
+        // TODO: Change this to be exposed properties or to be calculated based on page size and number of items per page?
+        guard self.reuseQueue.count > 10 || self.usedQueue.count > 10 else { return }
         self.isRecycling = true
 
-        var removedIndices = [Int]()
+        var removed = [String]()
         let usedQueue = self.usedQueue
 
-        for (index, item) in usedQueue.enumerated() {
+        for (key, item) in usedQueue {
             if !self.view.frame.intersects(item.view.frame) {
                 item.view.removeFromSuperview()
-                removedIndices.append(index)
+                removed.append(key)
 
                 if self.reuseQueue.count < 10 {
                     self.reuseQueue.append(item)
@@ -218,8 +230,8 @@ extension ViewerController {
             }
         }
 
-        for index in removedIndices.reversed() {
-            self.usedQueue.remove(at: index)
+        for key in removed {
+            self.usedQueue.removeValue(forKey: key)
         }
 
         self.isRecycling = false
@@ -228,19 +240,30 @@ extension ViewerController {
 
     fileprivate func findOrCreateViewableController(_ indexPath: IndexPath) -> ViewableController {
         let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
-        var viewableController = self.reuseQueue.popLast()
 
+        print("Find or create for index path: \(indexPath.indexPathString).")
+        
+        // First we try to find one already in use, based off of the index path.
+        var viewableController = self.usedQueue[indexPath.indexPathString]
+        viewableController?.prepareForReuse()
+
+        // If we can't, we try getting one from our reuse queue.
+        if viewableController == nil {
+            viewableController = self.reuseQueue.popLast()
+        }
+
+        // If there isn't one, we have to create it then.
         if viewableController == nil {
             viewableController = ViewableController()
             viewableController?.delegate = self
             viewableController?.dataSource = self
-
-            let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
-            gesture.delegate = self
-            viewableController?.imageView.addGestureRecognizer(gesture)
         }
 
-        self.usedQueue.append(viewableController!)
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
+        gesture.delegate = self
+        viewableController?.imageView.addGestureRecognizer(gesture)
+
+        self.usedQueue[indexPath.indexPathString] = viewableController!
 
         viewableController!.viewable = viewable
         viewableController!.indexPath = indexPath
@@ -308,7 +331,7 @@ extension ViewerController {
                 presentedView.removeFromSuperview()
                 self.overlayView.removeFromSuperview()
                 self.view.backgroundColor = .black
-                self.presented = true
+                self.isPresented = true
                 let item = self.findOrCreateViewableController(indexPath)
                 item.display()
 
@@ -516,7 +539,6 @@ extension ViewerController: PaginatedScrollViewDataSource {
 
     func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
-
         return self.findOrCreateViewableController(indexPath)
     }
 }
