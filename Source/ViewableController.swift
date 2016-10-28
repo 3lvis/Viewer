@@ -95,6 +95,7 @@ class ViewableController: UIViewController {
     }()
 
     var changed = false
+
     var viewable: Viewable? {
         willSet {
             if self.viewable?.id != newValue?.id {

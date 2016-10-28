@@ -74,17 +74,11 @@ public class ViewerController: UIViewController {
     public var autoplayVideos: Bool = false
 
     /**
-     ViewableControllers Queues
+     ViewableControllers reusable and currently used queues
      */
     fileprivate var reuseQueue = [ViewableController]()
 
-    fileprivate var usedQueue = [String: ViewableController]() {
-        didSet {
-            print("Adding vieweable controller #\(self.usedQueue.count).")
-        }
-    }
-
-    fileprivate var isRecycling = false
+    fileprivate var usedQueue = [String: ViewableController]()
 
     /**
      Temporary variable used to present the initial controller on viewDidAppear
@@ -214,7 +208,6 @@ extension ViewerController {
     fileprivate func recycleUsedControllers() {
         // TODO: Change this to be exposed properties or to be calculated based on page size and number of items per page?
         guard self.reuseQueue.count > 10 || self.usedQueue.count > 10 else { return }
-        self.isRecycling = true
 
         var removed = [String]()
         let usedQueue = self.usedQueue
@@ -233,16 +226,11 @@ extension ViewerController {
         for key in removed {
             self.usedQueue.removeValue(forKey: key)
         }
-
-        self.isRecycling = false
-        print("Recycled views. Used: \(self.usedQueue.count); Reusable queue: \(self.reuseQueue.count).")
     }
 
     fileprivate func findOrCreateViewableController(_ indexPath: IndexPath) -> ViewableController {
         let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
 
-        print("Find or create for index path: \(indexPath.indexPathString).")
-        
         // First we try to find one already in use, based off of the index path.
         var viewableController = self.usedQueue[indexPath.indexPathString]
         viewableController?.prepareForReuse()
