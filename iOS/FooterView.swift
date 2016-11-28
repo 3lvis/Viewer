@@ -1,8 +1,8 @@
 import UIKit
 
 protocol FooterViewDelegate: class {
-    func footerView(footerView: FooterView, didPressFavoriteButton button: UIButton)
-    func footerView(footerView: FooterView, didPressDeleteButton button: UIButton)
+    func footerView(_ footerView: FooterView, didPressFavoriteButton button: UIButton)
+    func footerView(_ footerView: FooterView, didPressDeleteButton button: UIButton)
 }
 
 class FooterView: UIView {
@@ -11,18 +11,17 @@ class FooterView: UIView {
 
     lazy var favoriteButton: UIButton = {
         let image = UIImage(named: "favorite")!
-        let button = UIButton(type: .Custom)
-        button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: #selector(FooterView.favoriteAction(_:)), forControlEvents: .TouchUpInside)
+        let button = UIButton(type: .custom)
+        button.setImage(image, for: .normal)
+
 
         return button
     }()
 
     lazy var deleteButton: UIButton = {
         let image = UIImage(named: "delete")!
-        let button = UIButton(type: .Custom)
-        button.setImage(image, forState: .Normal)
-        button.addTarget(self, action: #selector(FooterView.deleteAction(_:)), forControlEvents: .TouchUpInside)
+        let button = UIButton(type: .custom)
+        button.setImage(image, for: .normal)
 
         return button
     }()
@@ -32,6 +31,9 @@ class FooterView: UIView {
 
         self.addSubview(self.favoriteButton)
         self.addSubview(self.deleteButton)
+
+        self.favoriteButton.addTarget(self, action: #selector(FooterView.favoriteAction(button:)), for: .touchUpInside)
+        self.deleteButton.addTarget(self, action: #selector(FooterView.deleteAction(button:)), for: .touchUpInside)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -41,15 +43,15 @@ class FooterView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        let favoriteSizes = self.widthForElementAtIndex(0, totalElements: 2)
+        let favoriteSizes = self.widthForElementAtIndex(index: 0, totalElements: 2)
         self.favoriteButton.frame = CGRect(x: favoriteSizes.x, y: 0, width: favoriteSizes.width, height: FooterView.ButtonSize)
 
-        let deleteSizes = self.widthForElementAtIndex(1, totalElements: 2)
+        let deleteSizes = self.widthForElementAtIndex(index: 1, totalElements: 2)
         self.deleteButton.frame = CGRect(x: deleteSizes.x, y: 0, width: deleteSizes.width, height: FooterView.ButtonSize)
     }
 
     func widthForElementAtIndex(index: Int, totalElements: Int) -> (x: CGFloat, width: CGFloat) {
-        let bounds = UIScreen.mainScreen().bounds
+        let bounds = UIScreen.main.bounds
         let singleFrame = bounds.width / CGFloat(totalElements)
 
         return (singleFrame * CGFloat(index), singleFrame)

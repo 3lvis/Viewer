@@ -1,41 +1,52 @@
 import UIKit
 import Photos
 
-struct Photo: ViewerItem {
+struct Section {
+    var photos = [Photo]()
+    let groupedDate: String
+
+    init(groupedDate: String) {
+        self.groupedDate = groupedDate
+    }
+}
+
+struct Photo: Viewable {
+    var placeholder = UIImage()
+
     enum Size {
-        case Small, Large
+        case small
+        case large
     }
 
-    var type: ViewerItemType = .Image
+    var type: ViewableType = .image
     var id: String
-    var placeholder = UIImage(named: "clear.png")!
     var url: String?
-    var local: Bool = false
-    static let NumberOfSections = 20
+    var assetID: String?
 
     init(id: String) {
         self.id = id
     }
 
-    func media(completion: (image: UIImage?, error: NSError?) -> ()) {
-        if self.local {
-            if let asset = PHAsset.fetchAssetsWithLocalIdentifiers([self.id], options: nil).firstObject {
-                Photo.resolveAsset(asset as! PHAsset, size: .Large, completion: { image in
-                    completion(image: image, error: nil)
-                })
+    func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> ()) {
+        if let assetID = self.assetID {
+            if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject {
+                Photo.image(for: asset) { image in
+                    completion(image, nil)
+                }
             }
         } else {
-            completion(image: self.placeholder, error: nil)
+            completion(self.placeholder, nil)
         }
     }
 
-    static func constructRemoteElements() -> [[ViewerItem]] {
-        var sections = [[ViewerItem]]()
+    static func constructRemoteElements() -> [Section] {
+        var sections = [Section]()
+        let numberOfSections = 20
 
-        for section in 0..<Photo.NumberOfSections {
-            var elements = [ViewerItem]()
+        for sectionIndex in 10..<numberOfSections {
+            var photos = [Photo]()
             for row in 0..<10 {
-                var photo = Photo(id: "\(section)-\(row)")
+                var photo = Photo(id: "\(sectionIndex)-\(row)")
 
                 let index = Int(arc4random_uniform(6))
                 switch index {
@@ -56,88 +67,133 @@ struct Photo: ViewerItem {
                     break
                 case 5:
                     photo.placeholder = UIImage(named: "5.png")!
-                    photo.url = "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4"
-                    photo.type = .Video
+                    photo.url = "http://techslides.com/demos/sample-videos/small.mp4"
+                    photo.type = .video
                 default: break
                 }
-                elements.append(photo)
+                photos.append(photo)
             }
-            sections.append(elements)
+
+            let groupedDate = "\(sectionIndex)-12-2016"
+            var section = Section(groupedDate: groupedDate)
+            section.photos = photos
+            sections.append(section)
         }
 
         return sections
     }
 
-    static func constructLocalElements() -> [ViewerItem] {
-        var elements = [ViewerItem]()
+    static func constructLocalElements() -> [Section] {
+        var sections = [Section]()
 
         let fetchOptions = PHFetchOptions()
         let authorizationStatus = PHPhotoLibrary.authorizationStatus()
-        var fetchResult: PHFetchResult?
 
-        guard authorizationStatus == .Authorized else { abort() }
+        guard authorizationStatus == .authorized else { fatalError("Camera Roll not authorized") }
 
-        if fetchResult == nil {
-            fetchResult = PHAsset.fetchAssetsWithOptions(fetchOptions)
-        }
-
-        if fetchResult?.count > 0 {
-            fetchResult?.enumerateObjectsUsingBlock { object, index, stop in
-                if let asset = object as? PHAsset {
-                    var photo = Photo(id: asset.localIdentifier)
-
-                    if asset.duration > 0 {
-                        photo.type = .Video
+        let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
+        if fetchResult.count > 0 {
+            fetchResult.enumerateObjects ({ asset, index, stop in
+                let groupedDate = asset.creationDate?.groupedDateString() ?? ""
+                var foundSection = Section(groupedDate: groupedDate)
+                var foundIndex: Int?
+                for (index, section) in sections.enumerated() {
+                    if section.groupedDate == groupedDate {
+                        foundSection = section
+                        foundIndex = index
                     }
-
-                    photo.local = true
-                    elements.append(photo)
                 }
-            }
-        }
 
-        return elements
-    }
+                var photo = Photo(id: UUID().uuidString)
+                photo.assetID = asset.localIdentifier
 
-    static func resolveAsset(asset: PHAsset, size: Photo.Size, completion: (image: UIImage?) -> Void) {
-        let imageManager = PHImageManager.defaultManager()
-        let requestOptions = PHImageRequestOptions()
-        requestOptions.networkAccessAllowed = true
-        if size == .Small {
-            let targetSize = CGSize(width: 300, height: 300)
-            imageManager.requestImageForAsset(asset, targetSize: targetSize, contentMode: PHImageContentMode.AspectFill, options: requestOptions) { image, info in
-                if let info = info where info["PHImageFileUTIKey"] == nil {
-                    completion(image: image)
+                if asset.duration > 0 {
+                    photo.type = .video
                 }
-            }
-        } else {
-            requestOptions.version = .Original
-            imageManager.requestImageDataForAsset(asset, options: requestOptions) { data, _, _, _ in
-                if let data = data, image = UIImage(data: data) {
-                    completion(image: image)
+
+                foundSection.photos.append(photo)
+                if let foundIndex = foundIndex {
+                    sections[foundIndex] = foundSection
                 } else {
-                    fatalError("Couldn't get photo")
+                    sections.append(foundSection)
                 }
+            })
+        }
+
+        return sections
+    }
+
+    static func thumbnail(for asset: PHAsset) -> UIImage? {
+        let imageManager = PHImageManager.default()
+        let requestOptions = PHImageRequestOptions()
+        requestOptions.isNetworkAccessAllowed = true
+        requestOptions.isSynchronous = true
+        requestOptions.deliveryMode = .fastFormat
+        requestOptions.resizeMode = .fast
+
+        var returnedImage: UIImage?
+        let scaleFactor = UIScreen.main.scale
+        let itemSize = CGSize(width: 150, height: 150)
+        let targetSize = CGSize(width: itemSize.width * scaleFactor, height: itemSize.height * scaleFactor)
+        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, info in
+            // WARNING: This could fail if your phone doesn't have enough storage. Since the photo is probably
+            // stored in iCloud downloading it to your phone will take most of the space left making this feature fail.
+            // guard let image = image else { fatalError("Couldn't get photo data for asset \(asset)") }
+
+            returnedImage = image
+        }
+
+        return returnedImage
+    }
+
+    static func image(for asset: PHAsset, completion: @escaping (_ image: UIImage?) -> Void) {
+        let imageManager = PHImageManager.default()
+        let requestOptions = PHImageRequestOptions()
+        requestOptions.isNetworkAccessAllowed = true
+        requestOptions.isSynchronous = false
+        requestOptions.deliveryMode = .opportunistic
+        requestOptions.resizeMode = .fast
+
+        let bounds = UIScreen.main.bounds.size
+        let targetSize = CGSize(width: bounds.width * 2, height: bounds.height * 2)
+        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, info in
+            // WARNING: This could fail if your phone doesn't have enough storage. Since the photo is probably
+            // stored in iCloud downloading it to your phone will take most of the space left making this feature fail.
+            // guard let image = image else { fatalError("Couldn't get photo data for asset \(asset)") }
+            DispatchQueue.main.async {
+                completion(image)
             }
         }
     }
 
-    static func checkAuthorizationStatus(completion: (success: Bool) -> Void) {
+    static func checkAuthorizationStatus(completion: @escaping (_ success: Bool) -> Void) {
         let currentStatus = PHPhotoLibrary.authorizationStatus()
 
-        guard currentStatus != .Authorized else {
-            completion(success: true)
+        guard currentStatus != .authorized else {
+            completion(true)
             return
         }
 
         PHPhotoLibrary.requestAuthorization { authorizationStatus in
-            dispatch_async(dispatch_get_main_queue(), {
-                if authorizationStatus == .Denied {
-                    completion(success: false)
-                } else if authorizationStatus == .Authorized {
-                    completion(success: true)
+            DispatchQueue.main.async {
+                if authorizationStatus == .denied {
+                    completion(false)
+                } else if authorizationStatus == .authorized {
+                    completion(true)
                 }
-            })
+            }
         }
+    }
+}
+
+extension Date {
+    func groupedDateString() -> String {
+        let noTimeDate = Calendar.current.startOfDay(for: self)
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let groupedDateString = dateFormatter.string(from: noTimeDate)
+
+        return groupedDateString
     }
 }

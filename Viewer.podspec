@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = "Viewer"
   s.summary          = "Image viewer (or Lightbox) with support for local and remote videos and images"
-  s.version          = "0.1.2"
+  s.version          = "2.0.0"
   s.homepage         = "https://github.com/bakkenbaeck/Viewer"
   s.license          = 'MIT'
   s.author           = { "Bakken & Bæck AS" => "post@bakkenbaeck.com" }

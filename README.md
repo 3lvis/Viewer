@@ -9,7 +9,7 @@
 
 ### Focus
 
-Select an image to enter Lightbox mode.
+Select an image to enter into lightbox mode.
 
 <p align="center">
   <img src="https://github.com/bakkenbaeck/Viewer/raw/master/GitHub/focus.gif"/>
@@ -44,22 +44,25 @@ Pinch-to-zoom works seamlessly in images.
 From your UICollectionView:
 
 ```swift
-override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     guard let collectionView = self.collectionView else { return }
 
     let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+    viewerController.dataSource = self
+
     let headerView = HeaderView()
     headerView.viewDelegate = self
-    self.viewerController?.headerView = headerView
+    viewerController.headerView = headerView
+
     let footerView = FooterView()
     footerView.viewDelegate = self
-    self.viewerController?.footerView = footerView
-    viewerController.controllerDataSource = self
+    viewerController.footerView = footerView
+
     self.presentViewController(viewerController, animated: false, completion: nil)
 }
 
 extension CollectionController: ViewerControllerDataSource {
-    func viewerController(viewerController: ViewerController, itemAtIndexPath indexPath: NSIndexPath) -> ViewerItem {
+    func viewerController(_ viewerController: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
         return self.photos[indexPath.row]
     }
 }
