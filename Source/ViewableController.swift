@@ -147,7 +147,14 @@ class ViewableController: UIViewController {
         self.view.addSubview(self.videoProgressView)
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.tapAction))
+        tapRecognizer.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(tapRecognizer)
+        
+        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.doubleTapAction))
+        doubleTapRecognizer.numberOfTapsRequired = 2
+        self.view.addGestureRecognizer(doubleTapRecognizer)
+        
+        tapRecognizer.require(toFail: doubleTapRecognizer)
     }
 
     // In iOS 10 going into landscape provides a very strange animation. Basically you'll see the other
@@ -183,6 +190,14 @@ class ViewableController: UIViewController {
         }
 
         self.delegate?.viewableControllerDidTapItem(self)
+    }
+    
+    func doubleTapAction(recognizer: UITapGestureRecognizer) {
+        let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
+        
+        let touchPoint = recognizer.location(in: self.zoomingScrollView)
+        self.zoomingScrollView.contentOffset = touchPoint
+        self.zoomingScrollView.setZoomScale(zoomScale, animated: true)
     }
 
     override func viewWillLayoutSubviews() {
