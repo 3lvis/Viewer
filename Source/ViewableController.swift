@@ -196,6 +196,9 @@ class ViewableController: UIViewController {
         let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
         
         let touchPoint = recognizer.location(in: self.zoomingScrollView)
+        
+        print("Touch (\(touchPoint.x), \(touchPoint.y))")
+        
         //self.zoomingScrollView.contentOffset = touchPoint
         //self.zoomingScrollView.setZoomScale(zoomScale, animated: true)
         zoomToPoint(zoomPoint: touchPoint, withScale: zoomScale, animated: true)
