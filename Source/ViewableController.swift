@@ -23,8 +23,6 @@ class ViewableController: UIViewController {
     weak var delegate: ViewableControllerDelegate?
     weak var dataSource: ViewableControllerDataSource?
 
-    var indexPath: IndexPath?
-
     lazy var zoomingScrollView: UIScrollView = {
         let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
@@ -95,23 +93,20 @@ class ViewableController: UIViewController {
     }()
 
     var changed = false
-    var viewable: Viewable? {
-        willSet {
-            if self.viewable?.id != newValue?.id {
-                self.changed = true
-            }
+    var viewable: Viewable?
+    var indexPath: IndexPath?
+    func update(with viewable: Viewable, at indexPath: IndexPath) {
+        if self.indexPath?.description != indexPath.description {
+            self.changed = true
         }
 
-        didSet {
-            guard let viewable = self.viewable else { return }
-
-            if self.changed {
-                self.videoView.image = viewable.placeholder
-                self.imageView.image = viewable.placeholder
-                self.videoView.frame = viewable.placeholder.centeredFrame()
-
-                self.changed = false
-            }
+        if self.changed {
+            self.indexPath = indexPath
+            self.viewable = viewable
+            self.videoView.image = viewable.placeholder
+            self.imageView.image = viewable.placeholder
+            self.videoView.frame = viewable.placeholder.centeredFrame()
+            self.changed = false
         }
     }
 

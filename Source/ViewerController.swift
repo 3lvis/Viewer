@@ -197,7 +197,7 @@ extension ViewerController {
         let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
         var viewableController: ViewableController
 
-        if let cachedController = self.viewableControllerCache.object(forKey: viewable.id as NSString) {
+        if let cachedController = self.viewableControllerCache.object(forKey: indexPath.description as NSString) {
             viewableController = cachedController
         } else {
             viewableController = ViewableController()
@@ -208,11 +208,10 @@ extension ViewerController {
             gesture.delegate = self
             viewableController.imageView.addGestureRecognizer(gesture)
 
-            self.viewableControllerCache.setObject(viewableController, forKey: viewable.id as NSString)
+            self.viewableControllerCache.setObject(viewableController, forKey: indexPath.description as NSString)
         }
 
-        viewableController.viewable = viewable
-        viewableController.indexPath = indexPath
+        viewableController.update(with: viewable, at: indexPath)
 
         return viewableController
     }
