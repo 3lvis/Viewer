@@ -145,11 +145,13 @@ class ViewableController: UIViewController {
         tapRecognizer.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(tapRecognizer)
         
-        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.doubleTapAction))
-        doubleTapRecognizer.numberOfTapsRequired = 2
-        self.zoomingScrollView.addGestureRecognizer(doubleTapRecognizer)
-        
-        tapRecognizer.require(toFail: doubleTapRecognizer)
+        if viewable?.type == .image {
+            let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.doubleTapAction))
+            doubleTapRecognizer.numberOfTapsRequired = 2
+            self.zoomingScrollView.addGestureRecognizer(doubleTapRecognizer)
+            
+            tapRecognizer.require(toFail: doubleTapRecognizer)
+        }
     }
 
     // In iOS 10 going into landscape provides a very strange animation. Basically you'll see the other
