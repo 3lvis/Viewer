@@ -127,7 +127,7 @@ class ViewableController: UIViewController {
             heightFactor = image.size.height / self.view.bounds.height
         }
 
-        return max(widthFactor, heightFactor)
+        return max(2.0, max(widthFactor, heightFactor))
     }
 
     override func viewDidLoad() {
@@ -194,12 +194,19 @@ class ViewableController: UIViewController {
     
     func doubleTapAction(recognizer: UITapGestureRecognizer) {
         let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
+    
+        let touchPoint = recognizer.location(in: self.imageView)
         
-        let touchPoint = recognizer.location(in: recognizer.view!)
+        let scrollViewSize = self.imageView.bounds.size;
         
-        //self.zoomingScrollView.contentOffset = touchPoint
-        //self.zoomingScrollView.setZoomScale(zoomScale, animated: true)
-        self.zoomingScrollView.zoomToPoint(zoomPoint: touchPoint, withScale: zoomScale, animated: true)
+        let width = scrollViewSize.width / zoomScale
+        let height = scrollViewSize.height / zoomScale
+        let originX = touchPoint.x - (width / 2.0)
+        let originY = touchPoint.y - (height / 2.0)
+        
+        let rectToZoomTo = CGRect(x: originX, y: originY, width: width, height: height)
+        
+        self.zoomingScrollView.zoom(to: rectToZoomTo, animated: true)
     }
 
     override func viewWillLayoutSubviews() {
