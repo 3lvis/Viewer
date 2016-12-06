@@ -122,7 +122,7 @@ class ViewableController: UIViewController {
             heightFactor = image.size.height / self.view.bounds.height
         }
 
-        return max(widthFactor, heightFactor)
+        return max(2.0, max(widthFactor, heightFactor))
     }
 
     override func viewDidLoad() {
@@ -142,7 +142,14 @@ class ViewableController: UIViewController {
         self.view.addSubview(self.videoProgressView)
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.tapAction))
+        tapRecognizer.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(tapRecognizer)
+        
+        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.doubleTapAction))
+        doubleTapRecognizer.numberOfTapsRequired = 2
+        self.zoomingScrollView.addGestureRecognizer(doubleTapRecognizer)
+        
+        tapRecognizer.require(toFail: doubleTapRecognizer)
     }
 
     // In iOS 10 going into landscape provides a very strange animation. Basically you'll see the other
@@ -178,6 +185,23 @@ class ViewableController: UIViewController {
         }
 
         self.delegate?.viewableControllerDidTapItem(self)
+    }
+    
+    func doubleTapAction(recognizer: UITapGestureRecognizer) {
+        let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
+    
+        let touchPoint = recognizer.location(in: self.imageView)
+        
+        let scrollViewSize = self.imageView.bounds.size;
+        
+        let width = scrollViewSize.width / zoomScale
+        let height = scrollViewSize.height / zoomScale
+        let originX = touchPoint.x - (width / 2.0)
+        let originY = touchPoint.y - (height / 2.0)
+        
+        let rectToZoomTo = CGRect(x: originX, y: originY, width: width, height: height)
+        
+        self.zoomingScrollView.zoom(to: rectToZoomTo, animated: true)
     }
 
     override func viewWillLayoutSubviews() {
