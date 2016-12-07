@@ -45,7 +45,7 @@ class PhotosController: UICollectionViewController {
         self.collectionView?.backgroundColor = .white
         self.collectionView?.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
 
-        switch dataSourceType {
+        switch self.dataSourceType {
         case .local:
             Photo.checkAuthorizationStatus { success in
                 if success {
