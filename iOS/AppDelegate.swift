@@ -9,11 +9,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         self.window = UIWindow(frame: UIScreen.main.bounds)
 
-        let localController = PhotosController(useLocalPhotos: true)
+        let localController = PhotosController(dataSourceType: .local)
         localController.title = "Local"
         let localNavigationController = UINavigationController(rootViewController: localController)
 
-        let remoteController = PhotosController(useLocalPhotos: false)
+        let remoteController = PhotosController(dataSourceType: .remote)
         remoteController.title = "Remote"
         let remoteNavigationController = UINavigationController(rootViewController: remoteController)
 

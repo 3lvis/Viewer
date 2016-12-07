@@ -1,7 +1,12 @@
 import UIKit
 
+enum DataSourceType {
+    case local
+    case remote
+}
+
 class PhotosController: UICollectionViewController {
-    var useLocalPhotos: Bool
+    var dataSourceType: DataSourceType
     var viewerController: ViewerController?
     var optionsController: OptionsController?
     var numberOfItems = 0
@@ -16,8 +21,8 @@ class PhotosController: UICollectionViewController {
         }
     }
 
-    init(useLocalPhotos: Bool) {
-        self.useLocalPhotos = useLocalPhotos
+    init(dataSourceType: DataSourceType) {
+        self.dataSourceType = dataSourceType
 
         let numberOfColumns = CGFloat(4)
         let layout = UICollectionViewFlowLayout()
@@ -40,14 +45,15 @@ class PhotosController: UICollectionViewController {
         self.collectionView?.backgroundColor = .white
         self.collectionView?.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.Identifier)
 
-        if self.useLocalPhotos {
+        switch dataSourceType {
+        case .local:
             Photo.checkAuthorizationStatus { success in
                 if success {
                     self.sections = Photo.constructLocalElements()
                     self.collectionView?.reloadData()
                 }
             }
-        } else {
+        case .remote:
             self.sections = Photo.constructRemoteElements()
             self.collectionView?.reloadData()
         }
