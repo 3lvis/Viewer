@@ -48,7 +48,7 @@ class VideoView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin]
+        self.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleWidth, .flexibleHeight]
         self.isUserInteractionEnabled = false
         self.layer.addSublayer(self.playerLayer)
         self.addSubview(self.loadingIndicatorBackground)
