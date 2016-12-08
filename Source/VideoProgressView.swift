@@ -2,25 +2,24 @@ import UIKit
 
 class VideoProgressView: UIView {
     static let Height = CGFloat(55.0)
-    private static let ProgressBarXMargin = CGFloat(65.0)
-    private static let ProgressBarYMargin = CGFloat(23.0)
-    private static let ProgressBarHeight = CGFloat(6.0)
+    private static let progressBarYMargin = CGFloat(23.0)
+    private static let progressBarHeight = CGFloat(6.0)
 
-    private static let TextLabelWidth = CGFloat(36.0)
-    private static let TextLabelHeight = CGFloat(18.0)
-    private static let TextLabelMargin = CGFloat(18.0)
+    private static let textLabelHeight = CGFloat(18.0)
+    private static let textLabelMargin = CGFloat(18.0)
 
     var duration = 0.0 {
         didSet {
             if self.duration != oldValue {
-              self.durationTimeLabel.text = self.timeStringForSeconds(self.duration)
+                self.durationTimeLabel.text = self.duration.timeString()
+                self.layoutSubviews()
             }
         }
     }
     var progress = 0.0 {
         didSet {
-            self.currentTimeLabel.text = self.timeStringForSeconds(self.progress)
-            self.setFrameForProgressBar()
+            self.currentTimeLabel.text = self.progress.timeString()
+            self.layoutSubviews()
         }
     }
 
@@ -29,21 +28,13 @@ class VideoProgressView: UIView {
             return 0.0
         }
 
-        return progress/duration
+        return self.progress/self.duration
     }
 
-    var widthForBar: CGFloat {
-        return self.bounds.width - (2 * VideoProgressView.ProgressBarXMargin)
-    }
-
-    var widthForProgressBar: CGFloat {
-        return widthForBar * CGFloat(progressPercentage)
-    }
-
-    lazy var maskBarForRoundedCorners: UIView = {
+    lazy var progressBarMask: UIView = {
         let maskView = UIView()
         maskView.backgroundColor = .clear
-        maskView.layer.cornerRadius = ProgressBarHeight/2
+        maskView.layer.cornerRadius = self.progressBarHeight/2
         maskView.clipsToBounds = true
         maskView.layer.masksToBounds = true;
 
@@ -67,27 +58,29 @@ class VideoProgressView: UIView {
     }()
 
     lazy var currentTimeLabel: UILabel = {
-        let currentTimeLabel = UILabel()
-        currentTimeLabel.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
-        currentTimeLabel.textColor = .white
+        let label = UILabel()
+        label.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
+        label.textColor = .white
+        label.textAlignment = .center
 
-        return currentTimeLabel
+        return label
     }()
 
     lazy var durationTimeLabel: UILabel = {
-        let durationTimeLabel = UILabel()
-        durationTimeLabel.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
-        durationTimeLabel.textColor = .white
+        let label = UILabel()
+        label.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
+        label.textColor = .white
+        label.textAlignment = .center
 
-        return durationTimeLabel
+        return label
     }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.addSubview(self.maskBarForRoundedCorners)
-        self.maskBarForRoundedCorners.addSubview(self.backgroundBar)
-        self.maskBarForRoundedCorners.addSubview(self.progressBar)
+        self.addSubview(self.progressBarMask)
+        self.progressBarMask.addSubview(self.backgroundBar)
+        self.progressBarMask.addSubview(self.progressBar)
 
         self.addSubview(self.currentTimeLabel)
         self.addSubview(self.durationTimeLabel)
@@ -100,24 +93,71 @@ class VideoProgressView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        self.maskBarForRoundedCorners.frame = CGRect(x: VideoProgressView.ProgressBarXMargin, y: VideoProgressView.ProgressBarYMargin, width: self.widthForBar, height: VideoProgressView.ProgressBarHeight)
-        self.backgroundBar.frame = CGRect(x: 0, y: 0, width: self.widthForBar, height: VideoProgressView.ProgressBarHeight)
-        self.setFrameForProgressBar()
+        var currentTimeLabelFrame: CGRect {
+            let width = self.currentTimeLabel.width() + VideoProgressView.textLabelMargin
+            return CGRect(x: 0, y: VideoProgressView.textLabelMargin, width: width, height: VideoProgressView.textLabelHeight)
+        }
+        self.currentTimeLabel.frame = currentTimeLabelFrame
 
-        let xPosForCurrentTimeLabel = (VideoProgressView.ProgressBarXMargin - VideoProgressView.TextLabelWidth)/2
-        self.currentTimeLabel.frame = CGRect(x: xPosForCurrentTimeLabel, y: VideoProgressView.TextLabelMargin, width: VideoProgressView.TextLabelWidth, height: VideoProgressView.TextLabelHeight)
-        let xPosForDurationTimeLabel = self.bounds.width - VideoProgressView.TextLabelWidth - (VideoProgressView.ProgressBarXMargin - VideoProgressView.TextLabelWidth)/2
-        self.durationTimeLabel.frame = CGRect(x: xPosForDurationTimeLabel, y: VideoProgressView.TextLabelMargin, width: VideoProgressView.TextLabelWidth, height: VideoProgressView.TextLabelHeight)
+        var durationTimeLabelFrame: CGRect {
+            let width = self.durationTimeLabel.width() + VideoProgressView.textLabelMargin
+            let x = self.bounds.width - width
+            return CGRect(x: x, y: VideoProgressView.textLabelMargin, width: width, height: VideoProgressView.textLabelHeight)
+        }
+        self.durationTimeLabel.frame = durationTimeLabelFrame
+
+        var maskBarForRoundedCornersFrame: CGRect {
+            let x = self.currentTimeLabel.frame.width
+            let width = self.bounds.width - self.currentTimeLabel.frame.width - self.durationTimeLabel.frame.width
+            return CGRect(x: x, y: VideoProgressView.progressBarYMargin, width: width, height: VideoProgressView.progressBarHeight)
+        }
+        self.progressBarMask.frame = maskBarForRoundedCornersFrame
+
+        var backgroundBarFrame: CGRect {
+            let width = self.progressBarMask.frame.width
+            return CGRect(x: 0, y: 0, width: width, height: VideoProgressView.progressBarHeight)
+        }
+        self.backgroundBar.frame = backgroundBarFrame
+
+        var progressBarFrame: CGRect {
+            let width = self.progressBarMask.frame.width * CGFloat(self.progressPercentage)
+            return CGRect(x: 0, y: 0, width: width, height: VideoProgressView.progressBarHeight)
+        }
+        self.progressBar.frame = progressBarFrame
     }
+}
 
-    func setFrameForProgressBar() {
-        self.progressBar.frame = CGRect(x: 0, y: 0, width: self.widthForProgressBar, height: VideoProgressView.ProgressBarHeight)
+public extension UILabel {
+    public func width() -> CGFloat {
+        let rect = (self.attributedText ?? NSAttributedString()).boundingRect(with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude), options: .usesLineFragmentOrigin, context: nil)
+        return rect.width
     }
+}
 
-    func timeStringForSeconds(_ secondValue: Double) -> String {
-       let minutes = Int((secondValue.truncatingRemainder(dividingBy: 3600)) / 60)
-       let seconds = Int((secondValue.truncatingRemainder(dividingBy: 3600)).truncatingRemainder(dividingBy: 60))
+extension Double {
+    func timeString() -> String {
+        let remaining = floor(self)
+        let hours = Int(remaining / 3600)
+        let minutes = Int(remaining / 60) - hours * 60
+        let seconds = Int(remaining) - hours * 3600 - minutes * 60
 
-        return String(format: "%02d:%02d", minutes, seconds)
+        let formatter = NumberFormatter()
+        formatter.minimumIntegerDigits = 2
+
+        let secondsString = String(format: "%02d", seconds)
+
+        if hours > 0 {
+            let hoursString = formatter.string(from: NSNumber(value: hours))
+            if let hoursString = hoursString {
+                let minutesString = String(format: "%02d", minutes)
+                return "\(hoursString):\(minutesString):\(secondsString)"
+            }
+        } else {
+            if let minutesString = formatter.string(from: NSNumber(value: minutes)) {
+                return "\(minutesString):\(secondsString)"
+            }
+        }
+
+        return ""
     }
 }
