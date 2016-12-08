@@ -36,12 +36,14 @@ class OptionsController: UITableViewController {
 }
 
 extension OptionsController: UIPopoverPresentationControllerDelegate {
+
     func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
         return .none
     }
 }
 
 extension OptionsController {
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.options.count
     }
@@ -55,7 +57,7 @@ extension OptionsController {
         return cell
     }
 
-    override public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let option = self.options[indexPath.row]
         self.delegate?.optionsController(optionsController: self, didSelectOption: option)
     }

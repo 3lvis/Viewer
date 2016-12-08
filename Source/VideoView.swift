@@ -79,7 +79,7 @@ class VideoView: UIView {
         self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
     }
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         guard let playerItem = object as? AVPlayerItem else { return }
 
         if let error = playerItem.error {
@@ -105,7 +105,7 @@ class VideoView: UIView {
                 self.playbackProgressTimeObserver = nil
             }
 
-            let interval = CMTime(seconds: 1/60, preferredTimescale: Int32(NSEC_PER_SEC))
+            let interval = CMTime(seconds: 1 / 60, preferredTimescale: Int32(NSEC_PER_SEC))
             self.playbackProgressTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { time in
                 self.loadingIndicator.stopAnimating()
                 self.loadingIndicatorBackground.alpha = 0
@@ -182,6 +182,7 @@ class VideoView: UIView {
 }
 
 extension VideoView {
+
     fileprivate func addPlayer(using viewable: Viewable, completion: @escaping (Void) -> Void) {
         if let assetID = viewable.assetID {
             #if os(iOS)
@@ -281,7 +282,7 @@ extension VideoView {
             player.play()
         }
     }
-    
+
     @objc fileprivate func videoFinishedPlaying() {
         self.delegate?.videoViewDidFinishPlaying(self, error: nil)
     }

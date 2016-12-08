@@ -28,19 +28,18 @@ class VideoProgressView: UIView {
             return 0.0
         }
 
-        return self.progress/self.duration
+        return self.progress / self.duration
     }
 
     lazy var progressBarMask: UIView = {
         let maskView = UIView()
         maskView.backgroundColor = .clear
-        maskView.layer.cornerRadius = VideoProgressView.progressBarHeight/2
+        maskView.layer.cornerRadius = VideoProgressView.progressBarHeight / 2
         maskView.clipsToBounds = true
-        maskView.layer.masksToBounds = true;
+        maskView.layer.masksToBounds = true
 
         return maskView
     }()
-
 
     lazy var backgroundBar: UIView = {
         let backgroundBar = UIView()
@@ -85,7 +84,7 @@ class VideoProgressView: UIView {
         self.addSubview(self.currentTimeLabel)
         self.addSubview(self.durationTimeLabel)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -128,6 +127,7 @@ class VideoProgressView: UIView {
 }
 
 public extension UILabel {
+
     public func width() -> CGFloat {
         let rect = (self.attributedText ?? NSAttributedString()).boundingRect(with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude), options: .usesLineFragmentOrigin, context: nil)
         return rect.width
@@ -135,6 +135,7 @@ public extension UILabel {
 }
 
 extension Double {
+
     func timeString() -> String {
         let remaining = floor(self)
         let hours = Int(remaining / 3600)

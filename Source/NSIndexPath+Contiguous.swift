@@ -1,6 +1,7 @@
 import UIKit
 
 extension IndexPath {
+
     enum Direction {
         case forward
         case backward
@@ -11,9 +12,9 @@ extension IndexPath {
         var indexPaths = [IndexPath]()
 
         let sections = collectionView.numberOfSections
-        for section in 0..<sections {
+        for section in 0 ..< sections {
             let rows = collectionView.numberOfItems(inSection: section)
-            for row in 0..<rows {
+            for row in 0 ..< rows {
                 indexPaths.append(IndexPath(row: row, section: section))
             }
         }
@@ -24,7 +25,7 @@ extension IndexPath {
     func next(_ collectionView: UICollectionView) -> IndexPath? {
         var found = false
         let indexPaths = self.indexPaths(collectionView)
-        for indexPath in  indexPaths {
+        for indexPath in indexPaths {
             if found {
                 return indexPath
             }
@@ -54,7 +55,7 @@ extension IndexPath {
     static func indexPathForIndex(_ collectionView: UICollectionView, index: Int) -> IndexPath? {
         var count = 0
         let sections = collectionView.numberOfSections
-        for section in 0..<sections {
+        for section in 0 ..< sections {
             let rows = collectionView.numberOfItems(inSection: section)
             if index >= count && index < count + rows {
                 let foundRow = index - count
@@ -69,7 +70,7 @@ extension IndexPath {
     func totalRow(_ collectionView: UICollectionView) -> Int {
         var count = 0
         let sections = collectionView.numberOfSections
-        for section in 0..<sections {
+        for section in 0 ..< sections {
             if section < self.section {
                 let rows = collectionView.numberOfItems(inSection: section)
                 count += rows

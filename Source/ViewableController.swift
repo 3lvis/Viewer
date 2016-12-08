@@ -95,6 +95,7 @@ class ViewableController: UIViewController {
     var changed = false
     var viewable: Viewable?
     var indexPath: IndexPath?
+
     func update(with viewable: Viewable, at indexPath: IndexPath) {
         if self.indexPath?.description != indexPath.description {
             self.changed = true
@@ -144,12 +145,12 @@ class ViewableController: UIViewController {
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.tapAction))
         tapRecognizer.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(tapRecognizer)
-        
+
         if viewable?.type == .image {
             let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.doubleTapAction))
             doubleTapRecognizer.numberOfTapsRequired = 2
             self.zoomingScrollView.addGestureRecognizer(doubleTapRecognizer)
-            
+
             tapRecognizer.require(toFail: doubleTapRecognizer)
         }
     }
@@ -170,11 +171,11 @@ class ViewableController: UIViewController {
         }
         coordinator.animate(alongsideTransition: { context in
 
-            }) { completionContext in
-                if viewable.type == .video || isFocused == false  {
-                    self.view.backgroundColor = .black
-                    self.zoomingScrollView.isHidden = false
-                }
+        }) { completionContext in
+            if viewable.type == .video || isFocused == false {
+                self.view.backgroundColor = .black
+                self.zoomingScrollView.isHidden = false
+            }
         }
     }
 
@@ -183,26 +184,26 @@ class ViewableController: UIViewController {
             UIView.animate(withDuration: 0.3, animations: {
                 self.pauseButton.alpha = self.pauseButton.alpha == 0 ? 1 : 0
                 self.videoProgressView.alpha = self.videoProgressView.alpha == 0 ? 1 : 0
-            }) 
+            })
         }
 
         self.delegate?.viewableControllerDidTapItem(self)
     }
-    
+
     func doubleTapAction(recognizer: UITapGestureRecognizer) {
         let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
-    
+
         let touchPoint = recognizer.location(in: self.imageView)
-        
-        let scrollViewSize = self.imageView.bounds.size;
-        
+
+        let scrollViewSize = self.imageView.bounds.size
+
         let width = scrollViewSize.width / zoomScale
         let height = scrollViewSize.height / zoomScale
         let originX = touchPoint.x - (width / 2.0)
         let originY = touchPoint.y - (height / 2.0)
-        
+
         let rectToZoomTo = CGRect(x: originX, y: originY, width: width, height: height)
-        
+
         self.zoomingScrollView.zoom(to: rectToZoomTo, animated: true)
     }
 
@@ -301,6 +302,7 @@ class ViewableController: UIViewController {
     var shouldDimPause: Bool = false
     var shouldDimPlay: Bool = false
     var shouldDimVideoProgress: Bool = false
+
     func dimControls(_ alpha: CGFloat) {
         if self.pauseButton.alpha == 1.0 {
             self.shouldDimPause = true
@@ -335,6 +337,7 @@ class ViewableController: UIViewController {
 }
 
 extension ViewableController: UIScrollViewDelegate {
+
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         if self.viewable?.type == .image {
             return self.imageView
@@ -345,13 +348,14 @@ extension ViewableController: UIScrollViewDelegate {
 }
 
 extension ViewableController: VideoViewDelegate {
+
     func videoViewDidStartPlaying(_ videoView: VideoView) {
         self.requestToHideOverlayIfNeeded()
     }
 
     func videoView(_ videoView: VideoView, didChangeProgress progress: Double, duration: Double) {
-       self.videoProgressView.progress = progress
-       self.videoProgressView.duration = duration
+        self.videoProgressView.progress = progress
+        self.videoProgressView.duration = duration
     }
 
     func videoViewDidFinishPlaying(_ videoView: VideoView, error: NSError?) {

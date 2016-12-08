@@ -43,9 +43,9 @@ struct Photo: Viewable {
         var sections = [Section]()
         let numberOfSections = 20
 
-        for sectionIndex in 10..<numberOfSections {
+        for sectionIndex in 10 ..< numberOfSections {
             var photos = [Photo]()
-            for row in 0..<10 {
+            for row in 0 ..< 10 {
                 var photo = Photo(id: "\(sectionIndex)-\(row)")
 
                 let index = Int(arc4random_uniform(6))
@@ -93,7 +93,7 @@ struct Photo: Viewable {
 
         let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
         if fetchResult.count > 0 {
-            fetchResult.enumerateObjects ({ asset, index, stop in
+            fetchResult.enumerateObjects({ asset, index, stop in
                 let groupedDate = asset.creationDate?.groupedDateString() ?? ""
                 var foundSection = Section(groupedDate: groupedDate)
                 var foundIndex: Int?
@@ -187,6 +187,7 @@ struct Photo: Viewable {
 }
 
 extension Date {
+
     func groupedDateString() -> String {
         let noTimeDate = Calendar.current.startOfDay(for: self)
 

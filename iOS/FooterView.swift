@@ -14,7 +14,6 @@ class FooterView: UIView {
         let button = UIButton(type: .custom)
         button.setImage(image, for: .normal)
 
-
         return button
     }()
 
@@ -56,7 +55,6 @@ class FooterView: UIView {
 
         return (singleFrame * CGFloat(index), singleFrame)
     }
-
 
     func favoriteAction(button: UIButton) {
         viewDelegate?.footerView(self, didPressFavoriteButton: button)
