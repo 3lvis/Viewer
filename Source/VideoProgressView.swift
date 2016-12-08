@@ -34,7 +34,7 @@ class VideoProgressView: UIView {
     lazy var progressBarMask: UIView = {
         let maskView = UIView()
         maskView.backgroundColor = .clear
-        maskView.layer.cornerRadius = self.progressBarHeight/2
+        maskView.layer.cornerRadius = VideoProgressView.progressBarHeight/2
         maskView.clipsToBounds = true
         maskView.layer.masksToBounds = true;
 
