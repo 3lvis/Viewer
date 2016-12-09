@@ -27,13 +27,9 @@ class ViewableController: UIViewController {
         let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
         scrollView.backgroundColor = .clear
-        scrollView.alwaysBounceVertical = false
-        scrollView.alwaysBounceHorizontal = false
         scrollView.showsVerticalScrollIndicator = true
-        scrollView.flashScrollIndicators()
-        scrollView.minimumZoomScale = 1.0
-        scrollView.maximumZoomScale = self.maxZoomScale()
         scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        scrollView.clipsToBounds = true
 
         return scrollView
     }()
@@ -205,6 +201,9 @@ class ViewableController: UIViewController {
         let rectToZoomTo = CGRect(x: originX, y: originY, width: width, height: height)
 
         self.zoomingScrollView.zoom(to: rectToZoomTo, animated: true)
+
+        self.imageView.frame = CGRect(x: 0, y: 0, width: self.imageView.frame.width, height: self.imageView.frame.height)
+        self.zoomingScrollView.contentSize = self.imageView.frame.size
     }
 
     override func viewWillLayoutSubviews() {
@@ -237,7 +236,9 @@ class ViewableController: UIViewController {
             viewable.media { image, error in
                 if let image = image {
                     self.imageView.image = image
+                    self.zoomingScrollView.minimumZoomScale = 1.0
                     self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
+                    self.zoomingScrollView.contentSize = self.imageView.frame.size
                 }
             }
         case .video:
@@ -344,6 +345,28 @@ extension ViewableController: UIScrollViewDelegate {
         } else {
             return nil
         }
+    }
+
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        guard let image = self.imageView.image else { return }
+
+        let imageViewSize = self.imageView.frame.size
+        let imageSize = image.size
+
+        let realImageSize: CGSize
+        if imageSize.width / imageSize.height > imageViewSize.width / imageViewSize.height {
+            realImageSize = CGSize(width: imageViewSize.width, height: imageViewSize.width / imageSize.width * imageSize.height)
+        } else {
+            realImageSize = CGSize(width: imageViewSize.height / imageSize.height * imageSize.width, height: imageViewSize.height)
+        }
+
+        self.imageView.frame = CGRect(x: 0, y: 0, width: realImageSize.width, height: realImageSize.height)
+
+        let scrollViewSize = scrollView.frame.size
+        let horizontalInset = (scrollViewSize.width > realImageSize.width ? (scrollViewSize.width - realImageSize.width) / 2 : 0);
+        let verticalInset = (scrollViewSize.height > realImageSize.height ? (scrollViewSize.height - realImageSize.height) / 2 : 0);
+
+        scrollView.contentInset = UIEdgeInsets(top: verticalInset, left: horizontalInset, bottom: verticalInset, right: horizontalInset)
     }
 }
 
