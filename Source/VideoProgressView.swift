@@ -144,7 +144,7 @@ class VideoProgressView: UIView {
 
         var seekViewFrame: CGRect {
             let seekButtonImage = UIImage(named: "seek")
-            let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(progressPercentage)) - (seekButtonImage!.size.width / 2)
+            let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(self.progressPercentage)) - (seekButtonImage!.size.width / 2)
             return CGRect(x: x, y: VideoProgressView.textLabelMargin, width: seekButtonImage!.size.width, height: VideoProgressView.textLabelHeight)
         }
         self.seekView.frame = seekViewFrame
@@ -165,25 +165,35 @@ class VideoProgressView: UIView {
             self.isSeeking = true
             self.delegate?.videoProgressViewDidBeginSeeking(self)
         case .changed:
+            var pannableFrame = self.progressBarMask.frame
+            pannableFrame.size.height = self.frame.height
+
             let translation = gestureRecognizer.translation(in: self.seekView)
             let newCenter = CGPoint(x: gestureRecognizer.view!.center.x + translation.x, y: gestureRecognizer.view!.center.y)
-
-            let seekButtonImage = UIImage(named: "seek")
-            let x = (-(self.progressBarMask.frame.origin.x - (seekButtonImage!.size.width / 2) - newCenter.x)) / self.progressBarMask.frame.size.width
-            var progressPercentage = Double(x)
+            let seekButtonImage = UIImage(named: "seek")!
+            let newX = newCenter.x - (seekButtonImage.size.width / 2)
+            var progressPercentage = Double((-(self.progressBarMask.frame.origin.x - (seekButtonImage.size.width / 2) - newX)) / self.progressBarMask.frame.size.width)
             if progressPercentage < 0 {
                 progressPercentage = 0
             } else if progressPercentage > 1 {
                 progressPercentage = 1
             }
+
+            self.updateProgressBarFrame(with: progressPercentage)
+            if progressPercentage == 0 || progressPercentage == 1 {
+                let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(progressPercentage)) - (seekButtonImage.size.width / 2)
+                var frame = self.seekView.frame
+                frame.origin.x = x
+                self.seekView.frame = frame
+                return
+            }
+
             var progress = progressPercentage * self.duration
             if progress < 0 {
                 progress = 0
             } else if progress > self.duration {
                 progress = self.duration
             }
-
-            self.updateProgressBarFrame(with: progressPercentage)
             gestureRecognizer.view!.center = newCenter
             gestureRecognizer.setTranslation(CGPoint.zero, in: self.seekView)
             self.delegate?.videoProgressViewDidSeek(self, toDuration: progress)
