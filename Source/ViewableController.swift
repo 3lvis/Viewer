@@ -348,6 +348,7 @@ extension ViewableController: UIScrollViewDelegate {
 
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         guard let image = self.imageView.image else { return }
+        guard scrollView.zoomScale > 1.0 else { return }
 
         let imageViewSize = self.imageView.frame.size
         let imageSize = image.size
