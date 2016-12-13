@@ -378,7 +378,6 @@ extension ViewableController: VideoProgressViewDelegate {
 
     func videoProgressViewDidSeek(_ videoProgressView: VideoProgressView, toDuration duration: Double) {
         self.videoView.stopPlayingAndSeekSmoothlyToTime(duration: duration)
-        print(duration)
     }
 
     func videoProgressViewDidEndSeeking(_ videoProgressView: VideoProgressView) {
