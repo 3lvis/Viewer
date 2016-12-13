@@ -96,13 +96,13 @@ class ViewableController: UIViewController {
 
     var viewable: Viewable? {
         willSet {
-            if self.viewable?.id != newValue?.id {
+            if self.indexPath?.description != self.indexPath?.description {
                 self.changed = true
             }
         }
 
         didSet {
-            guard let viewable = self.viewable else {
+            if self.viewable != nil {
                 self.videoView.image = nil
                 self.imageView.image = nil
 

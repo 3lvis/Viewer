@@ -94,7 +94,7 @@ extension PaginatedScrollView: UIScrollViewDelegate {
         self.scrollViewDidFinishScrolling(scrollView)
     }
 
-    func scrollViewDidFinishScrolling(_ scrollView: UIScrollView) {
+    private func scrollViewDidFinishScrolling(_ scrollView: UIScrollView) {
         self.loadPageWithAdjacent()
     }
 
