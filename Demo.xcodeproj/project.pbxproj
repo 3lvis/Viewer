@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		141136DF1DFF87D80036E5F3 /* seek.png in Resources */ = {isa = PBXBuildFile; fileRef = 141136DC1DFF87D80036E5F3 /* seek.png */; };
+		141136E01DFF87D80036E5F3 /* seek.png in Resources */ = {isa = PBXBuildFile; fileRef = 141136DC1DFF87D80036E5F3 /* seek.png */; };
+		141136E11DFF87D80036E5F3 /* seek@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 141136DD1DFF87D80036E5F3 /* seek@2x.png */; };
+		141136E21DFF87D80036E5F3 /* seek@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 141136DD1DFF87D80036E5F3 /* seek@2x.png */; };
+		141136E31DFF87D80036E5F3 /* seek@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 141136DE1DFF87D80036E5F3 /* seek@3x.png */; };
+		141136E41DFF87D80036E5F3 /* seek@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 141136DE1DFF87D80036E5F3 /* seek@3x.png */; };
 		1438033E1C2452A1003CA252 /* NSIndexPath+Contiguous.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143803351C2452A1003CA252 /* NSIndexPath+Contiguous.swift */; };
 		143803401C2452A1003CA252 /* UIImage+CenteredFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143803361C2452A1003CA252 /* UIImage+CenteredFrame.swift */; };
 		143803421C2452A1003CA252 /* UIViewController+Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143803371C2452A1003CA252 /* UIViewController+Window.swift */; };
@@ -58,6 +64,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		141136DC1DFF87D80036E5F3 /* seek.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seek.png; sourceTree = "<group>"; };
+		141136DD1DFF87D80036E5F3 /* seek@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "seek@2x.png"; sourceTree = "<group>"; };
+		141136DE1DFF87D80036E5F3 /* seek@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "seek@3x.png"; sourceTree = "<group>"; };
 		143803351C2452A1003CA252 /* NSIndexPath+Contiguous.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSIndexPath+Contiguous.swift"; sourceTree = "<group>"; };
 		143803361C2452A1003CA252 /* UIImage+CenteredFrame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+CenteredFrame.swift"; sourceTree = "<group>"; };
 		143803371C2452A1003CA252 /* UIViewController+Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Window.swift"; sourceTree = "<group>"; };
@@ -141,6 +150,9 @@
 				14B9EF211CB7EE3800563610 /* dark-circle.png */,
 				14B9EF221CB7EE3800563610 /* dark-circle@2x.png */,
 				14B9EF231CB7EE3800563610 /* dark-circle@3x.png */,
+				141136DC1DFF87D80036E5F3 /* seek.png */,
+				141136DD1DFF87D80036E5F3 /* seek@2x.png */,
+				141136DE1DFF87D80036E5F3 /* seek@3x.png */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -331,6 +343,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				141136E31DFF87D80036E5F3 /* seek@3x.png in Resources */,
+				141136E11DFF87D80036E5F3 /* seek@2x.png in Resources */,
+				141136DF1DFF87D80036E5F3 /* seek.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,7 +353,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				141136E21DFF87D80036E5F3 /* seek@2x.png in Resources */,
 				E6D592891D22A2B8006EF238 /* DINNextLTPro-Regular.otf in Resources */,
+				141136E01DFF87D80036E5F3 /* seek.png in Resources */,
 				1459C2251CB694690007E498 /* play@2x.png in Resources */,
 				14AE4D5D1C18834500EEC4D9 /* 3.jpg in Resources */,
 				14AE4D5F1C18928B00EEC4D9 /* 4.jpg in Resources */,
@@ -352,6 +369,7 @@
 				1459C2281CB694690007E498 /* repeat@2x.png in Resources */,
 				1459C2261CB694690007E498 /* play@3x.png in Resources */,
 				14D081381C18579700E3FFC3 /* 1.jpg in Resources */,
+				141136E41DFF87D80036E5F3 /* seek@3x.png in Resources */,
 				14B95A471C57C8BE00FF14D8 /* 5.png in Resources */,
 				1459C2291CB694690007E498 /* repeat@3x.png in Resources */,
 				14C984051C0DE79200B5E515 /* LaunchScreen.storyboard in Resources */,

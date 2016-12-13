@@ -74,6 +74,14 @@ class VideoProgressView: UIView {
         return label
     }()
 
+    lazy var seekView: UIImageView = {
+        let view = UIImageView()
+        view.isUserInteractionEnabled = true
+        view.image = UIImage(named: "seek")
+
+        return view
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -81,6 +89,7 @@ class VideoProgressView: UIView {
         self.progressBarMask.addSubview(self.backgroundBar)
         self.progressBarMask.addSubview(self.progressBar)
 
+        self.addSubview(self.seekView)
         self.addSubview(self.currentTimeLabel)
         self.addSubview(self.durationTimeLabel)
     }
@@ -123,6 +132,13 @@ class VideoProgressView: UIView {
             return CGRect(x: 0, y: 0, width: width, height: VideoProgressView.progressBarHeight)
         }
         self.progressBar.frame = progressBarFrame
+
+        var seekViewFrame: CGRect {
+            let seekButtonImage = UIImage(named: "seek")
+            let width = self.durationTimeLabel.width() + VideoProgressView.textLabelMargin
+            return CGRect(x: width, y: VideoProgressView.textLabelMargin, width: seekButtonImage!.size.width, height: seekButtonImage!.size.height)
+        }
+        self.seekView.frame = seekViewFrame
     }
 }
 
