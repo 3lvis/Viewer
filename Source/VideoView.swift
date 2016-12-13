@@ -121,17 +121,15 @@ class VideoView: UIView {
     func prepare(using viewable: Viewable, completion: @escaping (Void) -> Void) {
         self.addPlayer(using: viewable) {
             if self.shouldRegisterForStatusNotifications {
-                self.shouldRegisterForStatusNotifications = false
-
-                guard let player = self.playerLayer.player else { fatalError("No player item was found") }
+                guard let player = self.playerLayer.player else { return }
                 guard let currentItem = player.currentItem else { return }
 
+                self.shouldRegisterForStatusNotifications = false
                 currentItem.addObserver(self, forKeyPath: VideoView.playerItemStatusKeyPath, options: [], context: nil)
             }
 
             if self.shouldRegisterForFailureOrEndingNotifications {
                 self.shouldRegisterForFailureOrEndingNotifications = false
-
                 NotificationCenter.default.addObserver(self, selector: #selector(self.videoFinishedPlaying), name: .AVPlayerItemDidPlayToEndTime, object: nil)
                 NotificationCenter.default.addObserver(self, selector: #selector(self.itemPlaybackStalled), name: .AVPlayerItemPlaybackStalled, object: nil)
             }
@@ -243,11 +241,10 @@ extension VideoView {
 
     fileprivate func removeBeforePlayingObservers() {
         if self.shouldRegisterForStatusNotifications == false {
-            self.shouldRegisterForStatusNotifications = true
-
-            guard let player = self.playerLayer.player else { fatalError("No player item was found") }
+            guard let player = self.playerLayer.player else { return }
             guard let currentItem = player.currentItem else { return }
 
+            self.shouldRegisterForStatusNotifications = true
             currentItem.removeObserver(self, forKeyPath: VideoView.playerItemStatusKeyPath)
         }
     }
