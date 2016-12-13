@@ -1,6 +1,7 @@
 import UIKit
 
 extension UIImage {
+
     func centeredFrame() -> CGRect {
         let screenBounds = UIScreen.main.bounds
         let widthScaleFactor = self.size.width / screenBounds.size.width

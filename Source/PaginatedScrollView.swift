@@ -32,7 +32,7 @@ class PaginatedScrollView: UIScrollView {
         self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.decelerationRate = UIScrollViewDecelerationRateFast
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -57,7 +57,7 @@ class PaginatedScrollView: UIScrollView {
             return
         }
 
-        if let controller = self.viewDataSource?.paginatedScrollView(self, controllerAtIndex: page) , controller.view.superview == nil {
+        if let controller = self.viewDataSource?.paginatedScrollView(self, controllerAtIndex: page), controller.view.superview == nil {
             var frame = self.frame
             frame.origin.x = frame.size.width * CGFloat(page)
             frame.origin.y = 0

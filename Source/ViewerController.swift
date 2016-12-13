@@ -178,22 +178,22 @@ public class ViewerController: UIViewController {
 
 extension ViewerController {
     #if os(iOS)
-    public override var prefersStatusBarHidden : Bool {
-        let orientation = UIApplication.shared.statusBarOrientation
-        if UIInterfaceOrientationIsLandscape(orientation) {
-            return true
+        public override var prefersStatusBarHidden: Bool {
+            let orientation = UIApplication.shared.statusBarOrientation
+            if UIInterfaceOrientationIsLandscape(orientation) {
+                return true
+            }
+
+            return self.shouldHideStatusBar
         }
 
-        return self.shouldHideStatusBar
-    }
-
-    public override var preferredStatusBarStyle : UIStatusBarStyle {
-        if self.shouldUseLightStatusBar {
-            return .lightContent
-        } else {
-            return self.presentingViewController?.preferredStatusBarStyle ?? .default
+        public override var preferredStatusBarStyle: UIStatusBarStyle {
+            if self.shouldUseLightStatusBar {
+                return .lightContent
+            } else {
+                return self.presentingViewController?.preferredStatusBarStyle ?? .default
+            }
         }
-    }
     #endif
 
     private func presentedViewCopy() -> UIImageView {
@@ -266,7 +266,7 @@ extension ViewerController {
             #endif
             self.headerView?.alpha = shouldShow ? 1 : 0
             self.footerView?.alpha = shouldShow ? 1 : 0
-        }) 
+        })
     }
 
     private func fadeButtons(_ alpha: CGFloat) {
@@ -372,20 +372,20 @@ extension ViewerController {
                 self.setNeedsStatusBarAppearanceUpdate()
             #endif
             presentedView.frame = self.view.convert(selectedCellFrame, from: self.collectionView)
-            }, completion: { completed in
-                if let existingCell = self.collectionView.cellForItem(at: viewableController.indexPath!) {
-                    existingCell.alpha = 1
-                }
+        }, completion: { completed in
+            if let existingCell = self.collectionView.cellForItem(at: viewableController.indexPath!) {
+                existingCell.alpha = 1
+            }
 
-                self.headerView?.removeFromSuperview()
-                self.footerView?.removeFromSuperview()
-                presentedView.removeFromSuperview()
-                self.overlayView.removeFromSuperview()
-                self.dismiss(animated: false, completion: nil)
-                self.delegate?.viewerControllerDidDismiss(self)
+            self.headerView?.removeFromSuperview()
+            self.footerView?.removeFromSuperview()
+            presentedView.removeFromSuperview()
+            self.overlayView.removeFromSuperview()
+            self.dismiss(animated: false, completion: nil)
+            self.delegate?.viewerControllerDidDismiss(self)
 
-                completion?()
-        }) 
+            completion?()
+        })
     }
 
     func panAction(_ gesture: UIPanGestureRecognizer) {
@@ -441,10 +441,10 @@ extension ViewerController {
                     #if os(iOS)
                         self.setNeedsStatusBarAppearanceUpdate()
                     #endif
-                    }, completion: { completed in
-                        controller.display()
-                        self.view.backgroundColor = .black
-                }) 
+                }, completion: { completed in
+                    controller.display()
+                    self.view.backgroundColor = .black
+                })
             }
         }
     }
@@ -479,6 +479,7 @@ extension ViewerController {
 }
 
 extension ViewerController: ViewableControllerDelegate {
+
     func viewableControllerDidTapItem(_ viewableController: ViewableController) {
         self.shouldHideStatusBar = !self.shouldHideStatusBar
         self.buttonsAreVisible = !self.buttonsAreVisible
@@ -491,6 +492,7 @@ extension ViewerController: ViewableControllerDelegate {
 }
 
 extension ViewerController: ViewableControllerDataSource {
+
     func viewableControllerOverlayIsVisible(_ viewableController: ViewableController) -> Bool {
         return self.buttonsAreVisible
     }
@@ -507,20 +509,22 @@ extension ViewerController: ViewableControllerDataSource {
 }
 
 extension ViewerController: UIGestureRecognizerDelegate {
+
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer is UIPanGestureRecognizer {
             let panGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
             let velocity = panGestureRecognizer.velocity(in: panGestureRecognizer.view!)
             let allowOnlyVerticalScrolls = fabs(velocity.y) > fabs(velocity.x)
-            
+
             return allowOnlyVerticalScrolls
         }
-        
+
         return true
     }
 }
 
 extension ViewerController: PaginatedScrollViewDataSource {
+
     func numberOfPagesInPaginatedScrollView(_ paginatedScrollView: PaginatedScrollView) -> Int {
         return self.dataSource?.numberOfItemsInViewerController(self) ?? 0
     }
@@ -532,6 +536,7 @@ extension ViewerController: PaginatedScrollViewDataSource {
 }
 
 extension ViewerController: PaginatedScrollViewDelegate {
+
     func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, didMoveToIndex index: Int) {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)

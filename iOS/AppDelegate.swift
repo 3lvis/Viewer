@@ -6,20 +6,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+    public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
         self.window = UIWindow(frame: UIScreen.main.bounds)
 
-        let localController = PhotosController(useLocalPhotos: true)
+        let localController = PhotosController(dataSourceType: .local)
         localController.title = "Local"
         let localNavigationController = UINavigationController(rootViewController: localController)
 
-        let remoteController = PhotosController(useLocalPhotos: false)
+        let remoteController = PhotosController(dataSourceType: .remote)
         remoteController.title = "Remote"
         let remoteNavigationController = UINavigationController(rootViewController: remoteController)
 
         if AppDelegate.IsLightStatusBar {
             UINavigationBar.appearance().barTintColor = .orange
-            UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName : UIColor.white]
+            UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
             remoteNavigationController.navigationBar.barStyle = .black
             localNavigationController.navigationBar.barStyle = .black
         }
