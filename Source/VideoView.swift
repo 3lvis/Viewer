@@ -122,7 +122,7 @@ class VideoView: UIView {
         }
     }
 
-    func prepare(using viewable: Viewable, completion: @escaping (Void) -> Void) {
+    func prepare(using viewable: Viewable, completion: @escaping () -> Void) {
         self.addPlayer(using: viewable) {
             if self.shouldRegisterForStatusNotifications {
                 guard let player = self.playerLayer.player else { return }
@@ -185,58 +185,46 @@ class VideoView: UIView {
     var isSeekInProgress = false
     var chaseTime = kCMTimeZero
 
-    func stopPlayingAndSeekSmoothlyToTime(duration:Double)
-    {
+    func stopPlayingAndSeekSmoothlyToTime(duration: Double) {
         guard let timescale = self.playerLayer.player?.currentItem?.currentTime().timescale else { return }
         let newChaseTime = CMTime(seconds: duration, preferredTimescale: timescale)
         self.playerLayer.player?.pause()
 
-        if CMTimeCompare(newChaseTime, chaseTime) != 0
-        {
-            chaseTime = newChaseTime;
+        if CMTimeCompare(newChaseTime, chaseTime) != 0 {
+            chaseTime = newChaseTime
 
-            if !isSeekInProgress
-            {
+            if !isSeekInProgress {
                 trySeekToChaseTime()
             }
         }
     }
 
-    func trySeekToChaseTime()
-    {
-        if playerCurrentItemStatus == .unknown
-        {
+    func trySeekToChaseTime() {
+        if playerCurrentItemStatus == .unknown {
             // wait until item becomes ready (KVO player.currentItem.status)
-        }
-        else if playerCurrentItemStatus == .readyToPlay
-        {
+        } else if playerCurrentItemStatus == .readyToPlay {
             actuallySeekToTime()
         }
     }
 
-    func actuallySeekToTime()
-    {
+    func actuallySeekToTime() {
         isSeekInProgress = true
         let seekTimeInProgress = chaseTime
         self.playerLayer.player?.seek(to: seekTimeInProgress, toleranceBefore: kCMTimeZero,
-                          toleranceAfter: kCMTimeZero, completionHandler:
-            { (isFinished:Bool) -> Void in
+                                      toleranceAfter: kCMTimeZero, completionHandler: { (isFinished: Bool) -> Void in
 
-                if CMTimeCompare(seekTimeInProgress, self.chaseTime) == 0
-                {
-                    self.isSeekInProgress = false
-                }
-                else
-                {
-                    self.trySeekToChaseTime()
-                }
+                                              if CMTimeCompare(seekTimeInProgress, self.chaseTime) == 0 {
+                                                  self.isSeekInProgress = false
+                                              } else {
+                                                  self.trySeekToChaseTime()
+                                              }
         })
     }
 }
 
 extension VideoView {
 
-    fileprivate func addPlayer(using viewable: Viewable, completion: @escaping (Void) -> Void) {
+    fileprivate func addPlayer(using viewable: Viewable, completion: @escaping () -> Void) {
         if let assetID = viewable.assetID {
             #if os(iOS)
                 let result = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)

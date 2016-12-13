@@ -27,7 +27,7 @@ struct Photo: Viewable {
         self.id = id
     }
 
-    func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> ()) {
+    func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> Void) {
         if let assetID = self.assetID {
             if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject {
                 Photo.image(for: asset) { image in

@@ -27,6 +27,7 @@ class VideoProgressView: UIView {
             }
         }
     }
+
     var progress = 0.0 {
         didSet {
             self.currentTimeLabel.text = self.progress.timeString()
