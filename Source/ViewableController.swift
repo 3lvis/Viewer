@@ -345,6 +345,28 @@ extension ViewableController: UIScrollViewDelegate {
             return nil
         }
     }
+
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        guard let image = self.imageView.image else { return }
+
+        let imageViewSize = self.imageView.frame.size
+        let imageSize = image.size
+
+        let realImageSize: CGSize
+        if imageSize.width / imageSize.height > imageViewSize.width / imageViewSize.height {
+            realImageSize = CGSize(width: imageViewSize.width, height: imageViewSize.width / imageSize.width * imageSize.height)
+        } else {
+            realImageSize = CGSize(width: imageViewSize.height / imageSize.height * imageSize.width, height: imageViewSize.height)
+        }
+
+        self.imageView.frame = CGRect(x: 0, y: 0, width: realImageSize.width, height: realImageSize.height)
+
+        let scrollViewSize = scrollView.frame.size
+        let horizontalInset = (scrollViewSize.width > realImageSize.width ? (scrollViewSize.width - realImageSize.width) / 2 : 0);
+        let verticalInset = (scrollViewSize.height > realImageSize.height ? (scrollViewSize.height - realImageSize.height) / 2 : 0);
+
+        scrollView.contentInset = UIEdgeInsets(top: verticalInset, left: horizontalInset, bottom: verticalInset, right: horizontalInset)
+    }
 }
 
 extension ViewableController: VideoViewDelegate {
