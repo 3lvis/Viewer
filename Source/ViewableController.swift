@@ -88,6 +88,7 @@ class ViewableController: UIViewController {
     lazy var videoProgressView: VideoProgressView = {
         let progressView = VideoProgressView(frame: .zero)
         progressView.alpha = 0
+        progressView.delegate = self
 
         return progressView
     }()
@@ -367,5 +368,20 @@ extension ViewableController: VideoViewDelegate {
             self.playButton.alpha = 0
             self.videoProgressView.alpha = 0
         }
+    }
+}
+
+extension ViewableController: VideoProgressViewDelegate {
+    func videoProgressViewDidBeginSeeking(_ videoProgressView: VideoProgressView) {
+        self.videoView.pause()
+    }
+
+    func videoProgressViewDidSeek(_ videoProgressView: VideoProgressView, toDuration duration: Double) {
+        self.videoView.stopPlayingAndSeekSmoothlyToTime(duration: duration)
+        print(duration)
+    }
+
+    func videoProgressViewDidEndSeeking(_ videoProgressView: VideoProgressView) {
+        self.videoView.play()
     }
 }

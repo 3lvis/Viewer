@@ -15,6 +15,7 @@ protocol VideoViewDelegate: class {
 class VideoView: UIView {
     static let playerItemStatusKeyPath = "status"
     weak var delegate: VideoViewDelegate?
+    var playerCurrentItemStatus = AVPlayerItemStatus.unknown
 
     fileprivate lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
@@ -81,6 +82,7 @@ class VideoView: UIView {
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         guard let playerItem = object as? AVPlayerItem else { return }
+        self.playerCurrentItemStatus = playerItem.status
 
         if let error = playerItem.error {
             self.playerLayer.player?.pause()
@@ -176,6 +178,57 @@ class VideoView: UIView {
         }
 
         return false
+    }
+
+    var isSeekInProgress = false
+    var chaseTime = kCMTimeZero
+
+    func stopPlayingAndSeekSmoothlyToTime(duration:Double)
+    {
+        guard let timescale = self.playerLayer.player?.currentItem?.currentTime().timescale else { return }
+        let newChaseTime = CMTime(seconds: duration, preferredTimescale: timescale)
+        self.playerLayer.player?.pause()
+
+        if CMTimeCompare(newChaseTime, chaseTime) != 0
+        {
+            chaseTime = newChaseTime;
+
+            if !isSeekInProgress
+            {
+                trySeekToChaseTime()
+            }
+        }
+    }
+
+    func trySeekToChaseTime()
+    {
+        if playerCurrentItemStatus == .unknown
+        {
+            // wait until item becomes ready (KVO player.currentItem.status)
+        }
+        else if playerCurrentItemStatus == .readyToPlay
+        {
+            actuallySeekToTime()
+        }
+    }
+
+    func actuallySeekToTime()
+    {
+        isSeekInProgress = true
+        let seekTimeInProgress = chaseTime
+        self.playerLayer.player?.seek(to: seekTimeInProgress, toleranceBefore: kCMTimeZero,
+                          toleranceAfter: kCMTimeZero, completionHandler:
+            { (isFinished:Bool) -> Void in
+
+                if CMTimeCompare(seekTimeInProgress, self.chaseTime) == 0
+                {
+                    self.isSeekInProgress = false
+                }
+                else
+                {
+                    self.trySeekToChaseTime()
+                }
+        })
     }
 }
 
@@ -282,5 +335,11 @@ extension VideoView {
 
     @objc fileprivate func videoFinishedPlaying() {
         self.delegate?.videoViewDidFinishPlaying(self, error: nil)
+    }
+}
+
+extension CMTime {
+    public init(seconds: Double, preferredTimescale: CMTimeScale) {
+        self = CMTimeMakeWithSeconds(seconds, preferredTimescale)
     }
 }
