@@ -16,6 +16,9 @@ class VideoProgressView: UIView {
     private static let textLabelHeight = CGFloat(18.0)
     private static let textLabelMargin = CGFloat(18.0)
 
+    private static let seekViewHeight = CGFloat(45.0)
+    private static let seekViewWidth = CGFloat(45.0)
+
     var duration = 0.0 {
         didSet {
             if self.duration != oldValue {
@@ -146,9 +149,8 @@ class VideoProgressView: UIView {
         self.progressBar.frame = progressBarFrame
 
         var seekViewFrame: CGRect {
-            let seekButtonImage = UIImage(named: "seek")
-            let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(self.progressPercentage)) - (seekButtonImage!.size.width / 2)
-            return CGRect(x: x, y: VideoProgressView.textLabelMargin, width: seekButtonImage!.size.width, height: VideoProgressView.textLabelHeight)
+            let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(self.progressPercentage)) - (VideoProgressView.seekViewWidth / 2)
+            return CGRect(x: x, y: VideoProgressView.textLabelMargin, width: VideoProgressView.seekViewWidth, height: VideoProgressView.textLabelHeight)
         }
         self.seekView.frame = seekViewFrame
     }
@@ -163,9 +165,8 @@ class VideoProgressView: UIView {
 
             let translation = gestureRecognizer.translation(in: self.seekView)
             let newCenter = CGPoint(x: gestureRecognizer.view!.center.x + translation.x, y: gestureRecognizer.view!.center.y)
-            let seekButtonImage = UIImage(named: "seek")!
-            let newX = newCenter.x - (seekButtonImage.size.width / 2)
-            var progressPercentage = Double((-(self.progressBarMask.frame.origin.x - (seekButtonImage.size.width / 2) - newX)) / self.progressBarMask.frame.size.width)
+            let newX = newCenter.x - (VideoProgressView.seekViewWidth / 2)
+            var progressPercentage = Double((-(self.progressBarMask.frame.origin.x - (VideoProgressView.seekViewWidth / 2) - newX)) / self.progressBarMask.frame.size.width)
             if progressPercentage < 0 {
                 progressPercentage = 0
             } else if progressPercentage > 1 {
@@ -173,7 +174,7 @@ class VideoProgressView: UIView {
             }
 
             if progressPercentage == 0 || progressPercentage == 1 {
-                let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(progressPercentage)) - (seekButtonImage.size.width / 2)
+                let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(progressPercentage)) - (VideoProgressView.seekViewWidth / 2)
                 var frame = self.seekView.frame
                 frame.origin.x = x
                 self.seekView.frame = frame

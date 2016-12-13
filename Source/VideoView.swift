@@ -114,8 +114,10 @@ class VideoView: UIView {
 
                 let duration = CMTimeGetSeconds(playerItem.asset.duration)
                 let currentTime = CMTimeGetSeconds(player.currentTime())
-
-                self.delegate?.videoView(self, didChangeProgress: currentTime, duration: duration)
+                // In some cases the video will start playing with negative current time.
+                if currentTime > 0 {
+                    self.delegate?.videoView(self, didChangeProgress: currentTime, duration: duration)
+                }
             }
         }
     }
