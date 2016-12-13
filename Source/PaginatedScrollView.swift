@@ -57,7 +57,7 @@ class PaginatedScrollView: UIScrollView {
             return
         }
 
-        if let controller = self.viewDataSource?.paginatedScrollView(self, controllerAtIndex: page), controller.view.superview == nil {
+        if let controller = self.viewDataSource?.paginatedScrollView(self, controllerAtIndex: page) , controller.view.superview == nil {
             var frame = self.frame
             frame.origin.x = frame.size.width * CGFloat(page)
             frame.origin.y = 0
@@ -79,33 +79,36 @@ class PaginatedScrollView: UIScrollView {
         bounds.origin.y = 0
         self.scrollRectToVisible(bounds, animated: animated)
     }
-
-    var shoudEvaluate = false
 }
 
 extension PaginatedScrollView: UIScrollViewDelegate {
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        self.loadPageWithAdjacent()
+    }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.shoudEvaluate = true
+        self.loadPageWithAdjacent()
     }
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.shoudEvaluate = false
+        self.loadPageWithAdjacent()
     }
 
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.shoudEvaluate {
-            let pageWidth = self.frame.size.width
-            let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
-            if page != self.currentPage {
-                self.viewDelegate?.paginatedScrollView(self, didMoveToIndex: page)
-                self.viewDelegate?.paginatedScrollView(self, didMoveFromIndex: self.currentPage)
-            }
-            self.currentPage = page
-
-            self.loadScrollViewWithPage(page - 1)
-            self.loadScrollViewWithPage(page)
-            self.loadScrollViewWithPage(page + 1)
+    func loadPageWithAdjacent() {
+        let pageWidth = self.frame.size.width
+        let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
+        if page != self.currentPage {
+            self.viewDelegate?.paginatedScrollView(self, didMoveToIndex: page)
+            self.viewDelegate?.paginatedScrollView(self, didMoveFromIndex: self.currentPage)
         }
+        self.currentPage = page
+
+        self.loadScrollViewWithPage(page - 3)
+        self.loadScrollViewWithPage(page - 2)
+        self.loadScrollViewWithPage(page - 1)
+        self.loadScrollViewWithPage(page)
+        self.loadScrollViewWithPage(page + 1)
+        self.loadScrollViewWithPage(page + 2)
+        self.loadScrollViewWithPage(page + 3)
     }
 }
