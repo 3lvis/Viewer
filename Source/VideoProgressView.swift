@@ -26,7 +26,6 @@ class VideoProgressView: UIView {
     }
     var progress = 0.0 {
         didSet {
-            guard self.isSeeking == false else { return }
             self.currentTimeLabel.text = self.progress.timeString()
             self.layoutSubviews()
         }
@@ -140,7 +139,11 @@ class VideoProgressView: UIView {
         }
         self.backgroundBar.frame = backgroundBarFrame
 
-        self.updateProgressBarFrame(with: self.progressPercentage)
+        var progressBarFrame: CGRect {
+            let width = self.progressBarMask.frame.width * CGFloat(self.progressPercentage)
+            return CGRect(x: 0, y: 0, width: width, height: VideoProgressView.progressBarHeight)
+        }
+        self.progressBar.frame = progressBarFrame
 
         var seekViewFrame: CGRect {
             let seekButtonImage = UIImage(named: "seek")
@@ -150,19 +153,9 @@ class VideoProgressView: UIView {
         self.seekView.frame = seekViewFrame
     }
 
-    func updateProgressBarFrame(with progressPercentage: Double) {
-        var progressBarFrame: CGRect {
-            let width = self.progressBarMask.frame.width * CGFloat(self.progressPercentage)
-            return CGRect(x: 0, y: 0, width: width, height: VideoProgressView.progressBarHeight)
-        }
-        self.progressBar.frame = progressBarFrame
-    }
-
-    var isSeeking = false
     func seek(gestureRecognizer: UIPanGestureRecognizer) {
         switch gestureRecognizer.state {
         case .began:
-            self.isSeeking = true
             self.delegate?.videoProgressViewDidBeginSeeking(self)
         case .changed:
             var pannableFrame = self.progressBarMask.frame
@@ -179,7 +172,6 @@ class VideoProgressView: UIView {
                 progressPercentage = 1
             }
 
-            self.updateProgressBarFrame(with: progressPercentage)
             if progressPercentage == 0 || progressPercentage == 1 {
                 let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(progressPercentage)) - (seekButtonImage.size.width / 2)
                 var frame = self.seekView.frame
@@ -194,11 +186,13 @@ class VideoProgressView: UIView {
             } else if progress > self.duration {
                 progress = self.duration
             }
+
+            self.progress = progress
+
             gestureRecognizer.view!.center = newCenter
             gestureRecognizer.setTranslation(CGPoint.zero, in: self.seekView)
             self.delegate?.videoProgressViewDidSeek(self, toDuration: progress)
         case .ended:
-            self.isSeeking = false
             self.delegate?.videoProgressViewDidEndSeeking(self)
         default:
             break
