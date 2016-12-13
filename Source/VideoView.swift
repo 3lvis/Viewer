@@ -182,6 +182,10 @@ class VideoView: UIView {
         return false
     }
 
+    // Source:
+    // Technical Q&A QA1820
+    // How do I achieve smooth video scrubbing with AVPlayer seekToTime:?
+    // https://developer.apple.com/library/content/qa/qa1820/_index.html
     var isSeekInProgress = false
     var chaseTime = kCMTimeZero
 
@@ -190,35 +194,37 @@ class VideoView: UIView {
         let newChaseTime = CMTime(seconds: duration, preferredTimescale: timescale)
         self.playerLayer.player?.pause()
 
-        if CMTimeCompare(newChaseTime, chaseTime) != 0 {
-            chaseTime = newChaseTime
+        if CMTimeCompare(newChaseTime, self.chaseTime) != 0 {
+            self.chaseTime = newChaseTime
 
-            if !isSeekInProgress {
-                trySeekToChaseTime()
+            if self.isSeekInProgress == false {
+                self.trySeekToChaseTime()
             }
         }
     }
 
     func trySeekToChaseTime() {
-        if playerCurrentItemStatus == .unknown {
+        switch self.playerCurrentItemStatus {
+        case .unknown:
             // wait until item becomes ready (KVO player.currentItem.status)
-        } else if playerCurrentItemStatus == .readyToPlay {
-            actuallySeekToTime()
+            break
+        case .readyToPlay:
+            self.actuallySeekToTime()
+        case .failed:
+            break
         }
     }
 
     func actuallySeekToTime() {
-        isSeekInProgress = true
-        let seekTimeInProgress = chaseTime
-        self.playerLayer.player?.seek(to: seekTimeInProgress, toleranceBefore: kCMTimeZero,
-                                      toleranceAfter: kCMTimeZero, completionHandler: { (isFinished: Bool) -> Void in
-
-                                              if CMTimeCompare(seekTimeInProgress, self.chaseTime) == 0 {
-                                                  self.isSeekInProgress = false
-                                              } else {
-                                                  self.trySeekToChaseTime()
-                                              }
-        })
+        self.isSeekInProgress = true
+        let seekTimeInProgress = self.chaseTime
+        self.playerLayer.player?.seek(to: seekTimeInProgress, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { _ in
+            if CMTimeCompare(seekTimeInProgress, self.chaseTime) == 0 {
+                self.isSeekInProgress = false
+            } else {
+                self.trySeekToChaseTime()
+            }
+        }
     }
 }
 
