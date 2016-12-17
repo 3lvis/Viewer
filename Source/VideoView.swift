@@ -15,6 +15,7 @@ protocol VideoViewDelegate: class {
 class VideoView: UIView {
     static let playerItemStatusKeyPath = "status"
     weak var delegate: VideoViewDelegate?
+    var playerCurrentItemStatus = AVPlayerItemStatus.unknown
 
     fileprivate lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
@@ -81,6 +82,7 @@ class VideoView: UIView {
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         guard let playerItem = object as? AVPlayerItem else { return }
+        self.playerCurrentItemStatus = playerItem.status
 
         if let error = playerItem.error {
             self.playerLayer.player?.pause()
@@ -112,13 +114,15 @@ class VideoView: UIView {
 
                 let duration = CMTimeGetSeconds(playerItem.asset.duration)
                 let currentTime = CMTimeGetSeconds(player.currentTime())
-
-                self.delegate?.videoView(self, didChangeProgress: currentTime, duration: duration)
+                // In some cases the video will start playing with negative current time.
+                if currentTime > 0 {
+                    self.delegate?.videoView(self, didChangeProgress: currentTime, duration: duration)
+                }
             }
         }
     }
 
-    func prepare(using viewable: Viewable, completion: @escaping (Void) -> Void) {
+    func prepare(using viewable: Viewable, completion: @escaping () -> Void) {
         self.addPlayer(using: viewable) {
             if self.shouldRegisterForStatusNotifications {
                 guard let player = self.playerLayer.player else { return }
@@ -177,11 +181,56 @@ class VideoView: UIView {
 
         return false
     }
+
+    // Source:
+    // Technical Q&A QA1820
+    // How do I achieve smooth video scrubbing with AVPlayer seekToTime:?
+    // https://developer.apple.com/library/content/qa/qa1820/_index.html
+    var isSeekInProgress = false
+    var chaseTime = kCMTimeZero
+
+    func stopPlayingAndSeekSmoothlyToTime(duration: Double) {
+        guard let timescale = self.playerLayer.player?.currentItem?.currentTime().timescale else { return }
+        let newChaseTime = CMTime(seconds: duration, preferredTimescale: timescale)
+        self.playerLayer.player?.pause()
+
+        if CMTimeCompare(newChaseTime, self.chaseTime) != 0 {
+            self.chaseTime = newChaseTime
+
+            if self.isSeekInProgress == false {
+                self.trySeekToChaseTime()
+            }
+        }
+    }
+
+    func trySeekToChaseTime() {
+        switch self.playerCurrentItemStatus {
+        case .unknown:
+            // wait until item becomes ready (KVO player.currentItem.status)
+            break
+        case .readyToPlay:
+            self.actuallySeekToTime()
+        case .failed:
+            break
+        }
+    }
+
+    func actuallySeekToTime() {
+        self.isSeekInProgress = true
+        let seekTimeInProgress = self.chaseTime
+        self.playerLayer.player?.seek(to: seekTimeInProgress, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { _ in
+            if CMTimeCompare(seekTimeInProgress, self.chaseTime) == 0 {
+                self.isSeekInProgress = false
+            } else {
+                self.trySeekToChaseTime()
+            }
+        }
+    }
 }
 
 extension VideoView {
 
-    fileprivate func addPlayer(using viewable: Viewable, completion: @escaping (Void) -> Void) {
+    fileprivate func addPlayer(using viewable: Viewable, completion: @escaping () -> Void) {
         if let assetID = viewable.assetID {
             #if os(iOS)
                 let result = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
@@ -282,5 +331,11 @@ extension VideoView {
 
     @objc fileprivate func videoFinishedPlaying() {
         self.delegate?.videoViewDidFinishPlaying(self, error: nil)
+    }
+}
+
+extension CMTime {
+    public init(seconds: Double, preferredTimescale: CMTimeScale) {
+        self = CMTimeMakeWithSeconds(seconds, preferredTimescale)
     }
 }

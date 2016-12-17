@@ -11,5 +11,5 @@ public protocol Viewable {
     var url: String? { get }
     var placeholder: UIImage { get }
 
-    func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> ())
+    func media(_ completion: @escaping (_ image: UIImage?, _ error: NSError?) -> Void)
 }

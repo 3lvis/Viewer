@@ -1,12 +1,23 @@
 import UIKit
 
+protocol VideoProgressViewDelegate: class {
+    func videoProgressViewDidBeginSeeking(_ videoProgressView: VideoProgressView)
+    func videoProgressViewDidSeek(_ videoProgressView: VideoProgressView, toDuration duration: Double)
+    func videoProgressViewDidEndSeeking(_ videoProgressView: VideoProgressView)
+}
+
 class VideoProgressView: UIView {
+    weak var delegate: VideoProgressViewDelegate?
+
     static let Height = CGFloat(55.0)
     private static let progressBarYMargin = CGFloat(23.0)
     private static let progressBarHeight = CGFloat(6.0)
 
     private static let textLabelHeight = CGFloat(18.0)
     private static let textLabelMargin = CGFloat(18.0)
+
+    private static let seekViewHeight = CGFloat(45.0)
+    private static let seekViewWidth = CGFloat(45.0)
 
     var duration = 0.0 {
         didSet {
@@ -16,6 +27,7 @@ class VideoProgressView: UIView {
             }
         }
     }
+
     var progress = 0.0 {
         didSet {
             self.currentTimeLabel.text = self.progress.timeString()
@@ -74,6 +86,15 @@ class VideoProgressView: UIView {
         return label
     }()
 
+    lazy var seekView: UIImageView = {
+        let view = UIImageView()
+        view.isUserInteractionEnabled = true
+        view.image = UIImage(named: "seek")
+        view.contentMode = .scaleAspectFit
+
+        return view
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -81,8 +102,12 @@ class VideoProgressView: UIView {
         self.progressBarMask.addSubview(self.backgroundBar)
         self.progressBarMask.addSubview(self.progressBar)
 
+        self.addSubview(self.seekView)
         self.addSubview(self.currentTimeLabel)
         self.addSubview(self.durationTimeLabel)
+
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(seek(gestureRecognizer:)))
+        self.seekView.addGestureRecognizer(panGesture)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -123,6 +148,57 @@ class VideoProgressView: UIView {
             return CGRect(x: 0, y: 0, width: width, height: VideoProgressView.progressBarHeight)
         }
         self.progressBar.frame = progressBarFrame
+
+        var seekViewFrame: CGRect {
+            let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(self.progressPercentage)) - (VideoProgressView.seekViewWidth / 2)
+            return CGRect(x: x, y: VideoProgressView.textLabelMargin, width: VideoProgressView.seekViewWidth, height: VideoProgressView.textLabelHeight)
+        }
+        self.seekView.frame = seekViewFrame
+    }
+
+    func seek(gestureRecognizer: UIPanGestureRecognizer) {
+        switch gestureRecognizer.state {
+        case .began:
+            self.delegate?.videoProgressViewDidBeginSeeking(self)
+        case .changed:
+            var pannableFrame = self.progressBarMask.frame
+            pannableFrame.size.height = self.frame.height
+
+            let translation = gestureRecognizer.translation(in: self.seekView)
+            let newCenter = CGPoint(x: gestureRecognizer.view!.center.x + translation.x, y: gestureRecognizer.view!.center.y)
+            let newX = newCenter.x - (VideoProgressView.seekViewWidth / 2)
+            var progressPercentage = Double((-(self.progressBarMask.frame.origin.x - (VideoProgressView.seekViewWidth / 2) - newX)) / self.progressBarMask.frame.size.width)
+            if progressPercentage < 0 {
+                progressPercentage = 0
+            } else if progressPercentage > 1 {
+                progressPercentage = 1
+            }
+
+            if progressPercentage == 0 || progressPercentage == 1 {
+                let x = self.progressBarMask.frame.origin.x + (self.progressBarMask.frame.size.width * CGFloat(progressPercentage)) - (VideoProgressView.seekViewWidth / 2)
+                var frame = self.seekView.frame
+                frame.origin.x = x
+                self.seekView.frame = frame
+                return
+            }
+
+            var progress = progressPercentage * self.duration
+            if progress < 0 {
+                progress = 0
+            } else if progress > self.duration {
+                progress = self.duration
+            }
+
+            self.progress = progress
+
+            gestureRecognizer.view!.center = newCenter
+            gestureRecognizer.setTranslation(CGPoint.zero, in: self.seekView)
+            self.delegate?.videoProgressViewDidSeek(self, toDuration: progress)
+        case .ended:
+            self.delegate?.videoProgressViewDidEndSeeking(self)
+        default:
+            break
+        }
     }
 }
 
