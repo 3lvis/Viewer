@@ -85,12 +85,13 @@ class VideoView: UIView {
         self.playerCurrentItemStatus = playerItem.status
 
         if let error = playerItem.error {
-            self.playerLayer.player?.pause()
-            self.removeBeforePlayingObservers()
-            self.removeWhilePlayingObservers()
-            self.delegate?.videoViewDidFinishPlaying(self, error: error as NSError?)
+            self.handleError(error as NSError)
         } else {
-            guard let player = self.playerLayer.player else { fatalError("Player not found") }
+            guard let player = self.playerLayer.player else {
+                let error = NSError(domain: ViewerController.domain, code: 0, userInfo: [NSLocalizedDescriptionKey: "Player not found."])
+                self.handleError(error)
+                return
+            }
             guard keyPath == VideoView.playerItemStatusKeyPath else { return }
             guard playerItem.status == .readyToPlay else { return }
 
@@ -120,6 +121,13 @@ class VideoView: UIView {
                 }
             }
         }
+    }
+
+    func handleError(_ error: NSError) {
+        self.playerLayer.player?.pause()
+        self.removeBeforePlayingObservers()
+        self.removeWhilePlayingObservers()
+        self.delegate?.videoViewDidFinishPlaying(self, error: error as NSError?)
     }
 
     func prepare(using viewable: Viewable, completion: @escaping () -> Void) {
@@ -158,7 +166,11 @@ class VideoView: UIView {
     }
 
     func play() {
-        guard let player = self.playerLayer.player else { fatalError("No player item was found") }
+        guard let player = self.playerLayer.player else {
+            let error = NSError(domain: ViewerController.domain, code: 0, userInfo: [NSLocalizedDescriptionKey: "No player was found."])
+            self.handleError(error)
+            return
+        }
 
         if player.status == .unknown {
             self.loadingIndicator.startAnimating()
@@ -234,13 +246,21 @@ extension VideoView {
         if let assetID = viewable.assetID {
             #if os(iOS)
                 let result = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil)
-                guard let asset = result.firstObject else { fatalError("Couldn't get asset for id: \(assetID)") }
+                guard let asset = result.firstObject else {
+                    let error = NSError(domain: ViewerController.domain, code: 0, userInfo: [NSLocalizedDescriptionKey: "Couldn't get asset for id: \(assetID)."])
+                    self.handleError(error)
+                    return
+                }
                 let requestOptions = PHVideoRequestOptions()
                 requestOptions.isNetworkAccessAllowed = true
                 requestOptions.version = .original
                 requestOptions.deliveryMode = .fastFormat
                 PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions) { playerItem, info in
-                    guard let playerItem = playerItem else { fatalError("Player item was nil: \(info)") }
+                    guard let playerItem = playerItem else {
+                        let error = NSError(domain: ViewerController.domain, code: 0, userInfo: [NSLocalizedDescriptionKey: "Couldn't create player: \(info)."])
+                        self.handleError(error)
+                        return
+                    }
 
                     if let player = self.playerLayer.player {
                         player.replaceCurrentItem(with: playerItem)

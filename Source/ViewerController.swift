@@ -30,6 +30,7 @@ public protocol ViewerControllerDelegate: class {
 }
 
 public class ViewerController: UIViewController {
+    static let domain = "com.bakkenbaeck.Viewer"
     fileprivate static let HeaderHeight = CGFloat(64)
     fileprivate static let FooterHeight = CGFloat(50)
     fileprivate static let DraggingMargin = CGFloat(60)
@@ -232,7 +233,7 @@ extension ViewerController {
     }
 
     fileprivate func present(with indexPath: IndexPath, completion: (() -> Void)?) {
-        guard let selectedCell = self.collectionView.cellForItem(at: indexPath) else { fatalError("Data source not implemented") }
+        guard let selectedCell = self.collectionView.cellForItem(at: indexPath) else { return }
 
         let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
         let image = viewable.placeholder
@@ -290,7 +291,7 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
-        guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewableController.indexPath!)?.frame else { fatalError() }
+        guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewableController.indexPath!)?.frame else { return }
 
         let viewable = self.dataSource!.viewerController(self, viewableAt: viewableController.indexPath!)
         let image = viewable.placeholder
