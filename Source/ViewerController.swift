@@ -1,34 +1,19 @@
 import UIKit
 import CoreData
 
-/**
- The ViewerController takes care of displaying the user's photos/videos in full-screen.
-
- You can swipe right or left to navigate between photos.
- */
-
 public protocol ViewerControllerDataSource: class {
     func numberOfItemsInViewerController(_ viewerController: ViewerController) -> Int
     func viewerController(_ viewerController: ViewerController, viewableAt indexPath: IndexPath) -> Viewable
 }
 
 public protocol ViewerControllerDelegate: class {
-    /**
-     Called when the ViewerController changes focus.
-     */
     func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath)
-
-    /**
-     Called when the ViewerController is dismissed.
-     */
     func viewerControllerDidDismiss(_ viewerController: ViewerController)
-
-    /**
-     Called when the video playback fails.
-     */
-    func viewerController(_ viewerController: ViewerController, didFailPlayingVideoAt indexPath: IndexPath, error: NSError)
+    func viewerController(_ viewerController: ViewerController, didFailDisplayingViewableAt indexPath: IndexPath, error: NSError)
 }
 
+
+/// The ViewerController takes care of displaying the user's photos and videos in full-screen. You can swipe right or left to navigate between them.
 public class ViewerController: UIViewController {
     static let domain = "com.bakkenbaeck.Viewer"
     fileprivate static let HeaderHeight = CGFloat(64)
@@ -444,8 +429,8 @@ extension ViewerController: ViewableControllerDelegate {
         self.toggleButtons(self.buttonsAreVisible)
     }
 
-    func viewableController(_ viewableController: ViewableController, didFailPlayingVideoWith error: NSError) {
-        self.delegate?.viewerController(self, didFailPlayingVideoAt: self.currentIndexPath, error: error)
+    func viewableController(_ viewableController: ViewableController, didFailDisplayingVieweableWith error: NSError) {
+        self.delegate?.viewerController(self, didFailDisplayingViewableAt: self.currentIndexPath, error: error)
     }
 }
 
