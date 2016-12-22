@@ -8,7 +8,7 @@ import AVKit
 
 protocol ViewableControllerDelegate: class {
     func viewableControllerDidTapItem(_ viewableController: ViewableController)
-    func viewableController(_ viewableController: ViewableController, didFailPlayingVideoWith error: NSError)
+    func viewableController(_ viewableController: ViewableController, didFailDisplayingVieweableWith error: NSError)
 }
 
 protocol ViewableControllerDataSource: class {
@@ -369,7 +369,7 @@ extension ViewableController: VideoViewDelegate {
 
     func videoViewDidFinishPlaying(_ videoView: VideoView, error: NSError?) {
         if let error = error {
-            self.delegate?.viewableController(self, didFailPlayingVideoWith: error)
+            self.delegate?.viewableController(self, didFailDisplayingVieweableWith: error)
         } else {
             self.repeatButton.alpha = 1
             self.pauseButton.alpha = 0
