@@ -200,15 +200,15 @@
 		14C0AF841BD6D4370009ECBE /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				143803381C2452A1003CA252 /* ViewerController.swift */,
+				1438033A1C2452A1003CA252 /* ViewableController.swift */,
+				14EC47B71C58F6BC0028A0CD /* VideoView.swift */,
+				E6D592821D226528006EF238 /* VideoProgressView.swift */,
+				143803391C2452A1003CA252 /* Viewable.swift */,
+				14C327B71CBE69F800CC0F98 /* PaginatedScrollView.swift */,
 				143803351C2452A1003CA252 /* NSIndexPath+Contiguous.swift */,
 				143803361C2452A1003CA252 /* UIImage+CenteredFrame.swift */,
 				143803371C2452A1003CA252 /* UIViewController+Window.swift */,
-				143803381C2452A1003CA252 /* ViewerController.swift */,
-				143803391C2452A1003CA252 /* Viewable.swift */,
-				1438033A1C2452A1003CA252 /* ViewableController.swift */,
-				E6D592821D226528006EF238 /* VideoProgressView.swift */,
-				14EC47B71C58F6BC0028A0CD /* VideoView.swift */,
-				14C327B71CBE69F800CC0F98 /* PaginatedScrollView.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
