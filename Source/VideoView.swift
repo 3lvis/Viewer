@@ -14,6 +14,7 @@ protocol VideoViewDelegate: class {
 
 class VideoView: UIView {
     static let playerItemStatusKeyPath = "status"
+    static let audioSessionVolumeKeyPath = "outputVolume"
     weak var delegate: VideoViewDelegate?
     var playerCurrentItemStatus = AVPlayerItemStatus.unknown
 
@@ -42,6 +43,7 @@ class VideoView: UIView {
 
     fileprivate var shouldRegisterForStatusNotifications = true
     fileprivate var shouldRegisterForFailureOrEndingNotifications = true
+    fileprivate var shouldRegisterForOutputVolume = true
 
     fileprivate var slowMotionTimeObserver: Any?
     fileprivate var playbackProgressTimeObserver: Any?
@@ -81,6 +83,17 @@ class VideoView: UIView {
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if keyPath == VideoView.audioSessionVolumeKeyPath {
+            do {
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: [])
+            }
+            catch let error {
+                print("Failed to start playback sound: \(error.localizedDescription)")
+            }
+            return
+        }
+        
         guard let playerItem = object as? AVPlayerItem else { return }
         self.playerCurrentItemStatus = playerItem.status
 
@@ -138,6 +151,15 @@ class VideoView: UIView {
 
                 self.shouldRegisterForStatusNotifications = false
                 currentItem.addObserver(self, forKeyPath: VideoView.playerItemStatusKeyPath, options: [], context: nil)
+                
+                do {
+                    let audioSession = AVAudioSession.sharedInstance()
+                    try audioSession.setActive(true)
+                    audioSession.addObserver(self, forKeyPath: VideoView.audioSessionVolumeKeyPath, options: .new, context: nil)
+                    self.shouldRegisterForOutputVolume = false
+                } catch {
+                    print("Failed to activate audio session")
+                }
             }
 
             if self.shouldRegisterForFailureOrEndingNotifications {
@@ -163,6 +185,8 @@ class VideoView: UIView {
         self.playerLayer.player?.pause()
         self.playerLayer.player?.seek(to: kCMTimeZero)
         self.playerLayer.player = nil
+        
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategorySoloAmbient, with: [])
     }
 
     func play() {
@@ -334,6 +358,11 @@ extension VideoView {
 
             NotificationCenter.default.removeObserver(self, name: .AVPlayerItemPlaybackStalled, object: nil)
             NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        }
+        
+        if self.shouldRegisterForOutputVolume == false {
+            self.shouldRegisterForOutputVolume = true
+            AVAudioSession.sharedInstance().removeObserver(self, forKeyPath: VideoView.audioSessionVolumeKeyPath)
         }
     }
 
