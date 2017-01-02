@@ -62,6 +62,15 @@ class VideoView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // Proposed workaround to fix some issues with observers called after being deallocated.
+    // Error description:
+    // Fatal Exception: NSInternalInconsistencyException
+    // An instance 0x15ed87220 of class AVPlayerItem was deallocated while key value observers were still registered with it.
+    deinit {
+        self.removeBeforePlayingObservers()
+        self.removeWhilePlayingObservers()
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
 
