@@ -87,6 +87,7 @@ struct Photo: Viewable {
         var sections = [Section]()
 
         let fetchOptions = PHFetchOptions()
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         let authorizationStatus = PHPhotoLibrary.authorizationStatus()
 
         guard authorizationStatus == .authorized else { fatalError("Camera Roll not authorized") }
@@ -123,6 +124,7 @@ struct Photo: Viewable {
                 } else {
                     sections.append(foundSection)
                 }
+                
             })
         }
 
