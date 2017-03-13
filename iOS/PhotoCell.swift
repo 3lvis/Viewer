@@ -40,7 +40,7 @@ class PhotoCell: UICollectionViewCell {
                 return
             }
 
-            self.videoIndicator.isHidden = photo.type == .image
+            self.videoIndicator.isHidden = photo.type != .video
 
             if let assetID = photo.assetID {
                 let asset = PHAsset.fetchAssets(withLocalIdentifiers: [assetID], options: nil).firstObject!

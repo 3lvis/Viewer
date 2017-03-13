@@ -1,6 +1,7 @@
 import UIKit
 import AVFoundation
 import AVKit
+import PhotosUI
 
 #if os(iOS)
     import Photos
@@ -38,6 +39,18 @@ class ViewableController: UIViewController {
         return scrollView
     }()
 
+    @available(iOS 9.1, *)
+    lazy var livePhotoView: PHLivePhotoView = {
+        let view = PHLivePhotoView(frame: UIScreen.main.bounds)
+        view.backgroundColor = .clear
+        view.contentMode = .scaleAspectFit
+        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.isUserInteractionEnabled = true
+        view.isMuted = false 
+        
+        return view
+    }()
+    
     lazy var imageView: UIImageView = {
         let view = UIImageView(frame: UIScreen.main.bounds)
         view.backgroundColor = .clear
@@ -111,8 +124,18 @@ class ViewableController: UIViewController {
             self.changed = false
         }
     }
+    
+    func imageContentView() -> UIView {
+        if #available(iOS 9.1, *), self.viewable?.type == .livePhoto {
+            return self.livePhotoView
+        } else {
+            return self.imageView
+        }
+    }
 
     func maxZoomScale() -> CGFloat {
+        return 3
+        /*
         guard let image = self.imageView.image else { return 1 }
 
         var widthFactor = CGFloat(1.0)
@@ -125,6 +148,7 @@ class ViewableController: UIViewController {
         }
 
         return max(2.0, max(widthFactor, heightFactor))
+        */
     }
 
     override func viewDidLoad() {
@@ -133,7 +157,7 @@ class ViewableController: UIViewController {
         self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.view.backgroundColor = .black
 
-        self.zoomingScrollView.addSubview(self.imageView)
+        self.zoomingScrollView.addSubview(self.imageContentView())
         self.view.addSubview(self.zoomingScrollView)
 
         self.view.addSubview(self.videoView)
@@ -147,7 +171,7 @@ class ViewableController: UIViewController {
         tapRecognizer.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(tapRecognizer)
 
-        if viewable?.type == .image {
+        if viewable?.type == .image || viewable?.type == .livePhoto {
             let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.doubleTapAction))
             doubleTapRecognizer.numberOfTapsRequired = 2
             self.zoomingScrollView.addGestureRecognizer(doubleTapRecognizer)
@@ -194,9 +218,10 @@ class ViewableController: UIViewController {
     func doubleTapAction(recognizer: UITapGestureRecognizer) {
         let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
 
-        let touchPoint = recognizer.location(in: self.imageView)
-
-        let scrollViewSize = self.imageView.bounds.size
+        let imageContentView = self.imageContentView()
+        
+        let touchPoint = recognizer.location(in: imageContentView)
+        let scrollViewSize = imageContentView.bounds.size
 
         let width = scrollViewSize.width / zoomScale
         let height = scrollViewSize.height / zoomScale
@@ -239,6 +264,14 @@ class ViewableController: UIViewController {
                 if let image = image {
                     self.imageView.image = image
                     self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
+                }
+            }
+        case .livePhoto:
+            if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [viewable.assetID!], options: nil).firstObject {
+                if #available(iOS 9.1, *) {
+                    self.livePhoto(for: asset) { livePhoto in
+                        self.livePhotoView.livePhoto = livePhoto
+                    }
                 }
             }
         case .video:
@@ -343,15 +376,33 @@ class ViewableController: UIViewController {
             self.shouldDimVideoProgress = false
         }
     }
+    
+    @available(iOS 9.1, *)
+    func livePhoto(for asset: PHAsset, completion: @escaping (_ livePhoto: PHLivePhoto?) -> Void) {
+        let imageManager = PHImageManager.default()
+        
+        let requestOptions = PHLivePhotoRequestOptions()
+        requestOptions.isNetworkAccessAllowed = true
+        requestOptions.deliveryMode = .opportunistic
+        
+        let bounds = UIScreen.main.bounds.size
+        let targetSize = CGSize(width: bounds.width * 2, height: bounds.height * 2)
+        imageManager.requestLivePhoto(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { livePhoto, info in
+            DispatchQueue.main.async {
+                completion(livePhoto)
+            }
+        }
+    }
 }
 
 extension ViewableController: UIScrollViewDelegate {
 
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        if self.viewable?.type == .image {
-            return self.imageView
-        } else {
+        if self.viewable?.type == .video {
             return nil
+        }
+        else {
+            return self.imageContentView()
         }
     }
 }

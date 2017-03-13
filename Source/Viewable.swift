@@ -2,6 +2,7 @@ import UIKit
 
 public enum ViewableType: String {
     case image
+    case livePhoto
     case video
 }
 

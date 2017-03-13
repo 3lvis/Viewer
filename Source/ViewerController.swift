@@ -190,9 +190,16 @@ extension ViewerController {
             viewableController.delegate = self
             viewableController.dataSource = self
 
-            let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
+            let gesture = UIPanGestureRecognizer(target: self, action: #selector(self.panAction(_:)))
             gesture.delegate = self
             viewableController.imageView.addGestureRecognizer(gesture)
+            
+            if #available(iOS 9.1, *) {
+                let gesture = UIPanGestureRecognizer(target: self, action: #selector(self.panAction(_:)))
+                gesture.delegate = self
+                viewableController.imageView.addGestureRecognizer(gesture)
+                viewableController.livePhotoView.addGestureRecognizer(gesture)
+            }
 
             self.viewableControllerCache.setObject(viewableController, forKey: indexPath.description as NSString)
         }
@@ -281,6 +288,9 @@ extension ViewerController {
         let viewable = self.dataSource!.viewerController(self, viewableAt: viewableController.indexPath!)
         let image = viewable.placeholder
         viewableController.imageView.alpha = 0
+        if #available(iOS 9.1, *), viewable.type == .livePhoto {
+            viewableController.livePhotoView.alpha = 0
+        }
         viewableController.view.backgroundColor = .clear
         viewableController.willDismiss()
 
@@ -300,7 +310,7 @@ extension ViewerController {
         presentedView.frame = image.centeredFrame()
         presentedView.image = image
         if self.isDragging {
-            presentedView.center = viewableController.imageView.center
+            presentedView.center = viewableController.imageContentView().center
         }
 
         let window = self.applicationWindow()
@@ -332,8 +342,11 @@ extension ViewerController {
     }
 
     func panAction(_ gesture: UIPanGestureRecognizer) {
+        guard let gestureView = gesture.view else { return }
+        
         let controller = self.findOrCreateViewableController(self.currentIndexPath)
-        let viewHeight = controller.imageView.frame.size.height
+        
+        let viewHeight = gestureView.frame.size.height
         let viewHalfHeight = viewHeight / 2
         var translatedPoint = gesture.translation(in: controller.imageView)
 
@@ -355,7 +368,7 @@ extension ViewerController {
         let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
 
         controller.dimControls(alpha)
-        controller.imageView.center = translatedPoint
+        gestureView.center = translatedPoint
         controller.view.backgroundColor = UIColor.black.withAlphaComponent(alpha)
 
         if self.buttonsAreVisible {
@@ -363,14 +376,14 @@ extension ViewerController {
         }
 
         if gesture.state == .ended {
-            let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - ViewerController.DraggingMargin
-            let centerBellowDraggingArea = controller.imageView.center.y > viewHalfHeight + ViewerController.DraggingMargin
+            let centerAboveDraggingArea = gestureView.center.y < viewHalfHeight - ViewerController.DraggingMargin
+            let centerBellowDraggingArea = gestureView.center.y > viewHalfHeight + ViewerController.DraggingMargin
             if centerAboveDraggingArea || centerBellowDraggingArea {
                 self.dismiss(controller, completion: nil)
             } else {
                 self.isDragging = false
                 UIView.animate(withDuration: 0.20, animations: {
-                    controller.imageView.center = self.originalDraggedCenter
+                    gestureView.center = self.originalDraggedCenter
                     controller.view.backgroundColor = .black
                     controller.dimControls(1.0)
 

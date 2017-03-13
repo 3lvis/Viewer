@@ -110,6 +110,12 @@ struct Photo: Viewable {
                 if asset.duration > 0 {
                     photo.type = .video
                 }
+                
+                if #available(iOS 9.1, *) {
+                    if photo.type == .image && asset.mediaSubtypes == PHAssetMediaSubtype.photoLive {
+                        photo.type = .livePhoto
+                    }
+                }
 
                 foundSection.photos.append(photo)
                 if let foundIndex = foundIndex {
