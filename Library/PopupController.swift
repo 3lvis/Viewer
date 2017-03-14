@@ -14,9 +14,11 @@ class OptionsController: UITableViewController {
     init(sourceView: UIView, sourceRect: CGRect) {
         super.init(nibName: nil, bundle: nil)
 
-        self.modalPresentationStyle = .popover
+        #if os(iOS)
+            self.modalPresentationStyle = .popover
+            self.popoverPresentationController?.delegate = self
+        #endif
         self.preferredContentSize = CGSize(width: OptionsController.PopoverSize, height: OptionsController.PopoverSize)
-        self.popoverPresentationController?.delegate = self
         self.popoverPresentationController?.backgroundColor = .white
         self.popoverPresentationController?.permittedArrowDirections = [.any]
         self.popoverPresentationController?.sourceView = sourceView
@@ -35,12 +37,14 @@ class OptionsController: UITableViewController {
     }
 }
 
+#if os(iOS)
 extension OptionsController: UIPopoverPresentationControllerDelegate {
 
     func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
         return .none
     }
 }
+#endif
 
 extension OptionsController {
 

@@ -7,6 +7,12 @@ class PhotoCell: UICollectionViewCell {
     lazy var imageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
+        view.clipsToBounds = true
+
+        #if os(tvOS)
+            view.clipsToBounds = false
+            view.adjustsImageWhenAncestorFocused = true
+        #endif
 
         return view
     }()
@@ -14,7 +20,6 @@ class PhotoCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.clipsToBounds = true
         self.backgroundColor = .black
         self.addSubview(self.imageView)
         self.addSubview(self.videoIndicator)
