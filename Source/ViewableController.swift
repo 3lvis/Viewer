@@ -208,6 +208,14 @@ class ViewableController: UIViewController {
         self.zoomingScrollView.zoom(to: rectToZoomTo, animated: true)
     }
 
+    func togglePlay() {
+        if self.videoView.isPlaying() {
+            self.pauseAction()
+        } else {
+            self.playAction()
+        }
+    }
+
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 

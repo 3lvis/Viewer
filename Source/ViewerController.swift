@@ -125,6 +125,26 @@ public class ViewerController: UIViewController {
         super.viewDidLoad()
 
         self.view.addSubview(self.scrollView)
+
+        let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu))
+        menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)];
+        self.view.addGestureRecognizer(menuTapRecognizer)
+
+        let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause))
+        playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)];
+        self.view.addGestureRecognizer(playPauseTapRecognizer)
+    }
+
+    func menu() {
+        self.dismiss(nil)
+    }
+
+    func playPause() {
+        let viewableController = self.findOrCreateViewableController(self.currentIndexPath)
+        let isVideo = viewableController.viewable?.type == .video
+        if isVideo {
+            viewableController.togglePlay()
+        }
     }
 
     public override func viewWillLayoutSubviews() {
