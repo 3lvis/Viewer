@@ -38,7 +38,7 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
         }
 
         #if os(tvOS)
-            let a = CGFloat(25)
+            let a = CGFloat(55)
             self.minimumLineSpacing = a
             self.minimumInteritemSpacing = a
             self.sectionInset = UIEdgeInsets(top: a, left: a, bottom: a, right: a)
