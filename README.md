@@ -39,6 +39,14 @@ Pinch-to-zoom works seamlessly in images.
   <img src="https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/zoom.gif"/>
 </p>
 
+### tvOS
+
+Support for the Apple TV.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/tv.gif"/>
+</p>
+
 ## Setup
 
 From your UICollectionView:
