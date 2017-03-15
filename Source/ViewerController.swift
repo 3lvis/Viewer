@@ -125,7 +125,55 @@ public class ViewerController: UIViewController {
         super.viewDidLoad()
 
         self.view.addSubview(self.scrollView)
+
+        #if os(tvOS)
+            let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
+            menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)];
+            self.view.addGestureRecognizer(menuTapRecognizer)
+
+            let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
+            playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)];
+            self.view.addGestureRecognizer(playPauseTapRecognizer)
+
+            let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightSwipe(gesture:)))
+            rightSwipeRecognizer.direction = .right
+            self.view.addGestureRecognizer(rightSwipeRecognizer)
+
+            let leftSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(leftSwipe(gesture:)))
+            leftSwipeRecognizer.direction = .left
+            self.view.addGestureRecognizer(leftSwipeRecognizer)
+        #endif
     }
+
+    #if os(tvOS)
+    func menu(gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+
+        self.dismiss(nil)
+    }
+
+    func playPause(gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+
+        let viewableController = self.findOrCreateViewableController(self.currentIndexPath)
+        let isVideo = viewableController.viewable?.type == .video
+        if isVideo {
+            viewableController.togglePlay()
+        }
+    }
+
+    func rightSwipe(gesture: UISwipeGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+
+        self.scrollView.goRight()
+    }
+
+    func leftSwipe(gesture: UISwipeGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+
+        self.scrollView.goLeft()
+    }
+    #endif
 
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()

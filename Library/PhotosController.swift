@@ -24,16 +24,7 @@ class PhotosController: UICollectionViewController {
     init(dataSourceType: DataSourceType) {
         self.dataSourceType = dataSourceType
 
-        let numberOfColumns = CGFloat(4)
-        let layout = UICollectionViewFlowLayout()
-        let bounds = UIScreen.main.bounds
-        layout.minimumLineSpacing = 1
-        layout.minimumInteritemSpacing = 1
-        let size = (bounds.width - numberOfColumns) / numberOfColumns
-        layout.itemSize = CGSize(width: size, height: size)
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
-
-        super.init(collectionViewLayout: layout)
+        super.init(collectionViewLayout: PhotosCollectionLayout())
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -103,12 +94,14 @@ extension PhotosController {
         guard let collectionView = self.collectionView else { return }
 
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
-        let headerView = HeaderView()
-        headerView.viewDelegate = self
-        self.viewerController?.headerView = headerView
-        let footerView = FooterView()
-        footerView.viewDelegate = self
-        self.viewerController?.footerView = footerView
+        #if os(iOS)
+            let headerView = HeaderView()
+            headerView.viewDelegate = self
+            self.viewerController?.headerView = headerView
+            let footerView = FooterView()
+            footerView.viewDelegate = self
+            self.viewerController?.footerView = footerView
+        #endif
         self.viewerController!.dataSource = self
         self.present(self.viewerController!, animated: false, completion: nil)
     }

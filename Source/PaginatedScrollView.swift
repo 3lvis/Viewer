@@ -81,6 +81,21 @@ class PaginatedScrollView: UIScrollView {
     }
 
     var shoudEvaluate = false
+
+    func goRight() {
+        let numPages = self.viewDataSource?.numberOfPagesInPaginatedScrollView(self) ?? 0
+        let newPage = self.currentPage + 1
+        guard newPage <= numPages else { return }
+
+        self.gotoPage(newPage, animated: true)
+    }
+
+    func goLeft() {
+        let newPage = self.currentPage - 1
+        guard newPage >= 0 else { return }
+
+        self.gotoPage(newPage, animated: true)
+    }
 }
 
 extension PaginatedScrollView: UIScrollViewDelegate {

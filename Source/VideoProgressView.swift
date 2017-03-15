@@ -9,7 +9,8 @@ protocol VideoProgressViewDelegate: class {
 class VideoProgressView: UIView {
     weak var delegate: VideoProgressViewDelegate?
 
-    static let Height = CGFloat(55.0)
+    #if os(iOS)
+    static let height = CGFloat(55.0)
     private static let progressBarYMargin = CGFloat(23.0)
     private static let progressBarHeight = CGFloat(6.0)
 
@@ -18,6 +19,21 @@ class VideoProgressView: UIView {
 
     private static let seekViewHeight = CGFloat(45.0)
     private static let seekViewWidth = CGFloat(45.0)
+
+    private static let font = UIFont.systemFont(ofSize: 14)
+    #else
+    static let height = CGFloat(110.0)
+    private static let progressBarYMargin = CGFloat(46.0)
+    private static let progressBarHeight = CGFloat(23.0)
+
+    private static let textLabelHeight = CGFloat(36.0)
+    private static let textLabelMargin = CGFloat(36.0)
+
+    private static let seekViewHeight = CGFloat(90.0)
+    private static let seekViewWidth = CGFloat(90.0)
+
+    private static let font = UIFont.systemFont(ofSize: 28)
+    #endif
 
     var duration = 0.0 {
         didSet {
@@ -70,7 +86,7 @@ class VideoProgressView: UIView {
 
     lazy var currentTimeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
+        label.font = VideoProgressView.font
         label.textColor = .white
         label.textAlignment = .center
 
@@ -79,7 +95,7 @@ class VideoProgressView: UIView {
 
     lazy var durationTimeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "DINNextLTPro-Regular", size: 14)
+        label.font = VideoProgressView.font
         label.textColor = .white
         label.textAlignment = .center
 
@@ -108,6 +124,10 @@ class VideoProgressView: UIView {
 
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(seek(gestureRecognizer:)))
         self.seekView.addGestureRecognizer(panGesture)
+
+        #if os(tvOS)
+            self.seekView.isHidden = true
+        #endif
     }
 
     required init?(coder aDecoder: NSCoder) {
