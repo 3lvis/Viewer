@@ -7,9 +7,10 @@ class PhotoCell: UICollectionViewCell {
     lazy var imageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
-        view.clipsToBounds = true
 
-        #if os(tvOS)
+        #if os(iOS)
+            view.clipsToBounds = true
+        #else
             view.clipsToBounds = false
             view.adjustsImageWhenAncestorFocused = true
         #endif

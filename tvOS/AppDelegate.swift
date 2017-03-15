@@ -13,11 +13,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         remoteController.title = "Remote"
         let remoteNavigationController = UINavigationController(rootViewController: remoteController)
 
-        if AppDelegate.IsLightStatusBar {
-            UINavigationBar.appearance().barTintColor = .orange
-            UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
-        }
-
         let tabBarController = UITabBarController()
         tabBarController.setViewControllers([remoteNavigationController], animated: false)
 

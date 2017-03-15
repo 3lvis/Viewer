@@ -209,7 +209,8 @@ class ViewableController: UIViewController {
     }
 
     func togglePlay() {
-        if self.repeatButton.alpha == 1.0 {
+        let videoHasFinished = self.repeatButton.alpha == 1.0
+        if videoHasFinished {
             self.repeatAction()
         } else {
             if self.videoView.isPlaying() {
