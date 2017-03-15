@@ -28,20 +28,21 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
     init(isGroupedByDay: Bool = true) {
         super.init()
 
-        let bounds = UIScreen.main.bounds
-        self.minimumLineSpacing = 1
-        self.minimumInteritemSpacing = 1
         self.itemSize = PhotosCollectionLayout.itemSize()
 
         if isGroupedByDay {
+            let bounds = UIScreen.main.bounds
             self.headerReferenceSize = CGSize(width: bounds.size.width, height: PhotosCollectionLayout.headerSize)
         }
 
-        #if os(tvOS)
-            let a = CGFloat(55)
-            self.minimumLineSpacing = a
-            self.minimumInteritemSpacing = a
-            self.sectionInset = UIEdgeInsets(top: a, left: a, bottom: a, right: a)
+        #if os(iOS)
+            self.minimumLineSpacing = 1
+            self.minimumInteritemSpacing = 1
+        #else
+            let margin = CGFloat(55)
+            self.minimumLineSpacing = margin
+            self.minimumInteritemSpacing = margin
+            self.sectionInset = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
         #endif
     }
 
