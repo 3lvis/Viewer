@@ -209,10 +209,14 @@ class ViewableController: UIViewController {
     }
 
     func togglePlay() {
-        if self.videoView.isPlaying() {
-            self.pauseAction()
+        if self.repeatButton.alpha == 1.0 {
+            self.repeatAction()
         } else {
-            self.playAction()
+            if self.videoView.isPlaying() {
+                self.pauseAction()
+            } else {
+                self.playAction()
+            }
         }
     }
 
@@ -226,7 +230,7 @@ class ViewableController: UIViewController {
         self.repeatButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
         self.pauseButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
 
-        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - ViewableController.FooterViewHeight - VideoProgressView.Height), width: self.view.frame.width, height: VideoProgressView.Height)
+        self.videoProgressView.frame = CGRect(x: 0, y: (self.view.frame.height - ViewableController.FooterViewHeight - VideoProgressView.height), width: self.view.frame.width, height: VideoProgressView.height)
     }
 
     func willDismiss() {
