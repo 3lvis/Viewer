@@ -24,8 +24,7 @@ class PhotosController: UICollectionViewController {
     init(dataSourceType: DataSourceType) {
         self.dataSourceType = dataSourceType
 
-        let layout = PhotosCollectionLayout(isGroupedByDay: true)
-        super.init(collectionViewLayout: layout)
+        super.init(collectionViewLayout: PhotosCollectionLayout())
     }
 
     required init?(coder aDecoder: NSCoder) {
