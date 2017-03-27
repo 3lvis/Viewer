@@ -24,7 +24,7 @@ class PhotosController: UICollectionViewController {
     init(dataSourceType: DataSourceType) {
         self.dataSourceType = dataSourceType
 
-        super.init(collectionViewLayout: PhotosCollectionLayout())
+        super.init(collectionViewLayout: PhotosCollectionLayout(isGroupedByDay: true))
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -48,16 +48,6 @@ class PhotosController: UICollectionViewController {
             self.sections = Photo.constructRemoteElements()
             self.collectionView?.reloadData()
         }
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-
-        let layout = self.collectionView?.collectionViewLayout as! UICollectionViewFlowLayout
-        let columns = CGFloat(4)
-        let bounds = UIScreen.main.bounds
-        let size = (bounds.width - columns) / columns
-        layout.itemSize = CGSize(width: size, height: size)
     }
 
     func alertController(with title: String) -> UIAlertController {
