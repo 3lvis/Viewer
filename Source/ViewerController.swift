@@ -321,13 +321,14 @@ extension ViewerController {
             #endif
             presentedView.frame = centeredImageFrame
         }, completion: { completed in
+            self.toggleButtons(true)
+            self.buttonsAreVisible = true
+            self.currentIndexPath = indexPath
+            presentedView.removeFromSuperview()
+            self.overlayView.removeFromSuperview()
+            self.view.backgroundColor = .black
+
             #if os(iOS)
-                self.toggleButtons(true)
-                self.buttonsAreVisible = true
-                self.currentIndexPath = indexPath
-                presentedView.removeFromSuperview()
-                self.overlayView.removeFromSuperview()
-                self.view.backgroundColor = .black
                 self.presented = true
                 let item = self.findOrCreateViewableController(indexPath)
                 item.display()
@@ -337,13 +338,6 @@ extension ViewerController {
             #else
                 let controller = self.findOrCreateViewableController(indexPath)
                 self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { finished in
-                    self.toggleButtons(true)
-                    self.buttonsAreVisible = true
-                    self.currentIndexPath = indexPath
-                    presentedView.removeFromSuperview()
-                    self.overlayView.removeFromSuperview()
-                    self.view.backgroundColor = .black
-                    
                     completion?()
                 })
             #endif
