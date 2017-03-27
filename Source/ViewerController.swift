@@ -25,6 +25,8 @@ public class ViewerController: UIViewController {
         self.currentIndexPath = initialIndexPath
         self.collectionView = collectionView
 
+        self.proposedCurrentIndexPath = initialIndexPath
+
         super.init(nibName: nil, bundle: nil)
 
         self.view.backgroundColor = .clear
@@ -34,6 +36,8 @@ public class ViewerController: UIViewController {
             self.modalPresentationCapturesStatusBarAppearance = true
         #endif
     }
+
+    fileprivate var proposedCurrentIndexPath: IndexPath
 
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -106,6 +110,14 @@ public class ViewerController: UIViewController {
         return view
     }()
 
+    fileprivate lazy var pageController: UIPageViewController = {
+        let controller = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+        controller.dataSource = self
+        controller.delegate = self
+
+        return controller
+    }()
+
     public var headerView: UIView?
 
     public var footerView: UIView?
@@ -124,9 +136,14 @@ public class ViewerController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.addSubview(self.scrollView)
+        #if os(iOS)
+            self.view.addSubview(self.scrollView)
+        #else
+            self.addChildViewController(self.pageController)
+            self.pageController.view.frame = UIScreen.main.bounds
+            self.view.addSubview(self.pageController.view)
+            self.pageController.didMove(toParentViewController: self)
 
-        #if os(tvOS)
             let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
             menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)];
             self.view.addGestureRecognizer(menuTapRecognizer)
@@ -310,11 +327,18 @@ extension ViewerController {
             presentedView.removeFromSuperview()
             self.overlayView.removeFromSuperview()
             self.view.backgroundColor = .black
-            self.presented = true
-            let item = self.findOrCreateViewableController(indexPath)
-            item.display()
 
-            completion?()
+            self.presented = true
+            let controller = self.findOrCreateViewableController(indexPath)
+            controller.display()
+
+            #if os(iOS)
+                completion?()
+            #else
+                self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { finished in
+                    completion?()
+                })
+            #endif
         })
     }
 
@@ -543,4 +567,47 @@ extension ViewerController: PaginatedScrollViewDelegate {
         let viewableController = self.findOrCreateViewableController(indexPath)
         viewableController.willDismiss()
     }
+}
+
+extension ViewerController: UIPageViewControllerDelegate {
+    public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        guard let controllers = pendingViewControllers as? [ViewableController] else { fatalError() }
+
+        for controller in controllers {
+            self.delegate?.viewerController(self, didChangeFocusTo: controller.indexPath!)
+            self.proposedCurrentIndexPath = controller.indexPath!
+        }
+    }
+
+    public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        if completed {
+            self.delegate?.viewerController(self, didChangeFocusTo: self.proposedCurrentIndexPath)
+            self.currentIndexPath = self.proposedCurrentIndexPath
+        }
+    }
+}
+
+extension ViewerController: UIPageViewControllerDataSource {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        if let viewerItemController = viewController as? ViewableController, let newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
+            let controller = self.findOrCreateViewableController(newIndexPath)
+            controller.display()
+
+            return controller
+        }
+
+        return nil
+    }
+
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        if let viewerItemController = viewController as? ViewableController, let newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
+            let controller = self.findOrCreateViewableController(newIndexPath)
+            controller.display()
+
+            return controller
+        }
+
+        return nil
+    }
+
 }
