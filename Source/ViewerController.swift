@@ -140,7 +140,7 @@ public class ViewerController: UIViewController {
             self.view.addSubview(self.scrollView)
         #else
             self.addChildViewController(self.pageController)
-            self.pageController.view.frame = self.view.frame
+            self.pageController.view.frame = UIScreen.main.bounds
             self.view.addSubview(self.pageController.view)
             self.pageController.didMove(toParentViewController: self)
 
@@ -321,17 +321,32 @@ extension ViewerController {
             #endif
             presentedView.frame = centeredImageFrame
         }, completion: { completed in
-            self.toggleButtons(true)
-            self.buttonsAreVisible = true
-            self.currentIndexPath = indexPath
-            presentedView.removeFromSuperview()
-            self.overlayView.removeFromSuperview()
-            self.view.backgroundColor = .black
-            self.presented = true
-            let item = self.findOrCreateViewableController(indexPath)
-            item.display()
+            #if os(iOS)
+                self.toggleButtons(true)
+                self.buttonsAreVisible = true
+                self.currentIndexPath = indexPath
+                presentedView.removeFromSuperview()
+                self.overlayView.removeFromSuperview()
+                self.view.backgroundColor = .black
+                self.presented = true
+                let item = self.findOrCreateViewableController(indexPath)
+                item.display()
 
-            completion?()
+                completion?()
+
+            #else
+                let controller = self.findOrCreateViewableController(indexPath)
+                self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { finished in
+                    self.toggleButtons(true)
+                    self.buttonsAreVisible = true
+                    self.currentIndexPath = indexPath
+                    presentedView.removeFromSuperview()
+                    self.overlayView.removeFromSuperview()
+                    self.view.backgroundColor = .black
+                    
+                    completion?()
+                })
+            #endif
         })
     }
 
@@ -583,8 +598,8 @@ extension ViewerController: UIPageViewControllerDelegate {
 extension ViewerController: UIPageViewControllerDataSource {
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         if let viewerItemController = viewController as? ViewableController, let newIndexPath = viewerItemController.indexPath?.previous(self.collectionView) {
-            // self.centerElementIfNotVisible(newIndexPath)
             let controller = self.findOrCreateViewableController(newIndexPath)
+            controller.display()
 
             return controller
         }
@@ -594,8 +609,8 @@ extension ViewerController: UIPageViewControllerDataSource {
 
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         if let viewerItemController = viewController as? ViewableController, let newIndexPath = viewerItemController.indexPath?.next(self.collectionView) {
-            // self.centerElementIfNotVisible(newIndexPath)
             let controller = self.findOrCreateViewableController(newIndexPath)
+            controller.display()
 
             return controller
         }
