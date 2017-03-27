@@ -328,15 +328,13 @@ extension ViewerController {
             self.overlayView.removeFromSuperview()
             self.view.backgroundColor = .black
 
+            self.presented = true
+            let controller = self.findOrCreateViewableController(indexPath)
+            controller.display()
+
             #if os(iOS)
-                self.presented = true
-                let item = self.findOrCreateViewableController(indexPath)
-                item.display()
-
                 completion?()
-
             #else
-                let controller = self.findOrCreateViewableController(indexPath)
                 self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { finished in
                     completion?()
                 })
