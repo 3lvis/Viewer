@@ -402,6 +402,7 @@ extension ViewerController {
             self.overlayView.removeFromSuperview()
             self.dismiss(animated: false, completion: nil)
 
+            // A small delay is required to avoid racing conditions between the dismissin animation and the state change.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 self.isPresented = false
                 self.delegate?.viewerControllerDidDismiss(self)
