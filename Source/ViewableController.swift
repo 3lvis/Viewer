@@ -293,6 +293,9 @@ class ViewableController: UIViewController {
         self.videoView.play()
         self.requestToHideOverlayIfNeeded()
         #else
+            // We use the native video player in Apple TV because it provides us extra functionality that are not
+            // providing in the custom player while at the same time it doesn't decrease the user experience since
+            // it's not expected that the user will drag the video to dismiss it, something that we need to do on iOS.
             if let url = self.viewable?.url {
                 let controller = AVPlayerViewController(nibName: nil, bundle: nil)
                 controller.player = AVPlayer(url: URL(string: url)!)
