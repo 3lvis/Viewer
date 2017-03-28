@@ -27,6 +27,7 @@ public class ViewerController: UIViewController {
 
         self.proposedCurrentIndexPath = initialIndexPath
 
+        self.collectionView.remembersLastFocusedIndexPath = true
         super.init(nibName: nil, bundle: nil)
 
         self.view.backgroundColor = .clear
