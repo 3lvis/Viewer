@@ -395,7 +395,6 @@ extension ViewerController {
             if let existingCell = self.collectionView.cellForItem(at: indexPath) {
                 existingCell.alpha = 1
             }
-            self.centerElementIfNotVisible(indexPath)
 
             self.headerView?.removeFromSuperview()
             self.footerView?.removeFromSuperview()
@@ -469,9 +468,9 @@ extension ViewerController {
         }
     }
 
-    private func centerElementIfNotVisible(_ indexPath: IndexPath) {
+    fileprivate func centerElementIfNotVisible(_ indexPath: IndexPath, animated: Bool) {
         if !self.collectionView.indexPathsForVisibleItems.contains(indexPath) {
-            self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+            self.collectionView.scrollToItem(at: indexPath, at: .top, animated: animated)
         }
     }
 
@@ -589,6 +588,7 @@ extension ViewerController: UIPageViewControllerDelegate {
             self.delegate?.viewerController(self, didChangeFocusTo: self.proposedCurrentIndexPath)
             self.currentIndexPath = self.proposedCurrentIndexPath
             self.delegate?.viewerController(self, didChangeFocusTo: self.currentIndexPath)
+            self.centerElementIfNotVisible(self.currentIndexPath, animated: false)
         }
     }
 }

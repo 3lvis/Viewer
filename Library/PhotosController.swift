@@ -11,6 +11,7 @@ class PhotosController: UICollectionViewController {
     var optionsController: OptionsController?
     var numberOfItems = 0
     var currentIndexPath: IndexPath?
+    var isPresenting = false
 
     var sections = [Section]() {
         didSet {
@@ -29,7 +30,6 @@ class PhotosController: UICollectionViewController {
         super.init(collectionViewLayout: PhotosCollectionLayout(isGroupedByDay: true))
 
         self.restoresFocusAfterTransition = false
-        self.collectionView?.remembersLastFocusedIndexPath = true
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -46,12 +46,12 @@ class PhotosController: UICollectionViewController {
             Photo.checkAuthorizationStatus { success in
                 if success {
                     self.sections = Photo.constructLocalElements()
-                    self.collectionView?.reloadData()
+                    self.collectionView?.reloadItems(at: self.collectionView?.indexPathsForVisibleItems ?? [IndexPath]())
                 }
             }
         case .remote:
             self.sections = Photo.constructRemoteElements()
-            self.collectionView?.reloadData()
+            self.collectionView?.reloadItems(at: self.collectionView?.indexPathsForVisibleItems ?? [IndexPath]())
         }
     }
 
@@ -112,6 +112,12 @@ extension PhotosController {
         self.viewerController!.delegate = self
         self.viewerController!.dataSource = self
         self.present(self.viewerController!, animated: false, completion: nil)
+
+        self.isPresenting = true
+    }
+
+    override public func collectionView(_ collectionView: UICollectionView, canFocusItemAt indexPath: IndexPath) -> Bool {
+        return !isPresenting
     }
 }
 
@@ -140,7 +146,10 @@ extension PhotosController: ViewerControllerDelegate {
     }
 
     func viewerControllerDidDismiss(_ viewerController: ViewerController) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        // Required in the Apple TV to update the focus engine to the desired location.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.isPresenting = false
+
             self.setNeedsFocusUpdate()
             self.updateFocusIfNeeded()
         }
