@@ -332,6 +332,8 @@ extension ViewerController {
             let controller = self.findOrCreateViewableController(indexPath)
             controller.display()
 
+            self.delegate?.viewerController(self, didChangeFocusTo: indexPath)
+
             #if os(iOS)
                 completion?()
             #else
@@ -583,6 +585,7 @@ extension ViewerController: UIPageViewControllerDelegate {
         if completed {
             self.delegate?.viewerController(self, didChangeFocusTo: self.proposedCurrentIndexPath)
             self.currentIndexPath = self.proposedCurrentIndexPath
+            self.delegate?.viewerController(self, didChangeFocusTo: self.currentIndexPath)
         }
     }
 }

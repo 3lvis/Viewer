@@ -10,6 +10,8 @@ class PhotosController: UICollectionViewController {
     var viewerController: ViewerController?
     var optionsController: OptionsController?
     var numberOfItems = 0
+    var currentIndexPath: IndexPath?
+
     var sections = [Section]() {
         didSet {
             var count = 0
@@ -92,6 +94,7 @@ extension PhotosController {
             footerView.viewDelegate = self
             self.viewerController?.footerView = footerView
         #endif
+        self.viewerController!.delegate = self
         self.viewerController!.dataSource = self
         self.present(self.viewerController!, animated: false, completion: nil)
     }
@@ -114,6 +117,16 @@ extension PhotosController: ViewerControllerDataSource {
 
         return viewable
     }
+}
+
+extension PhotosController: ViewerControllerDelegate {
+    func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath) {
+        self.currentIndexPath = indexPath
+    }
+
+    func viewerControllerDidDismiss(_ viewerController: ViewerController) {}
+
+    func viewerController(_ viewerController: ViewerController, didFailDisplayingViewableAt indexPath: IndexPath, error: NSError) {}
 }
 
 extension PhotosController: OptionsControllerDelegate {
