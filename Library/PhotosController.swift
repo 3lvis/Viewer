@@ -50,6 +50,7 @@ class PhotosController: UICollectionViewController {
         }
     }
 
+    #if os(tvOS)
     override var preferredFocusEnvironments: [UIFocusEnvironment] {
         var environments = [UIFocusEnvironment]()
 
@@ -61,6 +62,7 @@ class PhotosController: UICollectionViewController {
 
         return environments
     }
+    #endif
 
     func alertController(with title: String) -> UIAlertController {
         let alertController = UIAlertController(title: title, message: nil, preferredStyle: .alert)
@@ -96,6 +98,8 @@ extension PhotosController {
         guard let collectionView = self.collectionView else { return }
 
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
+        self.viewerController!.dataSource = self
+
         #if os(iOS)
             let headerView = HeaderView()
             headerView.viewDelegate = self
@@ -103,18 +107,21 @@ extension PhotosController {
             let footerView = FooterView()
             footerView.viewDelegate = self
             self.viewerController?.footerView = footerView
+        #else
+            self.viewerController!.delegate = self
         #endif
-        self.viewerController!.delegate = self
-        self.viewerController!.dataSource = self
+
         self.present(self.viewerController!, animated: false, completion: nil)
     }
 
+    #if os(tvOS)
     override public func collectionView(_ collectionView: UICollectionView, canFocusItemAt indexPath: IndexPath) -> Bool {
         let isViewerIsVisible = self.viewerController?.isPresented ?? false
         let shouldFocusCells = !isViewerIsVisible
 
         return shouldFocusCells
     }
+    #endif
 }
 
 extension PhotosController: ViewerControllerDataSource {
@@ -136,16 +143,18 @@ extension PhotosController: ViewerControllerDataSource {
     }
 }
 
-extension PhotosController: ViewerControllerDelegate {
-    func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath) {}
+#if os(tvOS)
+    extension PhotosController: ViewerControllerDelegate {
+        func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath) {}
 
-    func viewerControllerDidDismiss(_ viewerController: ViewerController) {
-        self.setNeedsFocusUpdate()
-        self.updateFocusIfNeeded()
+        func viewerControllerDidDismiss(_ viewerController: ViewerController) {
+            self.setNeedsFocusUpdate()
+            self.updateFocusIfNeeded()
+        }
+
+        func viewerController(_ viewerController: ViewerController, didFailDisplayingViewableAt indexPath: IndexPath, error: NSError) {}
     }
-
-    func viewerController(_ viewerController: ViewerController, didFailDisplayingViewableAt indexPath: IndexPath, error: NSError) {}
-}
+#endif
 
 extension PhotosController: OptionsControllerDelegate {
 
