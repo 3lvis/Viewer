@@ -10,7 +10,6 @@ class PhotosController: UICollectionViewController {
     var viewerController: ViewerController?
     var optionsController: OptionsController?
     var numberOfItems = 0
-    var currentIndexPath: IndexPath?
     var isPresenting = false
 
     var sections = [Section]() {
@@ -28,8 +27,6 @@ class PhotosController: UICollectionViewController {
         self.dataSourceType = dataSourceType
 
         super.init(collectionViewLayout: PhotosCollectionLayout(isGroupedByDay: true))
-
-        self.restoresFocusAfterTransition = false
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -51,14 +48,14 @@ class PhotosController: UICollectionViewController {
             }
         case .remote:
             self.sections = Photo.constructRemoteElements()
-            self.collectionView?.reloadItems(at: self.collectionView?.indexPathsForVisibleItems ?? [IndexPath]())
+            self.collectionView?.reloadData()
         }
     }
 
     override var preferredFocusEnvironments: [UIFocusEnvironment] {
         var environments = [UIFocusEnvironment]()
 
-        if let indexPath = self.currentIndexPath {
+        if let indexPath = self.viewerController?.currentIndexPath {
             if let cell = self.collectionView?.cellForItem(at: indexPath) {
                 environments.append(cell)
             }
@@ -141,9 +138,7 @@ extension PhotosController: ViewerControllerDataSource {
 }
 
 extension PhotosController: ViewerControllerDelegate {
-    func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath) {
-        self.currentIndexPath = indexPath
-    }
+    func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath) {}
 
     func viewerControllerDidDismiss(_ viewerController: ViewerController) {
         // Required in the Apple TV to update the focus engine to the desired location.

@@ -94,7 +94,7 @@ public class ViewerController: UIViewController {
     /**
      Tracks the index for the current viewer item controller
      */
-    fileprivate var currentIndexPath: IndexPath
+    fileprivate(set) public var currentIndexPath: IndexPath
 
     /**
      A helper to prevent the paginated scroll view to be set up twice when is presented
@@ -394,7 +394,7 @@ extension ViewerController {
         }, completion: { completed in
             if let existingCell = self.collectionView.cellForItem(at: indexPath) {
                 existingCell.alpha = 1
-            }
+           }
 
             self.headerView?.removeFromSuperview()
             self.footerView?.removeFromSuperview()
