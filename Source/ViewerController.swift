@@ -99,7 +99,7 @@ public class ViewerController: UIViewController {
     /**
      A helper to prevent the paginated scroll view to be set up twice when is presented
      */
-    fileprivate var presented = false
+    fileprivate(set) public var isPresented = false
 
     fileprivate lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.main.bounds)
@@ -195,7 +195,7 @@ public class ViewerController: UIViewController {
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
-        if self.presented {
+        if self.isPresented {
             self.scrollView.configure()
             if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
                 self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
@@ -328,7 +328,7 @@ extension ViewerController {
             self.overlayView.removeFromSuperview()
             self.view.backgroundColor = .black
 
-            self.presented = true
+            self.isPresented = true
             let controller = self.findOrCreateViewableController(indexPath)
             controller.display()
 
@@ -401,9 +401,12 @@ extension ViewerController {
             presentedView.removeFromSuperview()
             self.overlayView.removeFromSuperview()
             self.dismiss(animated: false, completion: nil)
-            self.delegate?.viewerControllerDidDismiss(self)
 
-            completion?()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.isPresented = false
+                self.delegate?.viewerControllerDidDismiss(self)
+                completion?()
+            }
         })
     }
 

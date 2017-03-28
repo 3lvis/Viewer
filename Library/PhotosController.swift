@@ -10,7 +10,6 @@ class PhotosController: UICollectionViewController {
     var viewerController: ViewerController?
     var optionsController: OptionsController?
     var numberOfItems = 0
-    var isPresenting = false
 
     var sections = [Section]() {
         didSet {
@@ -109,12 +108,12 @@ extension PhotosController {
         self.viewerController!.delegate = self
         self.viewerController!.dataSource = self
         self.present(self.viewerController!, animated: false, completion: nil)
-
-        self.isPresenting = true
     }
 
     override public func collectionView(_ collectionView: UICollectionView, canFocusItemAt indexPath: IndexPath) -> Bool {
-        return !isPresenting
+        let viewerControllerIsPresented = self.viewerController?.isPresented ?? false
+
+        return !viewerControllerIsPresented
     }
 }
 
@@ -141,13 +140,8 @@ extension PhotosController: ViewerControllerDelegate {
     func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath) {}
 
     func viewerControllerDidDismiss(_ viewerController: ViewerController) {
-        // Required in the Apple TV to update the focus engine to the desired location.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.isPresenting = false
-
-            self.setNeedsFocusUpdate()
-            self.updateFocusIfNeeded()
-        }
+        self.setNeedsFocusUpdate()
+        self.updateFocusIfNeeded()
     }
 
     func viewerController(_ viewerController: ViewerController, didFailDisplayingViewableAt indexPath: IndexPath, error: NSError) {}
