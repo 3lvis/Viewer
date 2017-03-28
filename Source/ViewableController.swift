@@ -55,12 +55,6 @@ class ViewableController: UIViewController {
         return view
     }()
 
-    #if os(tvOS)
-    lazy var avPlayerController: AVPlayerViewController = {
-        return AVPlayerViewController(nibName: nil, bundle: nil)
-    }()
-    #endif
-
     lazy var playButton: UIButton = {
         let button = UIButton(type: .custom)
         let image = UIImage(named: "play")!
@@ -291,21 +285,22 @@ class ViewableController: UIViewController {
 
     func playAction() {
         #if os(iOS)
-            self.repeatButton.alpha = 0
-            self.pauseButton.alpha = 0
-            self.playButton.alpha = 0
-            self.videoProgressView.alpha = 0
+        self.repeatButton.alpha = 0
+        self.pauseButton.alpha = 0
+        self.playButton.alpha = 0
+        self.videoProgressView.alpha = 0
 
-            self.videoView.play()
-            self.requestToHideOverlayIfNeeded()
+        self.videoView.play()
+        self.requestToHideOverlayIfNeeded()
         #else
             // We use the native video player in Apple TV because it provides us extra functionality that are not
             // providing in the custom player while at the same time it doesn't decrease the user experience since
             // it's not expected that the user will drag the video to dismiss it, something that we need to do on iOS.
             if let url = self.viewable?.url {
-                self.avPlayerController.player = AVPlayer(url: URL(string: url)!)
-                self.present(self.avPlayerController, animated: true) {
-                    self.avPlayerController.player?.play()
+                let controller = AVPlayerViewController(nibName: nil, bundle: nil)
+                controller.player = AVPlayer(url: URL(string: url)!)
+                self.present(controller, animated: true) {
+                    controller.player?.play()
                 }
             }
         #endif
