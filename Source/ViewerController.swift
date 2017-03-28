@@ -350,9 +350,11 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
-        guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewableController.indexPath!)?.frame else { return }
+        guard let indexPath = viewableController.indexPath else { return }
 
-        let viewable = self.dataSource!.viewerController(self, viewableAt: viewableController.indexPath!)
+        guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: indexPath)?.frame else { return }
+
+        let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
         let image = viewable.placeholder
         viewableController.imageView.alpha = 0
         viewableController.view.backgroundColor = .clear
@@ -390,9 +392,10 @@ extension ViewerController {
             #endif
             presentedView.frame = self.view.convert(selectedCellFrame, from: self.collectionView)
         }, completion: { completed in
-            if let existingCell = self.collectionView.cellForItem(at: viewableController.indexPath!) {
+            if let existingCell = self.collectionView.cellForItem(at: indexPath) {
                 existingCell.alpha = 1
             }
+            self.centerElementIfNotVisible(indexPath)
 
             self.headerView?.removeFromSuperview()
             self.footerView?.removeFromSuperview()

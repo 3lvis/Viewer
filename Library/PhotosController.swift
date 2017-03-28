@@ -27,6 +27,9 @@ class PhotosController: UICollectionViewController {
         self.dataSourceType = dataSourceType
 
         super.init(collectionViewLayout: PhotosCollectionLayout(isGroupedByDay: true))
+
+        self.restoresFocusAfterTransition = false
+        self.collectionView?.remembersLastFocusedIndexPath = true
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -50,6 +53,18 @@ class PhotosController: UICollectionViewController {
             self.sections = Photo.constructRemoteElements()
             self.collectionView?.reloadData()
         }
+    }
+
+    override var preferredFocusEnvironments: [UIFocusEnvironment] {
+        var environments = [UIFocusEnvironment]()
+
+        if let indexPath = self.currentIndexPath {
+            if let cell = self.collectionView?.cellForItem(at: indexPath) {
+                environments.append(cell)
+            }
+        }
+
+        return environments
     }
 
     func alertController(with title: String) -> UIAlertController {
@@ -124,7 +139,12 @@ extension PhotosController: ViewerControllerDelegate {
         self.currentIndexPath = indexPath
     }
 
-    func viewerControllerDidDismiss(_ viewerController: ViewerController) {}
+    func viewerControllerDidDismiss(_ viewerController: ViewerController) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.setNeedsFocusUpdate()
+            self.updateFocusIfNeeded()
+        }
+    }
 
     func viewerController(_ viewerController: ViewerController, didFailDisplayingViewableAt indexPath: IndexPath, error: NSError) {}
 }
