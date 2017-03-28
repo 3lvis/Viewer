@@ -21,13 +21,15 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
         return numberOfColumns
     }
 
-    override init() {
+    init(isGroupedByDay: Bool = true) {
         super.init()
 
+        let bounds = UIScreen.main.bounds
         self.itemSize = PhotosCollectionLayout.itemSize()
 
-        let bounds = UIScreen.main.bounds
-        self.headerReferenceSize = CGSize(width: bounds.size.width, height: PhotosCollectionLayout.headerSize)
+        if isGroupedByDay {
+            headerReferenceSize = CGSize(width: bounds.size.width, height: PhotosCollectionLayout.headerSize)
+        }
 
         self.minimumLineSpacing = 1
         self.minimumInteritemSpacing = 1
