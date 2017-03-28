@@ -152,6 +152,10 @@ public class ViewerController: UIViewController {
             playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)];
             self.view.addGestureRecognizer(playPauseTapRecognizer)
 
+            let selectTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.select(gesture:)))
+            selectTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)];
+            self.view.addGestureRecognizer(selectTapRecognizer)
+
             let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightSwipe(gesture:)))
             rightSwipeRecognizer.direction = .right
             self.view.addGestureRecognizer(rightSwipeRecognizer)
@@ -172,10 +176,20 @@ public class ViewerController: UIViewController {
     func playPause(gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended else { return }
 
+        self.playIfVideo()
+    }
+
+    func select(gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+
+        self.playIfVideo()
+    }
+
+    func playIfVideo() {
         let viewableController = self.findOrCreateViewableController(self.currentIndexPath)
         let isVideo = viewableController.viewable?.type == .video
         if isVideo {
-            viewableController.togglePlay()
+            viewableController.play()
         }
     }
 
