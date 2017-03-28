@@ -10,7 +10,6 @@ class PhotosController: UICollectionViewController {
     var viewerController: ViewerController?
     var optionsController: OptionsController?
     var numberOfItems = 0
-
     var sections = [Section]() {
         didSet {
             var count = 0
@@ -42,7 +41,7 @@ class PhotosController: UICollectionViewController {
             Photo.checkAuthorizationStatus { success in
                 if success {
                     self.sections = Photo.constructLocalElements()
-                    self.collectionView?.reloadItems(at: self.collectionView?.indexPathsForVisibleItems ?? [IndexPath]())
+                    self.collectionView?.reloadData()
                 }
             }
         case .remote:
