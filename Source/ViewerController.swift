@@ -23,17 +23,15 @@ public class ViewerController: UIViewController {
     public init(initialIndexPath: IndexPath, collectionView: UICollectionView) {
         self.initialIndexPath = initialIndexPath
         self.currentIndexPath = initialIndexPath
-        self.proposedCurrentIndexPath = initialIndexPath
-
         self.collectionView = collectionView
-        self.collectionView.remembersLastFocusedIndexPath = true
+
+        self.proposedCurrentIndexPath = initialIndexPath
 
         super.init(nibName: nil, bundle: nil)
 
         self.view.backgroundColor = .clear
         self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.modalPresentationStyle = .overCurrentContext
-
         #if os(iOS)
             self.modalPresentationCapturesStatusBarAppearance = true
         #endif
