@@ -115,4 +115,6 @@ github "bakkenbaeck/Viewer"
 
 ## Author
 
-Bakken & Bæck, [@bakkenbaeck](https://twitter.com/bakkenbaeck)
+<a href=https://twitter.com/bakkenbaeck>
+  <img src="https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/bakkenbaeck-logo.jpg" />
+</a>
