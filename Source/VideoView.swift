@@ -290,7 +290,7 @@ extension VideoView {
                 requestOptions.deliveryMode = .fastFormat
                 PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions) { playerItem, info in
                     guard let playerItem = playerItem else {
-                        let error = NSError(domain: ViewerController.domain, code: 0, userInfo: [NSLocalizedDescriptionKey: "Couldn't create player: \(info)."])
+                        let error = NSError(domain: ViewerController.domain, code: 0, userInfo: [NSLocalizedDescriptionKey: "Couldn't create player: \(String(describing: info))."])
                         self.handleError(error)
                         return
                     }

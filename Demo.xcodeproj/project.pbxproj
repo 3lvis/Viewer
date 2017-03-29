@@ -414,12 +414,13 @@
 						CreatedOnToolsVersion = 7.2;
 						DevelopmentTeam = 29X3GG489T;
 						DevelopmentTeamName = "Bakken & Bæck AS";
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 					14E5F75E1E7831AF00D970EF = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 29X3GG489T;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 				};
