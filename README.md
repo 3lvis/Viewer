@@ -1,4 +1,4 @@
-# Viewer
+![Viewer](https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/viewer-logo.jpg)
 
 [![Version](https://img.shields.io/cocoapods/v/Viewer.svg?style=flat)](https://cocoapods.org/pods/Viewer)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/bakkenbaeck/Viewer)
