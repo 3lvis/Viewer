@@ -33,7 +33,7 @@ class PaginatedScrollView: UIScrollView {
         self.decelerationRate = UIScrollViewDecelerationRateFast
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -100,15 +100,15 @@ class PaginatedScrollView: UIScrollView {
 
 extension PaginatedScrollView: UIScrollViewDelegate {
 
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    func scrollViewWillBeginDragging(_: UIScrollView) {
         self.shoudEvaluate = true
     }
 
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    func scrollViewDidEndDecelerating(_: UIScrollView) {
         self.shoudEvaluate = false
     }
 
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewDidScroll(_: UIScrollView) {
         if self.shoudEvaluate {
             let pageWidth = self.frame.size.width
             let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)

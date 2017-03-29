@@ -26,7 +26,7 @@ class PhotoCell: UICollectionViewCell {
         self.addSubview(self.videoIndicator)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

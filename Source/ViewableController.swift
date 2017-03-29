@@ -170,9 +170,9 @@ class ViewableController: UIViewController {
             self.view.backgroundColor = .clear
             self.zoomingScrollView.isHidden = true
         }
-        coordinator.animate(alongsideTransition: { context in
+        coordinator.animate(alongsideTransition: { _ in
 
-        }) { completionContext in
+        }) { _ in
             if viewable.type == .video || isFocused == false {
                 self.view.backgroundColor = .black
                 self.zoomingScrollView.isHidden = false
@@ -241,7 +241,7 @@ class ViewableController: UIViewController {
 
         switch viewable.type {
         case .image:
-            viewable.media { image, error in
+            viewable.media { image, _ in
                 if let image = image {
                     self.imageView.image = image
                     self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
@@ -250,7 +250,7 @@ class ViewableController: UIViewController {
         case .video:
             let autoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
             if !autoplayVideo {
-                viewable.media { image, error in
+                viewable.media { image, _ in
                     if let image = image {
                         self.imageView.image = image
                     }
@@ -285,13 +285,13 @@ class ViewableController: UIViewController {
 
     func playAction() {
         #if os(iOS)
-        self.repeatButton.alpha = 0
-        self.pauseButton.alpha = 0
-        self.playButton.alpha = 0
-        self.videoProgressView.alpha = 0
+            self.repeatButton.alpha = 0
+            self.pauseButton.alpha = 0
+            self.playButton.alpha = 0
+            self.videoProgressView.alpha = 0
 
-        self.videoView.play()
-        self.requestToHideOverlayIfNeeded()
+            self.videoView.play()
+            self.requestToHideOverlayIfNeeded()
         #else
             // We use the native video player in Apple TV because it provides us extra functionality that is not
             // provided in the custom player while at the same time it doesn't decrease the user experience since
@@ -366,7 +366,7 @@ class ViewableController: UIViewController {
 
 extension ViewableController: UIScrollViewDelegate {
 
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+    func viewForZooming(in _: UIScrollView) -> UIView? {
         if self.viewable?.type == .image {
             return self.imageView
         } else {
@@ -377,16 +377,16 @@ extension ViewableController: UIScrollViewDelegate {
 
 extension ViewableController: VideoViewDelegate {
 
-    func videoViewDidStartPlaying(_ videoView: VideoView) {
+    func videoViewDidStartPlaying(_: VideoView) {
         self.requestToHideOverlayIfNeeded()
     }
 
-    func videoView(_ videoView: VideoView, didChangeProgress progress: Double, duration: Double) {
+    func videoView(_: VideoView, didChangeProgress progress: Double, duration: Double) {
         self.videoProgressView.progress = progress
         self.videoProgressView.duration = duration
     }
 
-    func videoViewDidFinishPlaying(_ videoView: VideoView, error: NSError?) {
+    func videoViewDidFinishPlaying(_: VideoView, error: NSError?) {
         if let error = error {
             self.delegate?.viewableController(self, didFailDisplayingVieweableWith: error)
         } else {
@@ -399,15 +399,15 @@ extension ViewableController: VideoViewDelegate {
 }
 
 extension ViewableController: VideoProgressViewDelegate {
-    func videoProgressViewDidBeginSeeking(_ videoProgressView: VideoProgressView) {
+    func videoProgressViewDidBeginSeeking(_: VideoProgressView) {
         self.videoView.pause()
     }
 
-    func videoProgressViewDidSeek(_ videoProgressView: VideoProgressView, toDuration duration: Double) {
+    func videoProgressViewDidSeek(_: VideoProgressView, toDuration duration: Double) {
         self.videoView.stopPlayingAndSeekSmoothlyToTime(duration: duration)
     }
 
-    func videoProgressViewDidEndSeeking(_ videoProgressView: VideoProgressView) {
+    func videoProgressViewDidEndSeeking(_: VideoProgressView) {
         self.videoView.play()
     }
 }

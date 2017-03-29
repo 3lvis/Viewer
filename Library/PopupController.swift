@@ -25,7 +25,7 @@ class OptionsController: UITableViewController {
         self.popoverPresentationController?.sourceRect = sourceRect
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -38,17 +38,17 @@ class OptionsController: UITableViewController {
 }
 
 #if os(iOS)
-extension OptionsController: UIPopoverPresentationControllerDelegate {
+    extension OptionsController: UIPopoverPresentationControllerDelegate {
 
-    func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
-        return .none
+        func adaptivePresentationStyleForPresentationController(controller _: UIPresentationController) -> UIModalPresentationStyle {
+            return .none
+        }
     }
-}
 #endif
 
 extension OptionsController {
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
         return self.options.count
     }
 
@@ -61,7 +61,7 @@ extension OptionsController {
         return cell
     }
 
-    public override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public override func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         let option = self.options[indexPath.row]
         self.delegate?.optionsController(optionsController: self, didSelectOption: option)
     }

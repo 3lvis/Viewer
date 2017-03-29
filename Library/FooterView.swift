@@ -35,7 +35,7 @@ class FooterView: UIView {
         self.deleteButton.addTarget(self, action: #selector(FooterView.deleteAction(button:)), for: .touchUpInside)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -57,10 +57,10 @@ class FooterView: UIView {
     }
 
     func favoriteAction(button: UIButton) {
-        viewDelegate?.footerView(self, didPressFavoriteButton: button)
+        self.viewDelegate?.footerView(self, didPressFavoriteButton: button)
     }
 
     func deleteAction(button: UIButton) {
-        viewDelegate?.footerView(self, didPressDeleteButton: button)
+        self.viewDelegate?.footerView(self, didPressDeleteButton: button)
     }
 }

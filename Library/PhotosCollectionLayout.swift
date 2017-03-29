@@ -4,22 +4,22 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
     static let headerSize = CGFloat(69)
     class var numberOfColumns: Int {
         #if os(iOS)
-        var isPortrait: Bool
-        switch UIDevice.current.orientation {
-        case .portrait, .portraitUpsideDown, .unknown, .faceUp, .faceDown:
-            isPortrait = true
-        case .landscapeLeft, .landscapeRight:
-            isPortrait = false
-        }
+            var isPortrait: Bool
+            switch UIDevice.current.orientation {
+            case .portrait, .portraitUpsideDown, .unknown, .faceUp, .faceDown:
+                isPortrait = true
+            case .landscapeLeft, .landscapeRight:
+                isPortrait = false
+            }
 
-        var numberOfColumns = 0
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            numberOfColumns = isPortrait ? 3 : 6
-        } else {
-            numberOfColumns = isPortrait ? 5 : 8
-        }
+            var numberOfColumns = 0
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                numberOfColumns = isPortrait ? 3 : 6
+            } else {
+                numberOfColumns = isPortrait ? 5 : 8
+            }
 
-        return numberOfColumns
+            return numberOfColumns
         #else
             return 6
         #endif
@@ -30,14 +30,11 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
 
         let bounds = UIScreen.main.bounds
         self.itemSize = PhotosCollectionLayout.itemSize()
-
-        if isGroupedByDay {
-            headerReferenceSize = CGSize(width: bounds.size.width, height: PhotosCollectionLayout.headerSize)
-        }
+        self.headerReferenceSize = CGSize(width: bounds.size.width, height: PhotosCollectionLayout.headerSize)
 
         #if os(iOS)
-        self.minimumLineSpacing = 1
-        self.minimumInteritemSpacing = 1
+            self.minimumLineSpacing = 1
+            self.minimumInteritemSpacing = 1
         #else
             let margin = CGFloat(25)
             self.minimumLineSpacing = 50
@@ -46,15 +43,15 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
         #endif
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     class func itemSize() -> CGSize {
         #if os(iOS)
-        let bounds = UIScreen.main.bounds
-        let size = (bounds.width - (CGFloat(PhotosCollectionLayout.numberOfColumns) - 1)) / CGFloat(PhotosCollectionLayout.numberOfColumns)
-        return CGSize(width: size, height: size)
+            let bounds = UIScreen.main.bounds
+            let size = (bounds.width - (CGFloat(PhotosCollectionLayout.numberOfColumns) - 1)) / CGFloat(PhotosCollectionLayout.numberOfColumns)
+            return CGSize(width: size, height: size)
         #else
             return CGSize(width: 260, height: 260)
         #endif
