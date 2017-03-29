@@ -14,7 +14,7 @@
   <a href="https://cocoapods.org/pods/Viewer">
     <img src="https://img.shields.io/cocoapods/l/Viewer.svg?style=flat" />
   </a>
-/div>
+</div>
 
 ## Demo
 
