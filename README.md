@@ -63,17 +63,19 @@ Support for the Apple TV.
 You'll need a collection of items that comform to the [Viewable protocol](https://github.com/bakkenbaeck/Viewer/blob/master/Source/Viewable.swift). Then, from your UICollectionView:
 
 ```swift
+import Viewer
+
 override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     guard let collectionView = self.collectionView else { return }
 
     let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
     viewerController.dataSource = self
-    self.presentViewController(viewerController, animated: false, completion: nil)
+    presentViewController(viewerController, animated: false, completion: nil)
 }
 
 extension CollectionController: ViewerControllerDataSource {
     func viewerController(_ viewerController: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
-        return self.photos[indexPath.row]
+        return photos[indexPath.row]
     }
 }
 ```
