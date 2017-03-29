@@ -95,15 +95,13 @@ extension CollectionController: ViewerControllerDataSource {
 
 ## Installation
 
-**Viewer** is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+### CocoaPods
 
 ```ruby
 pod 'Viewer'
 ```
 
-**Viewer** is also available through [Carthage](https://github.com/Carthage/Carthage). To install
-it, simply add the following line to your Cartfile:
+### Carthage
 
 ```ruby
 github "bakkenbaeck/Viewer"
