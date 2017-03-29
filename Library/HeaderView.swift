@@ -35,7 +35,7 @@ class HeaderView: UIView {
         self.addSubview(self.menuButton)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -49,10 +49,10 @@ class HeaderView: UIView {
     }
 
     func clearAction(button: UIButton) {
-        viewDelegate?.headerView(self, didPressClearButton: button)
+        self.viewDelegate?.headerView(self, didPressClearButton: button)
     }
 
     func menuAction(button: UIButton) {
-        viewDelegate?.headerView(self, didPressMenuButton: button)
+        self.viewDelegate?.headerView(self, didPressMenuButton: button)
     }
 }

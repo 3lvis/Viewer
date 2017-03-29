@@ -93,7 +93,7 @@ struct Photo: Viewable {
 
         let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
         if fetchResult.count > 0 {
-            fetchResult.enumerateObjects({ asset, index, stop in
+            fetchResult.enumerateObjects({ asset, index, _ in
                 let groupedDate = asset.creationDate?.groupedDateString() ?? ""
                 var foundSection = Section(groupedDate: groupedDate)
                 var foundIndex: Int?
@@ -135,7 +135,7 @@ struct Photo: Viewable {
         let scaleFactor = UIScreen.main.scale
         let itemSize = CGSize(width: 150, height: 150)
         let targetSize = CGSize(width: itemSize.width * scaleFactor, height: itemSize.height * scaleFactor)
-        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, info in
+        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, _ in
             // WARNING: This could fail if your phone doesn't have enough storage. Since the photo is probably
             // stored in iCloud downloading it to your phone will take most of the space left making this feature fail.
             // guard let image = image else { fatalError("Couldn't get photo data for asset \(asset)") }
@@ -156,7 +156,7 @@ struct Photo: Viewable {
 
         let bounds = UIScreen.main.bounds.size
         let targetSize = CGSize(width: bounds.width * 2, height: bounds.height * 2)
-        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, info in
+        imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: requestOptions) { image, _ in
             // WARNING: This could fail if your phone doesn't have enough storage. Since the photo is probably
             // stored in iCloud downloading it to your phone will take most of the space left making this feature fail.
             // guard let image = image else { fatalError("Couldn't get photo data for asset \(asset)") }

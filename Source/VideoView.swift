@@ -58,7 +58,7 @@ class VideoView: UIView {
         self.addSubview(self.loadingIndicator)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -91,18 +91,17 @@ class VideoView: UIView {
         self.loadingIndicator.frame = CGRect(x: (self.frame.size.width - loadingWidth) / 2, y: (self.frame.size.height - loadingHeight) / 2, width: loadingWidth, height: loadingHeight)
     }
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change _: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
+
         if keyPath == VideoView.audioSessionVolumeKeyPath {
             do {
                 try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: [])
-            }
-            catch let error {
+            } catch let error {
                 print("Failed to start playback sound: \(error.localizedDescription)")
             }
             return
         }
-        
+
         guard let playerItem = object as? AVPlayerItem else { return }
         self.playerCurrentItemStatus = playerItem.status
 
@@ -131,7 +130,7 @@ class VideoView: UIView {
             }
 
             let interval = CMTime(seconds: 1 / 60, preferredTimescale: Int32(NSEC_PER_SEC))
-            self.playbackProgressTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { time in
+            self.playbackProgressTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { _ in
                 self.loadingIndicator.stopAnimating()
                 self.loadingIndicatorBackground.alpha = 0
 
@@ -160,7 +159,7 @@ class VideoView: UIView {
 
                 self.shouldRegisterForStatusNotifications = false
                 currentItem.addObserver(self, forKeyPath: VideoView.playerItemStatusKeyPath, options: [], context: nil)
-                
+
                 do {
                     let audioSession = AVAudioSession.sharedInstance()
                     try audioSession.setActive(true)
@@ -194,7 +193,7 @@ class VideoView: UIView {
         self.playerLayer.player?.pause()
         self.playerLayer.player?.seek(to: kCMTimeZero)
         self.playerLayer.player = nil
-        
+
         try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategorySoloAmbient, with: [])
     }
 
@@ -310,7 +309,7 @@ extension VideoView {
 
                         if asset.mediaSubtypes == .videoHighFrameRate {
                             let interval = CMTime(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
-                            self.slowMotionTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { time in
+                            self.slowMotionTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { _ in
                                 let currentTime = CMTimeGetSeconds(player.currentTime())
                                 if currentTime >= 2 {
                                     if player.rate != 0.000001 {
@@ -368,7 +367,7 @@ extension VideoView {
             NotificationCenter.default.removeObserver(self, name: .AVPlayerItemPlaybackStalled, object: nil)
             NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         }
-        
+
         if self.shouldRegisterForOutputVolume == false {
             self.shouldRegisterForOutputVolume = true
             AVAudioSession.sharedInstance().removeObserver(self, forKeyPath: VideoView.audioSessionVolumeKeyPath)

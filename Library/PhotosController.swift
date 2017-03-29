@@ -24,10 +24,10 @@ class PhotosController: UICollectionViewController {
     init(dataSourceType: DataSourceType) {
         self.dataSourceType = dataSourceType
 
-        super.init(collectionViewLayout: PhotosCollectionLayout(isGroupedByDay: true))
+        super.init(collectionViewLayout: PhotosCollectionLayout())
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -51,17 +51,17 @@ class PhotosController: UICollectionViewController {
     }
 
     #if os(tvOS)
-    override var preferredFocusEnvironments: [UIFocusEnvironment] {
-        var environments = [UIFocusEnvironment]()
+        override var preferredFocusEnvironments: [UIFocusEnvironment] {
+            var environments = [UIFocusEnvironment]()
 
-        if let indexPath = self.viewerController?.currentIndexPath {
-            if let cell = self.collectionView?.cellForItem(at: indexPath) {
-                environments.append(cell)
+            if let indexPath = self.viewerController?.currentIndexPath {
+                if let cell = self.collectionView?.cellForItem(at: indexPath) {
+                    environments.append(cell)
+                }
             }
-        }
 
-        return environments
-    }
+            return environments
+        }
     #endif
 
     func alertController(with title: String) -> UIAlertController {
@@ -74,11 +74,11 @@ class PhotosController: UICollectionViewController {
 
 extension PhotosController {
 
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in _: UICollectionView) -> Int {
         return self.sections.count
     }
 
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let section = self.sections[section]
 
         return section.photos.count
@@ -115,22 +115,22 @@ extension PhotosController {
     }
 
     #if os(tvOS)
-    override public func collectionView(_ collectionView: UICollectionView, canFocusItemAt indexPath: IndexPath) -> Bool {
-        let isViewerVisible = self.viewerController?.isPresented ?? false
-        let shouldFocusCells = !isViewerVisible
+        public override func collectionView(_: UICollectionView, canFocusItemAt _: IndexPath) -> Bool {
+            let isViewerVisible = self.viewerController?.isPresented ?? false
+            let shouldFocusCells = !isViewerVisible
 
-        return shouldFocusCells
-    }
+            return shouldFocusCells
+        }
     #endif
 }
 
 extension PhotosController: ViewerControllerDataSource {
 
-    func numberOfItemsInViewerController(_ viewerController: ViewerController) -> Int {
+    func numberOfItemsInViewerController(_: ViewerController) -> Int {
         return self.numberOfItems
     }
 
-    func viewerController(_ viewerController: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
+    func viewerController(_: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
         var section = self.sections[indexPath.section]
         var viewable = section.photos[indexPath.row]
         if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {
@@ -145,20 +145,20 @@ extension PhotosController: ViewerControllerDataSource {
 
 #if os(tvOS)
     extension PhotosController: ViewerControllerDelegate {
-        func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath) {}
+        func viewerController(_: ViewerController, didChangeFocusTo _: IndexPath) {}
 
-        func viewerControllerDidDismiss(_ viewerController: ViewerController) {
+        func viewerControllerDidDismiss(_: ViewerController) {
             self.setNeedsFocusUpdate()
             self.updateFocusIfNeeded()
         }
 
-        func viewerController(_ viewerController: ViewerController, didFailDisplayingViewableAt indexPath: IndexPath, error: NSError) {}
+        func viewerController(_: ViewerController, didFailDisplayingViewableAt _: IndexPath, error _: NSError) {}
     }
 #endif
 
 extension PhotosController: OptionsControllerDelegate {
 
-    func optionsController(optionsController: OptionsController, didSelectOption option: String) {
+    func optionsController(optionsController _: OptionsController, didSelectOption _: String) {
         self.optionsController?.dismiss(animated: true) {
             self.viewerController?.dismiss(nil)
         }
@@ -167,11 +167,11 @@ extension PhotosController: OptionsControllerDelegate {
 
 extension PhotosController: HeaderViewDelegate {
 
-    func headerView(_ headerView: HeaderView, didPressClearButton button: UIButton) {
+    func headerView(_: HeaderView, didPressClearButton _: UIButton) {
         self.viewerController?.dismiss(nil)
     }
 
-    func headerView(_ headerView: HeaderView, didPressMenuButton button: UIButton) {
+    func headerView(_: HeaderView, didPressMenuButton button: UIButton) {
         let rect = CGRect(x: 0, y: 0, width: 50, height: 50)
         self.optionsController = OptionsController(sourceView: button, sourceRect: rect)
         self.optionsController!.delegate = self
@@ -181,12 +181,12 @@ extension PhotosController: HeaderViewDelegate {
 
 extension PhotosController: FooterViewDelegate {
 
-    func footerView(_ footerView: FooterView, didPressFavoriteButton button: UIButton) {
+    func footerView(_: FooterView, didPressFavoriteButton _: UIButton) {
         let alertController = self.alertController(with: "Favorite pressed")
         self.viewerController?.present(alertController, animated: true, completion: nil)
     }
 
-    func footerView(_ footerView: FooterView, didPressDeleteButton button: UIButton) {
+    func footerView(_: FooterView, didPressDeleteButton _: UIButton) {
         let alertController = self.alertController(with: "Delete pressed")
         self.viewerController?.present(alertController, animated: true, completion: nil)
     }

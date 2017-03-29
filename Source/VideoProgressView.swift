@@ -10,29 +10,29 @@ class VideoProgressView: UIView {
     weak var delegate: VideoProgressViewDelegate?
 
     #if os(iOS)
-    static let height = CGFloat(55.0)
-    private static let progressBarYMargin = CGFloat(23.0)
-    private static let progressBarHeight = CGFloat(6.0)
+        static let height = CGFloat(55.0)
+        private static let progressBarYMargin = CGFloat(23.0)
+        private static let progressBarHeight = CGFloat(6.0)
 
-    private static let textLabelHeight = CGFloat(18.0)
-    private static let textLabelMargin = CGFloat(18.0)
+        private static let textLabelHeight = CGFloat(18.0)
+        private static let textLabelMargin = CGFloat(18.0)
 
-    private static let seekViewHeight = CGFloat(45.0)
-    private static let seekViewWidth = CGFloat(45.0)
+        private static let seekViewHeight = CGFloat(45.0)
+        private static let seekViewWidth = CGFloat(45.0)
 
-    private static let font = UIFont.systemFont(ofSize: 14)
+        private static let font = UIFont.systemFont(ofSize: 14)
     #else
-    static let height = CGFloat(110.0)
-    private static let progressBarYMargin = CGFloat(46.0)
-    private static let progressBarHeight = CGFloat(23.0)
+        static let height = CGFloat(110.0)
+        private static let progressBarYMargin = CGFloat(46.0)
+        private static let progressBarHeight = CGFloat(23.0)
 
-    private static let textLabelHeight = CGFloat(36.0)
-    private static let textLabelMargin = CGFloat(36.0)
+        private static let textLabelHeight = CGFloat(36.0)
+        private static let textLabelMargin = CGFloat(36.0)
 
-    private static let seekViewHeight = CGFloat(90.0)
-    private static let seekViewWidth = CGFloat(90.0)
+        private static let seekViewHeight = CGFloat(90.0)
+        private static let seekViewWidth = CGFloat(90.0)
 
-    private static let font = UIFont.systemFont(ofSize: 28)
+        private static let font = UIFont.systemFont(ofSize: 28)
     #endif
 
     var duration = 0.0 {
@@ -130,7 +130,7 @@ class VideoProgressView: UIView {
         #endif
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
