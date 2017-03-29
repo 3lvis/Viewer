@@ -118,3 +118,7 @@ github "bakkenbaeck/Viewer"
 <a href=https://twitter.com/bakkenbaeck>
   <img src="https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/bakkenbaeck-logo.jpg" />
 </a>
+
+We are a digital studio that help startups and established companies invent, build, and launch their next product or venture.
+
+We also build startups of our own. If you would like to work on open source components like this you would probably be interested in [joining us](https://bakkenbaeck.com/jobs).
