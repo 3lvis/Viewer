@@ -116,8 +116,8 @@ extension PhotosController {
 
     #if os(tvOS)
     override public func collectionView(_ collectionView: UICollectionView, canFocusItemAt indexPath: IndexPath) -> Bool {
-        let isViewerIsVisible = self.viewerController?.isPresented ?? false
-        let shouldFocusCells = !isViewerIsVisible
+        let isViewerVisible = self.viewerController?.isPresented ?? false
+        let shouldFocusCells = !isViewerVisible
 
         return shouldFocusCells
     }
