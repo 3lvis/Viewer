@@ -121,4 +121,4 @@ github "bakkenbaeck/Viewer"
 
 We are a digital studio that helps startups and established companies invent, build, and launch their next product or venture.
 
-We also build startups of our own. If you would like to work on open source components like this you would probably be interested in [joining us](https://bakkenbaeck.com/jobs).
+We also build startups of our own. If you would like to work on open source components like this one you would probably be interested in [joining us](https://bakkenbaeck.com/jobs).
