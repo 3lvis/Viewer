@@ -16,6 +16,19 @@
   </a>
 </div>
 
+## Table of Contents
+
+* [Features](#features)
+  * [Focus](#focus)
+  * [Browse](#browse)
+  * [Rotation](#rotation)
+  * [Zoom](#zoom)
+  * [tvOS](#tvos)
+* [Setup](#setup)
+* [Installation](#installation)
+* [License](#license)
+* [Author](#author)
+
 ## Features
 
 ### Focus
