@@ -60,7 +60,7 @@ Support for the Apple TV.
 
 ## Setup
 
-From your UICollectionView:
+You'll need a collection of items that comform to the [Viewable protocol](https://github.com/bakkenbaeck/Viewer/blob/master/Source/Viewable.swift). Then, from your UICollectionView:
 
 ```swift
 override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
