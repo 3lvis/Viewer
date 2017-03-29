@@ -111,7 +111,7 @@ github "bakkenbaeck/Viewer"
 
 ## License
 
-**Viewer** is available under the MIT license. See the LICENSE file for more info.
+**Viewer** is available under the MIT license. See the [LICENSE](/LICENSE.md) file for more info.
 
 ## Author
 
