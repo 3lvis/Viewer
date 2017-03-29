@@ -94,12 +94,12 @@ public class ViewerController: UIViewController {
     /**
      Tracks the index for the current viewer item controller
      */
-    fileprivate var currentIndexPath: IndexPath
+    fileprivate(set) public var currentIndexPath: IndexPath
 
     /**
      A helper to prevent the paginated scroll view to be set up twice when is presented
      */
-    fileprivate var presented = false
+    fileprivate(set) public var isPresented = false
 
     fileprivate lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.main.bounds)
@@ -209,7 +209,7 @@ public class ViewerController: UIViewController {
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
-        if self.presented {
+        if self.isPresented {
             self.scrollView.configure()
             if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
                 self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
@@ -342,9 +342,11 @@ extension ViewerController {
             self.overlayView.removeFromSuperview()
             self.view.backgroundColor = .black
 
-            self.presented = true
+            self.isPresented = true
             let controller = self.findOrCreateViewableController(indexPath)
             controller.display()
+
+            self.delegate?.viewerController(self, didChangeFocusTo: indexPath)
 
             #if os(iOS)
                 completion?()
@@ -362,9 +364,11 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
-        guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: viewableController.indexPath!)?.frame else { return }
+        guard let indexPath = viewableController.indexPath else { return }
 
-        let viewable = self.dataSource!.viewerController(self, viewableAt: viewableController.indexPath!)
+        guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: indexPath)?.frame else { return }
+
+        let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
         let image = viewable.placeholder
         viewableController.imageView.alpha = 0
         viewableController.view.backgroundColor = .clear
@@ -402,18 +406,23 @@ extension ViewerController {
             #endif
             presentedView.frame = self.view.convert(selectedCellFrame, from: self.collectionView)
         }, completion: { completed in
-            if let existingCell = self.collectionView.cellForItem(at: viewableController.indexPath!) {
+            if let existingCell = self.collectionView.cellForItem(at: indexPath) {
                 existingCell.alpha = 1
-            }
+           }
 
             self.headerView?.removeFromSuperview()
             self.footerView?.removeFromSuperview()
             presentedView.removeFromSuperview()
             self.overlayView.removeFromSuperview()
             self.dismiss(animated: false, completion: nil)
-            self.delegate?.viewerControllerDidDismiss(self)
 
-            completion?()
+            // A small delay is required to avoid racing conditions between the dismissing animation and the
+            // state change after the animation is completed.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.isPresented = false
+                self.delegate?.viewerControllerDidDismiss(self)
+                completion?()
+            }
         })
     }
 
@@ -478,9 +487,9 @@ extension ViewerController {
         }
     }
 
-    private func centerElementIfNotVisible(_ indexPath: IndexPath) {
+    fileprivate func centerElementIfNotVisible(_ indexPath: IndexPath, animated: Bool) {
         if !self.collectionView.indexPathsForVisibleItems.contains(indexPath) {
-            self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+            self.collectionView.scrollToItem(at: indexPath, at: .top, animated: animated)
         }
     }
 
@@ -597,6 +606,8 @@ extension ViewerController: UIPageViewControllerDelegate {
         if completed {
             self.delegate?.viewerController(self, didChangeFocusTo: self.proposedCurrentIndexPath)
             self.currentIndexPath = self.proposedCurrentIndexPath
+            self.delegate?.viewerController(self, didChangeFocusTo: self.currentIndexPath)
+            self.centerElementIfNotVisible(self.currentIndexPath, animated: false)
         }
     }
 }
