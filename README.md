@@ -68,15 +68,6 @@ override public func collectionView(_ collectionView: UICollectionView, didSelec
 
     let viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
     viewerController.dataSource = self
-
-    let headerView = HeaderView()
-    headerView.viewDelegate = self
-    viewerController.headerView = headerView
-
-    let footerView = FooterView()
-    footerView.viewDelegate = self
-    viewerController.footerView = footerView
-
     self.presentViewController(viewerController, animated: false, completion: nil)
 }
 
