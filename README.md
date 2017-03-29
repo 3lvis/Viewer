@@ -1,9 +1,20 @@
 ![Viewer](https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/viewer-logo.jpg)
 
-[![Version](https://img.shields.io/cocoapods/v/Viewer.svg?style=flat)](https://cocoapods.org/pods/Viewer)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/bakkenbaeck/Viewer)
-![platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20OS%20X%20%7C%20watchOS%20%7C%20tvOS%20-lightgrey.svg)
-[![License](https://img.shields.io/cocoapods/l/Viewer.svg?style=flat)](https://cocoapods.org/pods/DATAStack)
+<div align = "center">
+  <a href="https://cocoapods.org/pods/Viewer">
+    <img src="https://img.shields.io/cocoapods/v/Viewer.svg?style=flat" />
+  </a>
+  
+  <a href="https://github.com/bakkenbaeck/Viewer">
+    <img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat" />
+  </a>
+  
+  <img src="https://img.shields.io/badge/platforms-iOS%20%7C%20OS%20X%20%7C%20watchOS%20%7C%20tvOS%20-lightgrey.svg" />
+  
+  <a href="https://cocoapods.org/pods/Viewer">
+    <img src="https://img.shields.io/cocoapods/l/Viewer.svg?style=flat" />
+  </a>
+/div>
 
 ## Demo
 
