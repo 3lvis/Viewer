@@ -1,4 +1,4 @@
-![Viewer](https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/viewer-logo.jpg)
+![Viewer](https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/viewer-logo-2.jpg)
 
 <div align = "center">
   <a href="https://cocoapods.org/pods/Viewer">
