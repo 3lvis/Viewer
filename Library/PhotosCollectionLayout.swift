@@ -3,6 +3,7 @@ import UIKit
 class PhotosCollectionLayout: UICollectionViewFlowLayout {
     static let headerSize = CGFloat(69)
     class var numberOfColumns: Int {
+        #if os(iOS)
         var isPortrait: Bool
         switch UIDevice.current.orientation {
         case .portrait, .portraitUpsideDown, .unknown, .faceUp, .faceDown:
@@ -19,6 +20,9 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
         }
 
         return numberOfColumns
+        #else
+            return 6
+        #endif
     }
 
     init(isGroupedByDay: Bool = true) {
@@ -31,8 +35,15 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
             headerReferenceSize = CGSize(width: bounds.size.width, height: PhotosCollectionLayout.headerSize)
         }
 
+        #if os(iOS)
         self.minimumLineSpacing = 1
         self.minimumInteritemSpacing = 1
+        #else
+            let margin = CGFloat(25)
+            self.minimumLineSpacing = 50
+            self.minimumInteritemSpacing = margin
+            self.sectionInset = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
+        #endif
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -40,9 +51,13 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
     }
 
     class func itemSize() -> CGSize {
+        #if os(iOS)
         let bounds = UIScreen.main.bounds
         let size = (bounds.width - (CGFloat(PhotosCollectionLayout.numberOfColumns) - 1)) / CGFloat(PhotosCollectionLayout.numberOfColumns)
         return CGSize(width: size, height: size)
+        #else
+            return CGSize(width: 260, height: 260)
+        #endif
     }
 
     func updateItemSize() {
