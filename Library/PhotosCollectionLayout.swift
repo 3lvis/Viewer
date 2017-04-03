@@ -39,7 +39,7 @@ class PhotosCollectionLayout: UICollectionViewFlowLayout {
             let margin = CGFloat(25)
             self.minimumLineSpacing = 50
             self.minimumInteritemSpacing = margin
-            self.sectionInset = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
+            self.sectionInset = UIEdgeInsets(top: margin, left: 90, bottom: margin, right: 90)
         #endif
     }
 
