@@ -269,6 +269,7 @@ class ViewableController: UIViewController {
                 viewable.media { image, _ in
                     if let image = image {
                         self.imageView.image = image
+                        self.playButton.alpha = 1
                     }
                 }
             #endif
