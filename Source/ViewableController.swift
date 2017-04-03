@@ -248,22 +248,30 @@ class ViewableController: UIViewController {
                 }
             }
         case .video:
-            let autoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
-            if !autoplayVideo {
+            #if os(iOS)
+                let shouldAutoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
+                if !shouldAutoplayVideo {
+                    viewable.media { image, _ in
+                        if let image = image {
+                            self.imageView.image = image
+                        }
+                    }
+                }
+
+                self.videoView.prepare(using: viewable) {
+                    if shouldAutoplayVideo {
+                        self.videoView.play()
+                    } else {
+                        self.playButton.alpha = 1
+                    }
+                }
+            #else
                 viewable.media { image, _ in
                     if let image = image {
                         self.imageView.image = image
                     }
                 }
-            }
-
-            self.videoView.prepare(using: viewable) {
-                if autoplayVideo {
-                    self.videoView.play()
-                } else {
-                    self.playButton.alpha = 1
-                }
-            }
+            #endif
         }
     }
 
