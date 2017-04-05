@@ -18,6 +18,7 @@ protocol ViewableControllerDataSource: class {
 }
 
 class ViewableController: UIViewController {
+    static let playerItemStatusKeyPath = "status"
     private static let FooterViewHeight = CGFloat(50.0)
 
     weak var delegate: ViewableControllerDelegate?
@@ -96,6 +97,13 @@ class ViewableController: UIViewController {
     var changed = false
     var viewable: Viewable?
     var indexPath: IndexPath?
+
+    var playerViewController: AVPlayerViewController?
+
+    deinit {
+        self.playerViewController?.player?.currentItem?.removeObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, context: nil)
+        self.playerViewController = nil
+    }
 
     func update(with viewable: Viewable, at indexPath: IndexPath) {
         if self.indexPath?.description != indexPath.description {
@@ -266,10 +274,24 @@ class ViewableController: UIViewController {
                     }
                 }
             #else
-                viewable.media { image, _ in
-                    if let image = image {
-                        self.imageView.image = image
-                        self.playButton.alpha = 1
+                // If there's currently a `AVPlayerViewController` we want to reuse it and create a new `AVPlayer`.
+                // One of the reasons to do this is because we found a failure in our playback because it was an expired
+                // link and we renewed the link and want the video to play again.
+                if let playerViewController = self.playerViewController {
+                    playerViewController.player?.currentItem?.removeObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, context: nil)
+
+                    if let urlString = self.viewable?.url, let url = URL(string: urlString) {
+                        playerViewController.player = AVPlayer(url: url)
+
+                        guard let currentItem = playerViewController.player?.currentItem else { return }
+                        currentItem.addObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, options: [], context: nil)
+                    }
+                } else {
+                    viewable.media { image, _ in
+                        if let image = image {
+                            self.imageView.image = image
+                            self.playButton.alpha = 1
+                        }
                     }
                 }
             #endif
@@ -306,13 +328,32 @@ class ViewableController: UIViewController {
             // provided in the custom player while at the same time it doesn't decrease the user experience since
             // it's not expected that the user will drag the video to dismiss it, something that we need to do on iOS.
             if let url = self.viewable?.url {
-                let controller = AVPlayerViewController(nibName: nil, bundle: nil)
-                controller.player = AVPlayer(url: URL(string: url)!)
-                self.present(controller, animated: true) {
-                    controller.player?.play()
+                self.playerViewController?.player?.currentItem?.removeObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, context: nil)
+                self.playerViewController = nil
+
+                self.playerViewController = AVPlayerViewController(nibName: nil, bundle: nil)
+                self.playerViewController?.player = AVPlayer(url: URL(string: url)!)
+
+                guard let currentItem = self.playerViewController?.player?.currentItem else { return }
+                currentItem.addObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, options: [], context: nil)
+
+                self.present(self.playerViewController!, animated: true) {
+                    self.playerViewController!.player?.play()
                 }
             }
         #endif
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change _: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
+        guard let playerItem = object as? AVPlayerItem else { return }
+
+        if let error = playerItem.error {
+            self.handleVideoPlaybackError(error as NSError)
+        }
+    }
+
+    func handleVideoPlaybackError(_ error: NSError) {
+        self.delegate?.viewableController(self, didFailDisplayingVieweableWith: error)
     }
 
     func repeatAction() {
