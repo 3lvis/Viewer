@@ -267,10 +267,21 @@ class ViewableController: UIViewController {
                     }
                 }
             #else
-                viewable.media { image, _ in
-                    if let image = image {
-                        self.imageView.image = image
-                        self.playButton.alpha = 1
+                if self.playerViewController != nil {
+                    if let url = self.viewable?.url {
+                        self.playerViewController?.player?.currentItem?.removeObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, context: nil)
+                        let player = AVPlayer(url: URL(string: url)!)
+                        self.playerViewController?.player = player
+
+                        guard let currentItem = player.currentItem else { return }
+                        currentItem.addObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, options: [], context: nil)
+                    }
+                } else {
+                    viewable.media { image, _ in
+                        if let image = image {
+                            self.imageView.image = image
+                            self.playButton.alpha = 1
+                        }
                     }
                 }
             #endif
@@ -293,6 +304,13 @@ class ViewableController: UIViewController {
         self.videoView.pause()
     }
 
+    var playerViewController: AVPlayerViewController?
+
+    deinit {
+        self.playerViewController?.player?.currentItem?.removeObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, context: nil)
+        self.playerViewController = nil
+    }
+
     func playAction() {
         #if os(iOS)
             self.repeatButton.alpha = 0
@@ -307,15 +325,18 @@ class ViewableController: UIViewController {
             // provided in the custom player while at the same time it doesn't decrease the user experience since
             // it's not expected that the user will drag the video to dismiss it, something that we need to do on iOS.
             if let url = self.viewable?.url {
-                let controller = AVPlayerViewController(nibName: nil, bundle: nil)
+                self.playerViewController?.player?.currentItem?.removeObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, context: nil)
+                self.playerViewController = nil
+
+                self.playerViewController = AVPlayerViewController(nibName: nil, bundle: nil)
                 let player = AVPlayer(url: URL(string: url)!)
-                controller.player = player
+                self.playerViewController?.player = player
 
                 guard let currentItem = player.currentItem else { return }
                 currentItem.addObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, options: [], context: nil)
 
-                self.present(controller, animated: true) {
-                    controller.player?.play()
+                self.present(self.playerViewController!, animated: true) {
+                    self.playerViewController!.player?.play()
                 }
             }
         #endif
