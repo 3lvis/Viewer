@@ -281,7 +281,8 @@ class ViewableController: UIViewController {
                     playerViewController.player?.currentItem?.removeObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, context: nil)
 
                     if let urlString = self.viewable?.url, let url = URL(string: urlString) {
-                        playerViewController.player = AVPlayer(url: url)
+                        let playerItem = AVPlayerItem(url: url)
+                        playerViewController.player?.replaceCurrentItem(with: playerItem)
 
                         guard let currentItem = playerViewController.player?.currentItem else { return }
                         currentItem.addObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, options: [], context: nil)
