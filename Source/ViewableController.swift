@@ -18,6 +18,7 @@ protocol ViewableControllerDataSource: class {
 }
 
 class ViewableController: UIViewController {
+    static let playerItemStatusKeyPath = "status"
     private static let FooterViewHeight = CGFloat(50.0)
 
     weak var delegate: ViewableControllerDelegate?
@@ -307,12 +308,29 @@ class ViewableController: UIViewController {
             // it's not expected that the user will drag the video to dismiss it, something that we need to do on iOS.
             if let url = self.viewable?.url {
                 let controller = AVPlayerViewController(nibName: nil, bundle: nil)
-                controller.player = AVPlayer(url: URL(string: url)!)
+                let player = AVPlayer(url: URL(string: url)!)
+                controller.player = player
+
+                guard let currentItem = player.currentItem else { return }
+                currentItem.addObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, options: [], context: nil)
+
                 self.present(controller, animated: true) {
                     controller.player?.play()
                 }
             }
         #endif
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change _: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
+        guard let playerItem = object as? AVPlayerItem else { return }
+
+        if let error = playerItem.error {
+            self.handleError(error as NSError)
+        }
+    }
+
+    func handleError(_ error: NSError) {
+        self.delegate?.viewableController(self, didFailDisplayingVieweableWith: error)
     }
 
     func repeatAction() {
