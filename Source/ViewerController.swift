@@ -135,13 +135,13 @@ public class ViewerController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        #if os(iOS)
+//        #if os(iOS)
             self.view.addSubview(self.scrollView)
-        #else
-            self.addChildViewController(self.pageController)
-            self.pageController.view.frame = UIScreen.main.bounds
-            self.view.addSubview(self.pageController.view)
-            self.pageController.didMove(toParentViewController: self)
+//        #else
+//            self.addChildViewController(self.pageController)
+//            self.pageController.view.frame = UIScreen.main.bounds
+//            self.view.addSubview(self.pageController.view)
+//            self.pageController.didMove(toParentViewController: self)
 
             let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
             menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
@@ -162,7 +162,7 @@ public class ViewerController: UIViewController {
             let leftSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(leftSwipe(gesture:)))
             leftSwipeRecognizer.direction = .left
             self.view.addGestureRecognizer(leftSwipeRecognizer)
-        #endif
+//        #endif
     }
 
     #if os(tvOS)
@@ -175,7 +175,7 @@ public class ViewerController: UIViewController {
         func playPause(gesture: UITapGestureRecognizer) {
             guard gesture.state == .ended else { return }
 
-            self.playIfVideo()
+            self.scrollView.slideshow()
         }
 
         func select(gesture: UITapGestureRecognizer) {

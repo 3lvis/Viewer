@@ -69,7 +69,7 @@ class PaginatedScrollView: UIScrollView {
         }
     }
 
-    func gotoPage(_ page: Int, animated: Bool) {
+    func gotoPage(_ page: Int, animated: Bool, isSlideshow: Bool = false) {
         self.loadScrollViewWithPage(page - 1)
         self.loadScrollViewWithPage(page)
         self.loadScrollViewWithPage(page + 1)
@@ -77,7 +77,16 @@ class PaginatedScrollView: UIScrollView {
         var bounds = self.bounds
         bounds.origin.x = bounds.size.width * CGFloat(page)
         bounds.origin.y = 0
-        self.scrollRectToVisible(bounds, animated: animated)
+
+        if isSlideshow {
+            self.alpha = 0
+            self.scrollRectToVisible(bounds, animated: false)
+            UIView.animate(withDuration: 0.3) {
+                self.alpha = 1
+            }
+        } else {
+            self.scrollRectToVisible(bounds, animated: true)
+        }
     }
 
     var shoudEvaluate = false
@@ -95,6 +104,16 @@ class PaginatedScrollView: UIScrollView {
         guard newPage >= 0 else { return }
 
         self.gotoPage(newPage, animated: true)
+    }
+
+    func slideshow() {
+        self.goRight()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.goRight()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.slideshow()
+            }
+        }
     }
 }
 
