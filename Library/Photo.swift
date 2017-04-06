@@ -1,7 +1,7 @@
 import UIKit
 import Photos
 
-struct Section {
+class Section {
     var photos = [Photo]()
     let groupedDate: String
 
@@ -10,7 +10,7 @@ struct Section {
     }
 }
 
-struct Photo: Viewable {
+class Photo: Viewable {
     var placeholder = UIImage()
 
     enum Size {
@@ -46,7 +46,7 @@ struct Photo: Viewable {
         for sectionIndex in 10 ..< numberOfSections {
             var photos = [Photo]()
             for row in 0 ..< 10 {
-                var photo = Photo(id: "\(sectionIndex)-\(row)")
+                let photo = Photo(id: "\(sectionIndex)-\(row)")
 
                 let index = Int(arc4random_uniform(6))
                 switch index {
@@ -75,7 +75,7 @@ struct Photo: Viewable {
             }
 
             let groupedDate = "\(sectionIndex)-12-2016"
-            var section = Section(groupedDate: groupedDate)
+            let section = Section(groupedDate: groupedDate)
             section.photos = photos
             sections.append(section)
         }
@@ -104,7 +104,7 @@ struct Photo: Viewable {
                     }
                 }
 
-                var photo = Photo(id: UUID().uuidString)
+                let photo = Photo(id: UUID().uuidString)
                 photo.assetID = asset.localIdentifier
 
                 if asset.duration > 0 {

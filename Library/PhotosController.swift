@@ -9,17 +9,22 @@ class PhotosController: UICollectionViewController {
     var dataSourceType: DataSourceType
     var viewerController: ViewerController?
     var optionsController: OptionsController?
-    var numberOfItems = 0
-    var sections = [Section]() {
-        didSet {
-            var count = 0
-            for i in 0 ..< self.sections.count {
-                let section = self.sections[i]
+
+    func numberOfItems(isSlideshow: Bool) -> Int {
+        var count = 0
+        for i in 0 ..< self.sections.count {
+            let section = self.sections[i]
+            if isSlideshow {
+                let filteredArray = section.photos.filter { $0.type == .image }
+                count += filteredArray.count
+            } else {
                 count += section.photos.count
             }
-            self.numberOfItems = count
         }
+        return count
     }
+    var isSlideshow = false
+    var sections = [Section]()
 
     init(dataSourceType: DataSourceType) {
         self.dataSourceType = dataSourceType
@@ -70,6 +75,19 @@ class PhotosController: UICollectionViewController {
 
         return alertController
     }
+
+    func object(at indexPath: IndexPath, isSlideshow: Bool) -> Photo {
+        let section = self.sections[indexPath.section]
+        var photo: Photo
+        if isSlideshow {
+            let filteredArray = section.photos.filter { $0.type == .image }
+            photo = filteredArray[indexPath.row]
+        } else {
+            photo = section.photos[indexPath.row]
+        }
+
+        return photo
+    }
 }
 
 extension PhotosController {
@@ -86,9 +104,7 @@ extension PhotosController {
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath) as! PhotoCell
-        let section = self.sections[indexPath.section]
-        let photo = section.photos[indexPath.row]
-        cell.photo = photo
+        cell.photo = self.object(at: indexPath, isSlideshow: false)
         cell.photo?.placeholder = cell.imageView.image ?? UIImage()
 
         return cell
@@ -97,6 +113,7 @@ extension PhotosController {
     public override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let collectionView = self.collectionView else { return }
 
+        self.isSlideshow = true
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
         self.viewerController!.dataSource = self
 
@@ -127,17 +144,14 @@ extension PhotosController {
 extension PhotosController: ViewerControllerDataSource {
 
     func numberOfItemsInViewerController(_: ViewerController) -> Int {
-        return self.numberOfItems
+        return self.numberOfItems(isSlideshow: self.isSlideshow)
     }
 
     func viewerController(_: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
-        var section = self.sections[indexPath.section]
-        var viewable = section.photos[indexPath.row]
+        let viewable = self.object(at: indexPath, isSlideshow: self.isSlideshow)
         if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {
             viewable.placeholder = placeholder
         }
-        section.photos[indexPath.row] = viewable
-        self.sections[indexPath.section] = section
 
         return viewable
     }
