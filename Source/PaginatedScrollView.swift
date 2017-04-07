@@ -89,7 +89,7 @@ class PaginatedScrollView: UIScrollView {
                 self.shoudEvaluate = false
             }
         } else {
-            self.scrollRectToVisible(bounds, animated: true)
+            self.scrollRectToVisible(bounds, animated: animated)
         }
     }
 
