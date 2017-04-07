@@ -47,7 +47,28 @@ class PhotosController: UICollectionViewController {
             self.sections = Photo.constructRemoteElements()
             self.collectionView?.reloadData()
         }
+
+        #if os(tvOS)
+        let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
+        playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
+        self.collectionView?.addGestureRecognizer(playPauseTapRecognizer)
+        #endif
     }
+
+    #if os(tvOS)
+    func playPause(gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+        guard let collectionView = self.collectionView else { return }
+
+        if let focusedCell = UIScreen.main.focusedView as? UICollectionViewCell {
+            if let indexPath = collectionView.indexPath(for: focusedCell) {
+                self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, isSlideshow: true)
+                self.viewerController!.dataSource = self
+                self.present(self.viewerController!, animated: false, completion: nil)
+            }
+        }
+    }
+    #endif
 
     #if os(tvOS)
         override var preferredFocusEnvironments: [UIFocusEnvironment] {
