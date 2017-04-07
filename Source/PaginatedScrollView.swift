@@ -119,7 +119,7 @@ class PaginatedScrollView: UIScrollView {
         return timer
     }()
 
-    func slideshow() {
+    func startSlideshow() {
         RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
     }
 }

@@ -19,12 +19,15 @@ public class ViewerController: UIViewController {
     fileprivate static let FooterHeight = CGFloat(50)
     fileprivate static let DraggingMargin = CGFloat(60)
 
-    public init(initialIndexPath: IndexPath, collectionView: UICollectionView) {
+    fileprivate var isSlideshow: Bool
+
+    public init(initialIndexPath: IndexPath, collectionView: UICollectionView, isSlideshow: Bool = false) {
         self.initialIndexPath = initialIndexPath
         self.currentIndexPath = initialIndexPath
         self.collectionView = collectionView
 
         self.proposedCurrentIndexPath = initialIndexPath
+        self.isSlideshow = isSlideshow
 
         super.init(nibName: nil, bundle: nil)
 
@@ -135,34 +138,38 @@ public class ViewerController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-//        #if os(iOS)
+        #if os(iOS)
             self.view.addSubview(self.scrollView)
-//        #else
-//            self.addChildViewController(self.pageController)
-//            self.pageController.view.frame = UIScreen.main.bounds
-//            self.view.addSubview(self.pageController.view)
-//            self.pageController.didMove(toParentViewController: self)
+        #else
+            if self.isSlideshow {
+                self.view.addSubview(self.scrollView)
+            } else {
+                self.addChildViewController(self.pageController)
+                self.pageController.view.frame = UIScreen.main.bounds
+                self.view.addSubview(self.pageController.view)
+                self.pageController.didMove(toParentViewController: self)
 
-            let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
-            menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
-            self.view.addGestureRecognizer(menuTapRecognizer)
+                let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
+                menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
+                self.view.addGestureRecognizer(menuTapRecognizer)
 
-            let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
-            playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
-            self.view.addGestureRecognizer(playPauseTapRecognizer)
+                let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
+                playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
+                self.view.addGestureRecognizer(playPauseTapRecognizer)
 
-            let selectTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.select(gesture:)))
-            selectTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
-            self.view.addGestureRecognizer(selectTapRecognizer)
+                let selectTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.select(gesture:)))
+                selectTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
+                self.view.addGestureRecognizer(selectTapRecognizer)
 
-            let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightSwipe(gesture:)))
-            rightSwipeRecognizer.direction = .right
-            self.view.addGestureRecognizer(rightSwipeRecognizer)
+                let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightSwipe(gesture:)))
+                rightSwipeRecognizer.direction = .right
+                self.view.addGestureRecognizer(rightSwipeRecognizer)
 
-            let leftSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(leftSwipe(gesture:)))
-            leftSwipeRecognizer.direction = .left
-            self.view.addGestureRecognizer(leftSwipeRecognizer)
-//        #endif
+                let leftSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(leftSwipe(gesture:)))
+                leftSwipeRecognizer.direction = .left
+                self.view.addGestureRecognizer(leftSwipeRecognizer)
+            }
+        #endif
     }
 
     #if os(tvOS)
@@ -175,7 +182,7 @@ public class ViewerController: UIViewController {
         func playPause(gesture: UITapGestureRecognizer) {
             guard gesture.state == .ended else { return }
 
-            self.scrollView.slideshow()
+            self.playIfVideo()
         }
 
         func select(gesture: UITapGestureRecognizer) {
@@ -350,9 +357,13 @@ extension ViewerController {
             #if os(iOS)
                 completion?()
             #else
-                self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { _ in
-                    completion?()
-                })
+                if self.isSlideshow {
+                    self.scrollView.startSlideshow()
+                } else {
+                    self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { _ in
+                        completion?()
+                    })
+                }
             #endif
         })
     }
