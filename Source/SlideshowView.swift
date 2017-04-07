@@ -104,12 +104,14 @@ class SlideshowView: UIView {
     }
 
     lazy var timer: Timer = {
-        let timer = Timer(timeInterval: 4, repeats: true) { timer in
-            self.goRight(isSlideshow: true)
-        }
+        let timer = Timer(timeInterval: 4, target: self, selector: #selector(fadeToNext), userInfo: nil, repeats: true)
 
         return timer
     }()
+
+    func fadeToNext() {
+        self.goRight(isSlideshow: true)
+    }
 
     func startSlideshow() {
         RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
