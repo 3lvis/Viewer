@@ -48,7 +48,7 @@ class PaginatedScrollView: UIScrollView {
         self.loadScrollViewWithPage(self.currentPage - 1)
         self.loadScrollViewWithPage(self.currentPage)
         self.loadScrollViewWithPage(self.currentPage + 1)
-        self.gotoPage(self.currentPage, animated: false)
+        self.gotoPage(self.currentPage, animated: false, isSlideshow: false)
     }
 
     func loadScrollViewWithPage(_ page: Int) {
@@ -69,7 +69,7 @@ class PaginatedScrollView: UIScrollView {
         }
     }
 
-    func gotoPage(_ page: Int, animated: Bool, isSlideshow: Bool = false) {
+    func gotoPage(_ page: Int, animated: Bool, isSlideshow: Bool) {
         self.loadScrollViewWithPage(page - 1)
         self.loadScrollViewWithPage(page)
         self.loadScrollViewWithPage(page + 1)
@@ -79,10 +79,14 @@ class PaginatedScrollView: UIScrollView {
         bounds.origin.y = 0
 
         if isSlideshow {
+            self.shoudEvaluate = true
+
             self.alpha = 0
             self.scrollRectToVisible(bounds, animated: false)
             UIView.animate(withDuration: 0.3) {
                 self.alpha = 1
+
+                self.shoudEvaluate = false
             }
         } else {
             self.scrollRectToVisible(bounds, animated: true)
@@ -91,29 +95,32 @@ class PaginatedScrollView: UIScrollView {
 
     var shoudEvaluate = false
 
-    func goRight() {
+    func goRight(isSlideshow: Bool) {
         let numPages = self.viewDataSource?.numberOfPagesInPaginatedScrollView(self) ?? 0
         let newPage = self.currentPage + 1
+        print(newPage)
         guard newPage <= numPages else { return }
 
-        self.gotoPage(newPage, animated: true)
+        self.gotoPage(newPage, animated: true, isSlideshow: isSlideshow)
     }
 
     func goLeft() {
         let newPage = self.currentPage - 1
         guard newPage >= 0 else { return }
 
-        self.gotoPage(newPage, animated: true)
+        self.gotoPage(newPage, animated: true, isSlideshow: false)
     }
 
-    func slideshow() {
-        self.goRight()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.goRight()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.slideshow()
-            }
+    lazy var timer: Timer = {
+        let timer = Timer(timeInterval: 4, repeats: true) { timer in
+            self.goRight(isSlideshow: true)
         }
+
+        return timer
+    }()
+
+    func slideshow() {
+        RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
     }
 }
 

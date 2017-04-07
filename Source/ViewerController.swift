@@ -195,7 +195,7 @@ public class ViewerController: UIViewController {
         func rightSwipe(gesture: UISwipeGestureRecognizer) {
             guard gesture.state == .ended else { return }
 
-            self.scrollView.goRight()
+            self.scrollView.goRight(isSlideshow: false)
         }
 
         func leftSwipe(gesture: UISwipeGestureRecognizer) {
