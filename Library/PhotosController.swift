@@ -64,6 +64,7 @@ class PhotosController: UICollectionViewController {
             if let indexPath = collectionView.indexPath(for: focusedCell) {
                 self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView, isSlideshow: true)
                 self.viewerController!.dataSource = self
+                self.viewerController!.delegate = self
                 self.present(self.viewerController!, animated: false, completion: nil)
             }
         }

@@ -34,7 +34,7 @@ class SlideshowView: UIView {
             view.removeFromSuperview()
         }
 
-        let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
+        _ = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
         // self.contentSize = CGSize(width: self.frame.size.width * CGFloat(numPages), height: self.frame.size.height)
 
         self.loadScrollViewWithPage(self.currentPage - 1)

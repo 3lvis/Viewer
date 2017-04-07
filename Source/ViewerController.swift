@@ -141,6 +141,10 @@ public class ViewerController: UIViewController {
         #if os(iOS)
             self.view.addSubview(self.scrollView)
         #else
+            let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
+            menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
+            self.view.addGestureRecognizer(menuTapRecognizer)
+
             if self.isSlideshow {
                 self.view.addSubview(self.scrollView)
             } else {
@@ -148,10 +152,6 @@ public class ViewerController: UIViewController {
                 self.pageController.view.frame = UIScreen.main.bounds
                 self.view.addSubview(self.pageController.view)
                 self.pageController.didMove(toParentViewController: self)
-
-                let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
-                menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
-                self.view.addGestureRecognizer(menuTapRecognizer)
 
                 let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
                 playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
@@ -374,6 +374,7 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
+        self.scrollView.stopSlideshow()
         guard let indexPath = viewableController.indexPath else { return }
 
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: indexPath)?.frame else { return }
