@@ -70,6 +70,15 @@ class PaginatedScrollView: UIScrollView {
     }
 
     func gotoPage(_ page: Int, animated: Bool, isSlideshow: Bool) {
+        if isSlideshow {
+            if let controller = self.viewDataSource?.paginatedScrollView(self, controllerAtIndex: page) as? ViewableController {
+                if controller.viewable?.type == .video {
+                    self.gotoPage(page + 1, animated: animated, isSlideshow: isSlideshow)
+                    return
+                }
+            }
+        }
+
         self.loadScrollViewWithPage(page - 1)
         self.loadScrollViewWithPage(page)
         self.loadScrollViewWithPage(page + 1)
