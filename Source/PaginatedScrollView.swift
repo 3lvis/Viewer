@@ -98,7 +98,6 @@ class PaginatedScrollView: UIScrollView {
     func goRight(isSlideshow: Bool) {
         let numPages = self.viewDataSource?.numberOfPagesInPaginatedScrollView(self) ?? 0
         let newPage = self.currentPage + 1
-        print(newPage)
         guard newPage <= numPages else { return }
 
         self.gotoPage(newPage, animated: true, isSlideshow: isSlideshow)
