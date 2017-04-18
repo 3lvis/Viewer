@@ -10,11 +10,17 @@ protocol SlideshowViewDelegate: class {
     func slideshowView(_ slideshowView: SlideshowView, didMoveFromIndex index: Int)
 }
 
-class SlideshowView: UIScrollView {
+class SlideshowView: UIView {
     weak var viewDataSource: SlideshowViewDataSource?
     weak var viewDelegate: SlideshowViewDelegate?
     unowned var parentController: UIViewController
     var currentPage: Int
+
+    lazy var timer: Timer = {
+        let timer = Timer(timeInterval: 4, target: self, selector: #selector(goRight), userInfo: nil, repeats: true)
+
+        return timer
+    }()
 
     init(frame: CGRect, parentController: UIViewController, initialPage: Int) {
         self.parentController = parentController
@@ -22,15 +28,7 @@ class SlideshowView: UIScrollView {
 
         super.init(frame: frame)
 
-        #if os(iOS)
-            self.isPagingEnabled = true
-            self.scrollsToTop = false
-        #endif
-        self.showsHorizontalScrollIndicator = false
-        self.showsVerticalScrollIndicator = false
-        self.delegate = self
         self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.decelerationRate = UIScrollViewDecelerationRateFast
     }
 
     required init?(coder _: NSCoder) {
@@ -42,78 +40,75 @@ class SlideshowView: UIScrollView {
             view.removeFromSuperview()
         }
 
-        let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
-        self.contentSize = CGSize(width: self.frame.size.width * CGFloat(numPages), height: self.frame.size.height)
-
-        self.loadScrollViewWithPage(self.currentPage - 1)
-        self.loadScrollViewWithPage(self.currentPage)
-        self.loadScrollViewWithPage(self.currentPage + 1)
-        self.gotoPage(self.currentPage, animated: false)
+        self.loadPage(self.currentPage, animated: false)
     }
 
-    func loadScrollViewWithPage(_ page: Int) {
+    func loadPage(_ page: Int, animated: Bool) {
         let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
         if page >= numPages || page < 0 {
             return
         }
 
-        if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page), controller.view.superview == nil {
-            var frame = self.frame
-            frame.origin.x = frame.size.width * CGFloat(page)
-            frame.origin.y = 0
-            controller.view.frame = frame
+        if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil {
+            guard let image = controller.viewable?.placeholder else { return }
 
+            controller.view.frame = image.centeredFrame()
             self.parentController.addChildViewController(controller)
             self.addSubview(controller.view)
             controller.didMove(toParentViewController: self.parentController)
         }
     }
 
-    func gotoPage(_ page: Int, animated: Bool) {
-        if animated {
-            if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController {
-                if controller.viewable?.type == .video {
-                    self.gotoPage(page + 1, animated: animated)
-                    return
-                }
-            }
-        }
+//    func loadScrollViewWithPage(_ page: Int) {
+//        let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
+//        if page >= numPages || page < 0 {
+//            return
+//        }
+//
+//        if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page), controller.view.superview == nil {
+//            var frame = self.frame
+//            frame.origin.x = frame.size.width * CGFloat(page)
+//            frame.origin.y = 0
+//            controller.view.frame = frame
+//
+//            self.parentController.addChildViewController(controller)
+//            self.addSubview(controller.view)
+//            controller.didMove(toParentViewController: self.parentController)
+//        }
+//    }
 
-        self.loadScrollViewWithPage(page - 1)
-        self.loadScrollViewWithPage(page)
-        self.loadScrollViewWithPage(page + 1)
-
-        var bounds = self.bounds
-        bounds.origin.x = bounds.size.width * CGFloat(page)
-        bounds.origin.y = 0
-
-        self.shoudEvaluate = true
-
-        self.alpha = 0
-        self.scrollRectToVisible(bounds, animated: false)
-        let duration = animated ? 0.3 : 0
-        UIView.animate(withDuration: duration) {
-            self.alpha = 1
-
-            self.shoudEvaluate = false
-        }
-    }
-
-    var shoudEvaluate = false
+//    func gotoPage(_ page: Int, animated: Bool) {
+//        if animated {
+//            if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController {
+//                if controller.viewable?.type == .video {
+//                    self.gotoPage(page + 1, animated: animated)
+//                    return
+//                }
+//            }
+//        }
+//
+//        self.loadScrollViewWithPage(page - 1)
+//        self.loadScrollViewWithPage(page)
+//        self.loadScrollViewWithPage(page + 1)
+//
+//        var bounds = self.bounds
+//        bounds.origin.x = bounds.size.width * CGFloat(page)
+//        bounds.origin.y = 0
+//
+//        self.alpha = 0
+//        let duration = animated ? 0.3 : 0
+//        UIView.animate(withDuration: duration) {
+//            self.alpha = 1
+//        }
+//    }
 
     func goRight() {
         let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
         let newPage = self.currentPage + 1
         guard newPage <= numPages else { return }
 
-        self.gotoPage(newPage, animated: true)
+//        self.gotoPage(newPage, animated: true)
     }
-
-    lazy var timer: Timer = {
-        let timer = Timer(timeInterval: 4, target: self, selector: #selector(goRight), userInfo: nil, repeats: true)
-
-        return timer
-    }()
 
     func startSlideshow() {
         RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
@@ -121,32 +116,5 @@ class SlideshowView: UIScrollView {
 
     func stopSlideshow() {
         self.timer.invalidate()
-    }
-}
-
-extension SlideshowView: UIScrollViewDelegate {
-
-    func scrollViewWillBeginDragging(_: UIScrollView) {
-        self.shoudEvaluate = true
-    }
-
-    func scrollViewDidEndDecelerating(_: UIScrollView) {
-        self.shoudEvaluate = false
-    }
-
-    func scrollViewDidScroll(_: UIScrollView) {
-        if self.shoudEvaluate {
-            let pageWidth = self.frame.size.width
-            let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
-            if page != self.currentPage {
-                self.viewDelegate?.slideshowView(self, didMoveToIndex: page)
-                self.viewDelegate?.slideshowView(self, didMoveFromIndex: self.currentPage)
-            }
-            self.currentPage = page
-            
-            self.loadScrollViewWithPage(page - 1)
-            self.loadScrollViewWithPage(page)
-            self.loadScrollViewWithPage(page + 1)
-        }
     }
 }
