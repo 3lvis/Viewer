@@ -133,6 +133,15 @@ public class ViewerController: UIViewController {
         return view
     }()
 
+    lazy var slideshowView: SlideshowView = {
+        let view = SlideshowView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
+        view.viewDataSource = self
+        view.viewDelegate = self
+        view.backgroundColor = .clear
+
+        return view
+    }()
+
     // MARK: View Lifecycle
 
     public override func viewDidLoad() {
@@ -146,7 +155,7 @@ public class ViewerController: UIViewController {
             self.view.addGestureRecognizer(menuTapRecognizer)
 
             if self.isSlideshow {
-                self.view.addSubview(self.scrollView)
+                self.view.addSubview(self.slideshowView)
             } else {
                 self.addChildViewController(self.pageController)
                 self.pageController.view.frame = UIScreen.main.bounds
@@ -202,7 +211,7 @@ public class ViewerController: UIViewController {
         func rightSwipe(gesture: UISwipeGestureRecognizer) {
             guard gesture.state == .ended else { return }
 
-            self.scrollView.goRight(isSlideshow: false)
+            self.scrollView.goRight()
         }
 
         func leftSwipe(gesture: UISwipeGestureRecognizer) {
@@ -216,7 +225,11 @@ public class ViewerController: UIViewController {
         super.viewWillLayoutSubviews()
 
         if self.isPresented {
-            self.scrollView.configure()
+            if self.isSlideshow {
+                self.slideshowView.configure()
+            } else {
+                self.scrollView.configure()
+            }
             if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
                 self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
             }
@@ -358,7 +371,7 @@ extension ViewerController {
                 completion?()
             #else
                 if self.isSlideshow {
-                    self.scrollView.startSlideshow()
+                    self.slideshowView.startSlideshow()
                 } else {
                     self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { _ in
                         completion?()
@@ -374,7 +387,7 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
-        self.scrollView.stopSlideshow()
+        self.slideshowView.stopSlideshow()
         guard let indexPath = viewableController.indexPath else { return }
 
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: indexPath)?.frame else { return }
@@ -569,6 +582,35 @@ extension ViewerController: UIGestureRecognizerDelegate {
         }
 
         return true
+    }
+}
+
+extension ViewerController: SlideshowViewDataSource {
+    func numberOfPagesInSlideshowView(_ slideshowView: SlideshowView) -> Int {
+        return self.dataSource?.numberOfItemsInViewerController(self) ?? 0
+    }
+
+    func slideshowView(_ slideshowView: SlideshowView, controllerAtIndex index: Int) -> UIViewController {
+        let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
+
+        return self.findOrCreateViewableController(indexPath)
+    }
+}
+
+extension ViewerController: SlideshowViewDelegate {
+    func slideshowView(_ slideshowView: SlideshowView, didMoveToIndex index: Int) {
+        let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
+        self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
+        self.currentIndexPath = indexPath
+        self.delegate?.viewerController(self, didChangeFocusTo: indexPath)
+        let viewableController = self.findOrCreateViewableController(indexPath)
+        viewableController.display()
+    }
+
+    func slideshowView(_ slideshowView: SlideshowView, didMoveFromIndex index: Int) {
+        let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
+        let viewableController = self.findOrCreateViewableController(indexPath)
+        viewableController.willDismiss()
     }
 }
 
