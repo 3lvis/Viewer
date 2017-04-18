@@ -134,7 +134,6 @@
 		14B9EF211CB7EE3800563610 /* dark-circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dark-circle.png"; sourceTree = "<group>"; };
 		14B9EF221CB7EE3800563610 /* dark-circle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dark-circle@2x.png"; sourceTree = "<group>"; };
 		14B9EF231CB7EE3800563610 /* dark-circle@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dark-circle@3x.png"; sourceTree = "<group>"; };
-		14C0AF801BD6D4230009ECBE /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = .travis.yml; sourceTree = "<group>"; };
 		14C0AF811BD6D4230009ECBE /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		14C0AF821BD6D4230009ECBE /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
 		14C0AF831BD6D4230009ECBE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -278,7 +277,6 @@
 		14C136501AB7849300B7B07A /* Metadata */ = {
 			isa = PBXGroup;
 			children = (
-				14C0AF801BD6D4230009ECBE /* .travis.yml */,
 				14C0AF811BD6D4230009ECBE /* CHANGELOG.md */,
 				14C0AF821BD6D4230009ECBE /* CONTRIBUTING.md */,
 				14C0AF831BD6D4230009ECBE /* README.md */,
