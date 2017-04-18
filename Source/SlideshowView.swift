@@ -48,7 +48,7 @@ class SlideshowView: UIScrollView {
         self.loadScrollViewWithPage(self.currentPage - 1)
         self.loadScrollViewWithPage(self.currentPage)
         self.loadScrollViewWithPage(self.currentPage + 1)
-        self.gotoPage(self.currentPage, animated: false, isSlideshow: false)
+        self.gotoPage(self.currentPage, animated: false)
     }
 
     func loadScrollViewWithPage(_ page: Int) {
@@ -69,11 +69,11 @@ class SlideshowView: UIScrollView {
         }
     }
 
-    func gotoPage(_ page: Int, animated: Bool, isSlideshow: Bool) {
-        if isSlideshow {
+    func gotoPage(_ page: Int, animated: Bool) {
+        if animated {
             if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController {
                 if controller.viewable?.type == .video {
-                    self.gotoPage(page + 1, animated: animated, isSlideshow: isSlideshow)
+                    self.gotoPage(page + 1, animated: animated)
                     return
                 }
             }
@@ -87,47 +87,33 @@ class SlideshowView: UIScrollView {
         bounds.origin.x = bounds.size.width * CGFloat(page)
         bounds.origin.y = 0
 
-        if isSlideshow {
-            self.shoudEvaluate = true
+        self.shoudEvaluate = true
 
-            self.alpha = 0
-            self.scrollRectToVisible(bounds, animated: false)
-            UIView.animate(withDuration: 0.3) {
-                self.alpha = 1
+        self.alpha = 0
+        self.scrollRectToVisible(bounds, animated: false)
+        let duration = animated ? 0.3 : 0
+        UIView.animate(withDuration: duration) {
+            self.alpha = 1
 
-                self.shoudEvaluate = false
-            }
-        } else {
-            self.scrollRectToVisible(bounds, animated: animated)
+            self.shoudEvaluate = false
         }
     }
 
     var shoudEvaluate = false
 
-    func goRight(isSlideshow: Bool) {
+    func goRight() {
         let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
         let newPage = self.currentPage + 1
         guard newPage <= numPages else { return }
 
-        self.gotoPage(newPage, animated: true, isSlideshow: isSlideshow)
-    }
-
-    func goLeft() {
-        let newPage = self.currentPage - 1
-        guard newPage >= 0 else { return }
-
-        self.gotoPage(newPage, animated: true, isSlideshow: false)
+        self.gotoPage(newPage, animated: true)
     }
 
     lazy var timer: Timer = {
-        let timer = Timer(timeInterval: 4, target: self, selector: #selector(fadeToNext), userInfo: nil, repeats: true)
+        let timer = Timer(timeInterval: 4, target: self, selector: #selector(goRight), userInfo: nil, repeats: true)
 
         return timer
     }()
-
-    func fadeToNext() {
-        self.goRight(isSlideshow: true)
-    }
 
     func startSlideshow() {
         RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
