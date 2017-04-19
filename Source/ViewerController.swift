@@ -19,12 +19,15 @@ public class ViewerController: UIViewController {
     fileprivate static let FooterHeight = CGFloat(50)
     fileprivate static let DraggingMargin = CGFloat(60)
 
-    public init(initialIndexPath: IndexPath, collectionView: UICollectionView) {
+    fileprivate var isSlideshow: Bool
+
+    public init(initialIndexPath: IndexPath, collectionView: UICollectionView, isSlideshow: Bool = false) {
         self.initialIndexPath = initialIndexPath
         self.currentIndexPath = initialIndexPath
         self.collectionView = collectionView
 
         self.proposedCurrentIndexPath = initialIndexPath
+        self.isSlideshow = isSlideshow
 
         super.init(nibName: nil, bundle: nil)
 
@@ -130,6 +133,15 @@ public class ViewerController: UIViewController {
         return view
     }()
 
+    lazy var slideshowView: SlideshowView = {
+        let view = SlideshowView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
+        view.dataSource = self
+        view.delegate = self
+        view.backgroundColor = .clear
+
+        return view
+    }()
+
     // MARK: View Lifecycle
 
     public override func viewDidLoad() {
@@ -138,30 +150,34 @@ public class ViewerController: UIViewController {
         #if os(iOS)
             self.view.addSubview(self.scrollView)
         #else
-            self.addChildViewController(self.pageController)
-            self.pageController.view.frame = UIScreen.main.bounds
-            self.view.addSubview(self.pageController.view)
-            self.pageController.didMove(toParentViewController: self)
-
             let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
             menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
             self.view.addGestureRecognizer(menuTapRecognizer)
 
-            let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
-            playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
-            self.view.addGestureRecognizer(playPauseTapRecognizer)
+            if self.isSlideshow {
+                self.view.addSubview(self.slideshowView)
+            } else {
+                self.addChildViewController(self.pageController)
+                self.pageController.view.frame = UIScreen.main.bounds
+                self.view.addSubview(self.pageController.view)
+                self.pageController.didMove(toParentViewController: self)
 
-            let selectTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.select(gesture:)))
-            selectTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
-            self.view.addGestureRecognizer(selectTapRecognizer)
+                let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
+                playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
+                self.view.addGestureRecognizer(playPauseTapRecognizer)
 
-            let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightSwipe(gesture:)))
-            rightSwipeRecognizer.direction = .right
-            self.view.addGestureRecognizer(rightSwipeRecognizer)
+                let selectTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.select(gesture:)))
+                selectTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
+                self.view.addGestureRecognizer(selectTapRecognizer)
 
-            let leftSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(leftSwipe(gesture:)))
-            leftSwipeRecognizer.direction = .left
-            self.view.addGestureRecognizer(leftSwipeRecognizer)
+                let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightSwipe(gesture:)))
+                rightSwipeRecognizer.direction = .right
+                self.view.addGestureRecognizer(rightSwipeRecognizer)
+
+                let leftSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(leftSwipe(gesture:)))
+                leftSwipeRecognizer.direction = .left
+                self.view.addGestureRecognizer(leftSwipeRecognizer)
+            }
         #endif
     }
 
@@ -209,7 +225,11 @@ public class ViewerController: UIViewController {
         super.viewWillLayoutSubviews()
 
         if self.isPresented {
-            self.scrollView.configure()
+            if self.isSlideshow {
+                self.slideshowView.configure()
+            } else {
+                self.scrollView.configure()
+            }
             if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
                 self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
             }
@@ -350,9 +370,13 @@ extension ViewerController {
             #if os(iOS)
                 completion?()
             #else
-                self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { _ in
-                    completion?()
-                })
+                if self.isSlideshow {
+                    self.slideshowView.start()
+                } else {
+                    self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { _ in
+                        completion?()
+                    })
+                }
             #endif
         })
     }
@@ -363,6 +387,10 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
+        if self.isSlideshow {
+            self.slideshowView.stop()
+        }
+
         guard let indexPath = viewableController.indexPath else { return }
 
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: indexPath)?.frame else { return }
@@ -560,22 +588,20 @@ extension ViewerController: UIGestureRecognizerDelegate {
     }
 }
 
-extension ViewerController: PaginatedScrollViewDataSource {
-
-    func numberOfPagesInPaginatedScrollView(_: PaginatedScrollView) -> Int {
+extension ViewerController: ViewableControllerContainerDataSource {
+    func numberOfPagesInViewableControllerContainer(_ viewableControllerContainer: ViewableControllerContainer) -> Int {
         return self.dataSource?.numberOfItemsInViewerController(self) ?? 0
     }
 
-    func paginatedScrollView(_: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
+    func viewableControllerContainer(_ viewableControllerContainer: ViewableControllerContainer, controllerAtIndex index: Int) -> UIViewController {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
 
         return self.findOrCreateViewableController(indexPath)
     }
 }
 
-extension ViewerController: PaginatedScrollViewDelegate {
-
-    func paginatedScrollView(_: PaginatedScrollView, didMoveToIndex index: Int) {
+extension ViewerController: ViewableControllerContainerDelegate {
+    func viewableControllerContainer(_ viewableControllerContainer: ViewableControllerContainer, didMoveToIndex index: Int) {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
         self.currentIndexPath = indexPath
@@ -584,7 +610,7 @@ extension ViewerController: PaginatedScrollViewDelegate {
         viewableController.display()
     }
 
-    func paginatedScrollView(_: PaginatedScrollView, didMoveFromIndex index: Int) {
+    func viewableControllerContainer(_ viewableControllerContainer: ViewableControllerContainer, didMoveFromIndex index: Int) {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         let viewableController = self.findOrCreateViewableController(indexPath)
         viewableController.willDismiss()
