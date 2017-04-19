@@ -1,6 +1,9 @@
 import UIKit
 
 class SlideshowView: UIView, ViewableControllerContainer {
+    fileprivate static let fadeDuration: Double = 1
+    fileprivate static let transitionToNextDuration: Double = 6
+
     weak var dataSource: ViewableControllerContainerDataSource?
     weak var delegate: ViewableControllerContainerDelegate?
     fileprivate unowned var parentController: UIViewController
@@ -8,7 +11,7 @@ class SlideshowView: UIView, ViewableControllerContainer {
     fileprivate var currentController: ViewableController?
 
     fileprivate lazy var timer: Timer = {
-        let timer = Timer(timeInterval: 6, target: self, selector: #selector(loadNext), userInfo: nil, repeats: true)
+        let timer = Timer(timeInterval: SlideshowView.transitionToNextDuration, target: self, selector: #selector(loadNext), userInfo: nil, repeats: true)
 
         return timer
     }()
@@ -52,7 +55,7 @@ class SlideshowView: UIView, ViewableControllerContainer {
             self.currentController = controller
         } else {
             controller.view.alpha = 0
-            UIView.animate(withDuration: 1, delay: 0, options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction], animations: {
+            UIView.animate(withDuration: SlideshowView.fadeDuration, delay: 0, options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction], animations: {
                 self.currentController?.view.alpha = 0
                 controller.view.alpha = 1
             }, completion: { isFinished in
