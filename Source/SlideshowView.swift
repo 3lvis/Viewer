@@ -1,7 +1,7 @@
 import UIKit
 
 
-/// The current implementation of SlideshowVideo will ignore videos, if a video is the initial presented element then
+/// The current implementation of SlideshowVideo will ignore videos, if a video is the initially presented element then
 /// it will instantly jump to the next element. If the next element is a video it will continue jumping until a photo
 /// is found.
 class SlideshowView: UIView, ViewableControllerContainer {
