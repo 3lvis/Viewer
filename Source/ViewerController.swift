@@ -372,6 +372,8 @@ extension ViewerController {
             #else
                 if self.isSlideshow {
                     self.slideshowView.start()
+
+                    UIApplication.shared.isIdleTimerDisabled = true
                 } else {
                     self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { _ in
                         completion?()
@@ -389,6 +391,8 @@ extension ViewerController {
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
         if self.isSlideshow {
             self.slideshowView.stop()
+
+            UIApplication.shared.isIdleTimerDisabled = false
         }
 
         guard let indexPath = viewableController.indexPath else { return }
