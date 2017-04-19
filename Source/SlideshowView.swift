@@ -40,74 +40,49 @@ class SlideshowView: UIView {
             view.removeFromSuperview()
         }
 
-        self.loadPage(self.currentPage, animated: false)
+        self.loadPage(self.currentPage, animated: false, isInitial: true)
     }
 
-    func loadPage(_ page: Int, animated: Bool) {
+    var currentController: ViewableController?
+
+    func loadPage(_ page: Int, animated: Bool, isInitial: Bool) {
         let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
         if page >= numPages || page < 0 {
             return
         }
 
-        if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil {
-            guard let image = controller.viewable?.placeholder else { return }
+        guard let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil else { return }
+        guard let image = controller.viewable?.placeholder else { return }
 
-            controller.view.frame = image.centeredFrame()
-            self.parentController.addChildViewController(controller)
-            self.addSubview(controller.view)
-            controller.didMove(toParentViewController: self.parentController)
+        controller.view.frame = image.centeredFrame()
+        self.parentController.addChildViewController(controller)
+        self.addSubview(controller.view)
+        controller.didMove(toParentViewController: self.parentController)
+
+        if isInitial {
+            self.currentController = controller
+        } else {
+            controller.view.alpha = 0
+            UIView.animate(withDuration: 1, delay: 0, options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction], animations: {
+                self.currentController?.view.alpha = 0
+                controller.view.alpha = 1
+            }, completion: { isFinished in
+                self.currentController?.willMove(toParentViewController: nil)
+                self.currentController?.view.removeFromSuperview()
+                self.currentController?.removeFromParentViewController()
+                self.currentController = nil
+
+                self.currentController = controller
+            })
         }
     }
-
-//    func loadScrollViewWithPage(_ page: Int) {
-//        let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
-//        if page >= numPages || page < 0 {
-//            return
-//        }
-//
-//        if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page), controller.view.superview == nil {
-//            var frame = self.frame
-//            frame.origin.x = frame.size.width * CGFloat(page)
-//            frame.origin.y = 0
-//            controller.view.frame = frame
-//
-//            self.parentController.addChildViewController(controller)
-//            self.addSubview(controller.view)
-//            controller.didMove(toParentViewController: self.parentController)
-//        }
-//    }
-
-//    func gotoPage(_ page: Int, animated: Bool) {
-//        if animated {
-//            if let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController {
-//                if controller.viewable?.type == .video {
-//                    self.gotoPage(page + 1, animated: animated)
-//                    return
-//                }
-//            }
-//        }
-//
-//        self.loadScrollViewWithPage(page - 1)
-//        self.loadScrollViewWithPage(page)
-//        self.loadScrollViewWithPage(page + 1)
-//
-//        var bounds = self.bounds
-//        bounds.origin.x = bounds.size.width * CGFloat(page)
-//        bounds.origin.y = 0
-//
-//        self.alpha = 0
-//        let duration = animated ? 0.3 : 0
-//        UIView.animate(withDuration: duration) {
-//            self.alpha = 1
-//        }
-//    }
 
     func goRight() {
         let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
         let newPage = self.currentPage + 1
         guard newPage <= numPages else { return }
 
-//        self.gotoPage(newPage, animated: true)
+        self.loadPage(newPage, animated: true, isInitial: false)
     }
 
     func startSlideshow() {
