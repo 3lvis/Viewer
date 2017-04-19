@@ -49,15 +49,16 @@ class SlideshowView: UIView, ViewableControllerContainer {
         self.parentController.addChildViewController(controller)
         self.addSubview(controller.view)
         controller.didMove(toParentViewController: self.parentController)
+        controller.view.alpha = 0
     }
 
     func show(page: Int, isInitial: Bool) {
-        guard let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil else { return }
+        guard let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: page) as? ViewableController else { return }
 
         if isInitial {
             self.currentController = controller
+            controller.view.alpha = 1
         } else {
-            controller.view.alpha = 0
             UIView.animate(withDuration: 1, delay: 0, options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction], animations: {
                 self.currentController?.view.alpha = 0
                 controller.view.alpha = 1
@@ -89,10 +90,11 @@ class SlideshowView: UIView, ViewableControllerContainer {
         }
 
         self.loadPage(newPage)
+        self.show(page: newPage, isInitial: false)
+
         let nextIsFirst = newPage + 1 == numPages
         let nextPage = nextIsFirst ? 0 : newPage + 1
         self.loadPage(nextPage)
-        self.show(page: nextPage, isInitial: false)
     }
 
     func start() {
