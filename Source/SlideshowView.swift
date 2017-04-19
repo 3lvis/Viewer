@@ -11,13 +11,14 @@ protocol SlideshowViewDelegate: class {
 }
 
 class SlideshowView: UIView {
-    weak var viewDataSource: SlideshowViewDataSource?
-    weak var viewDelegate: SlideshowViewDelegate?
-    unowned var parentController: UIViewController
-    var currentPage: Int
+    weak var dataSource: SlideshowViewDataSource?
+    weak var delegate: SlideshowViewDelegate?
+    fileprivate unowned var parentController: UIViewController
+    fileprivate var currentPage: Int
+    fileprivate var currentController: ViewableController?
 
-    lazy var timer: Timer = {
-        let timer = Timer(timeInterval: 6, target: self, selector: #selector(goRight), userInfo: nil, repeats: true)
+    fileprivate lazy var timer: Timer = {
+        let timer = Timer(timeInterval: 6, target: self, selector: #selector(loadNext), userInfo: nil, repeats: true)
 
         return timer
     }()
@@ -43,15 +44,13 @@ class SlideshowView: UIView {
         self.loadPage(self.currentPage, animated: false, isInitial: true)
     }
 
-    var currentController: ViewableController?
-
-    func loadPage(_ page: Int, animated: Bool, isInitial: Bool) {
-        let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
+    fileprivate func loadPage(_ page: Int, animated: Bool, isInitial: Bool) {
+        let numPages = self.dataSource?.numberOfPagesInSlideshowView(self) ?? 0
         if page >= numPages || page < 0 {
             return
         }
 
-        guard let controller = self.viewDataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil else { return }
+        guard let controller = self.dataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil else { return }
         guard let image = controller.viewable?.placeholder else { return }
 
         controller.view.frame = image.centeredFrame()
@@ -73,24 +72,34 @@ class SlideshowView: UIView {
                 self.currentController = nil
 
                 self.currentController = controller
+
+                self.delegate?.slideshowView(self, didMoveFromIndex: self.currentPage)
+                self.delegate?.slideshowView(self, didMoveToIndex: page)
+
                 self.currentPage = page
             })
         }
     }
 
-    func goRight() {
-        let numPages = self.viewDataSource?.numberOfPagesInSlideshowView(self) ?? 0
-        let newPage = self.currentPage + 1
+    func loadNext() {
+        let numPages = self.dataSource?.numberOfPagesInSlideshowView(self) ?? 0
+        var newPage = self.currentPage + 1
+
         guard newPage <= numPages else { return }
+
+        let hasReachedEnd = newPage == numPages
+        if hasReachedEnd {
+            newPage = 0
+        }
 
         self.loadPage(newPage, animated: true, isInitial: false)
     }
 
-    func startSlideshow() {
+    func start() {
         RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
     }
 
-    func stopSlideshow() {
+    func stop() {
         self.timer.invalidate()
     }
 }

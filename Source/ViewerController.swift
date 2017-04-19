@@ -135,8 +135,8 @@ public class ViewerController: UIViewController {
 
     lazy var slideshowView: SlideshowView = {
         let view = SlideshowView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
-        view.viewDataSource = self
-        view.viewDelegate = self
+        view.dataSource = self
+        view.delegate = self
         view.backgroundColor = .clear
 
         return view
@@ -371,7 +371,7 @@ extension ViewerController {
                 completion?()
             #else
                 if self.isSlideshow {
-                    self.slideshowView.startSlideshow()
+                    self.slideshowView.start()
                 } else {
                     self.pageController.setViewControllers([controller], direction: .forward, animated: false, completion: { _ in
                         completion?()
@@ -387,7 +387,7 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
-        self.slideshowView.stopSlideshow()
+        self.slideshowView.stop()
         guard let indexPath = viewableController.indexPath else { return }
 
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: indexPath)?.frame else { return }
