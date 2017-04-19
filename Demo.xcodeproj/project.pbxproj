@@ -258,12 +258,12 @@
 				14EC47B71C58F6BC0028A0CD /* VideoView.swift */,
 				E6D592821D226528006EF238 /* VideoProgressView.swift */,
 				143803391C2452A1003CA252 /* Viewable.swift */,
+				14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */,
 				14C327B71CBE69F800CC0F98 /* PaginatedScrollView.swift */,
 				14C96A1B1E9775C700DDE110 /* SlideshowView.swift */,
 				143803351C2452A1003CA252 /* NSIndexPath+Contiguous.swift */,
 				143803361C2452A1003CA252 /* UIImage+CenteredFrame.swift */,
 				143803371C2452A1003CA252 /* UIViewController+Window.swift */,
-				14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";

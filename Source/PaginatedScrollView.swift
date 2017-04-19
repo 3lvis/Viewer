@@ -1,20 +1,11 @@
 import UIKit
 
-protocol PaginatedScrollViewDataSource: class {
-    func numberOfPagesInPaginatedScrollView(_ paginatedScrollView: PaginatedScrollView) -> Int
-    func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController
-}
-
-protocol PaginatedScrollViewDelegate: class {
-    func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, didMoveToIndex index: Int)
-    func paginatedScrollView(_ paginatedScrollView: PaginatedScrollView, didMoveFromIndex index: Int)
-}
-
 class PaginatedScrollView: UIScrollView, ViewableControllerContainer {
     weak var viewDataSource: ViewableControllerContainerDataSource?
     weak var viewDelegate: ViewableControllerContainerDelegate?
-    unowned var parentController: UIViewController
-    var currentPage: Int
+    fileprivate unowned var parentController: UIViewController
+    fileprivate var currentPage: Int
+    fileprivate var shoudEvaluate = false
 
     init(frame: CGRect, parentController: UIViewController, initialPage: Int) {
         self.parentController = parentController
@@ -51,7 +42,7 @@ class PaginatedScrollView: UIScrollView, ViewableControllerContainer {
         self.gotoPage(self.currentPage, animated: false)
     }
 
-    func loadScrollViewWithPage(_ page: Int) {
+    fileprivate func loadScrollViewWithPage(_ page: Int) {
         let numPages = self.viewDataSource?.numberOfPagesInViewableControllerContainer(self) ?? 0
         if page >= numPages || page < 0 {
             return
@@ -69,7 +60,7 @@ class PaginatedScrollView: UIScrollView, ViewableControllerContainer {
         }
     }
 
-    func gotoPage(_ page: Int, animated: Bool) {
+    fileprivate func gotoPage(_ page: Int, animated: Bool) {
         self.loadScrollViewWithPage(page - 1)
         self.loadScrollViewWithPage(page)
         self.loadScrollViewWithPage(page + 1)
@@ -80,8 +71,6 @@ class PaginatedScrollView: UIScrollView, ViewableControllerContainer {
 
             self.scrollRectToVisible(bounds, animated: animated)
     }
-
-    var shoudEvaluate = false
 
     func goRight() {
         let numPages = self.viewDataSource?.numberOfPagesInViewableControllerContainer(self) ?? 0
