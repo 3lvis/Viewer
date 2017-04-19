@@ -92,7 +92,7 @@ class PhotosController: UICollectionViewController {
         return alertController
     }
 
-    func object(at indexPath: IndexPath) -> Photo {
+    func photo(at indexPath: IndexPath) -> Photo {
         let section = self.sections[indexPath.section]
         let photo = section.photos[indexPath.row]
 
@@ -114,7 +114,7 @@ extension PhotosController {
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.Identifier, for: indexPath) as! PhotoCell
-        cell.photo = self.object(at: indexPath)
+        cell.photo = self.photo(at: indexPath)
         cell.photo?.placeholder = cell.imageView.image ?? UIImage()
 
         return cell
@@ -157,7 +157,7 @@ extension PhotosController: ViewerControllerDataSource {
     }
 
     func viewerController(_: ViewerController, viewableAt indexPath: IndexPath) -> Viewable {
-        let viewable = self.object(at: indexPath)
+        let viewable = self.photo(at: indexPath)
         if let cell = self.collectionView?.cellForItem(at: indexPath) as? PhotoCell, let placeholder = cell.imageView.image {
             viewable.placeholder = placeholder
         }
