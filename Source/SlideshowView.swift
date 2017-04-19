@@ -54,6 +54,9 @@ class SlideshowView: UIView, ViewableControllerContainer {
         if isInitial {
             self.currentController = controller
         } else {
+            self.delegate?.viewableControllerContainer(self, didMoveFromIndex: self.currentPage)
+            self.delegate?.viewableControllerContainer(self, didMoveToIndex: page)
+
             controller.view.alpha = 0
             UIView.animate(withDuration: SlideshowView.fadeDuration, delay: 0, options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction], animations: {
                 self.currentController?.view.alpha = 0
@@ -65,9 +68,6 @@ class SlideshowView: UIView, ViewableControllerContainer {
                 self.currentController = nil
 
                 self.currentController = controller
-
-                self.delegate?.viewableControllerContainer(self, didMoveFromIndex: self.currentPage)
-                self.delegate?.viewableControllerContainer(self, didMoveToIndex: page)
 
                 self.currentPage = page
             })
