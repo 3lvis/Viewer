@@ -43,7 +43,7 @@ class SlideshowView: UIView, ViewableControllerContainer {
             return
         }
 
-        guard let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil else { return }
+        guard let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: page) as? ViewableController else { return }
         guard let image = controller.viewable?.placeholder else { return }
 
         controller.view.frame = image.centeredFrame()
