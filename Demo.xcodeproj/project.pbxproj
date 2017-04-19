@@ -94,6 +94,8 @@
 		14E5F7A51E7833B200D970EF /* SharedAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14E5F7A41E7833B200D970EF /* SharedAssets.xcassets */; };
 		14E5F7A61E7833B200D970EF /* SharedAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14E5F7A41E7833B200D970EF /* SharedAssets.xcassets */; };
 		14EC47B91C58F6C00028A0CD /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* VideoView.swift */; };
+		14FAC8E21EA754D7003DA8F2 /* ViewableControllerContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */; };
+		14FAC8E31EA754D7003DA8F2 /* ViewableControllerContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */; };
 		E6D592841D226528006EF238 /* VideoProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D592821D226528006EF238 /* VideoProgressView.swift */; };
 		E6D592891D22A2B8006EF238 /* DINNextLTPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */; };
 /* End PBXBuildFile section */
@@ -151,6 +153,7 @@
 		14E5F7881E78330400D970EF /* PopupController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupController.swift; sourceTree = "<group>"; };
 		14E5F7A41E7833B200D970EF /* SharedAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = SharedAssets.xcassets; sourceTree = "<group>"; };
 		14EC47B71C58F6BC0028A0CD /* VideoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
+		14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewableControllerContainer.swift; sourceTree = "<group>"; };
 		E6D592821D226528006EF238 /* VideoProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoProgressView.swift; sourceTree = "<group>"; };
 		E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DINNextLTPro-Regular.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -260,6 +263,7 @@
 				143803351C2452A1003CA252 /* NSIndexPath+Contiguous.swift */,
 				143803361C2452A1003CA252 /* UIImage+CenteredFrame.swift */,
 				143803371C2452A1003CA252 /* UIViewController+Window.swift */,
+				14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -530,6 +534,7 @@
 				143803461C2452A1003CA252 /* Viewable.swift in Sources */,
 				14B905321E8BF05500214247 /* PhotosCollectionLayout.swift in Sources */,
 				143803441C2452A1003CA252 /* ViewerController.swift in Sources */,
+				14FAC8E21EA754D7003DA8F2 /* ViewableControllerContainer.swift in Sources */,
 				143803421C2452A1003CA252 /* UIViewController+Window.swift in Sources */,
 				14C984001C0DE79200B5E515 /* AppDelegate.swift in Sources */,
 				14E5F79F1E78330400D970EF /* PhotosController.swift in Sources */,
@@ -555,6 +560,7 @@
 				14E5F7731E78329C00D970EF /* VideoProgressView.swift in Sources */,
 				14B905331E8BF05500214247 /* PhotosCollectionLayout.swift in Sources */,
 				14E5F7781E78329C00D970EF /* UIViewController+Window.swift in Sources */,
+				14FAC8E31EA754D7003DA8F2 /* ViewableControllerContainer.swift in Sources */,
 				14E5F7751E78329C00D970EF /* PaginatedScrollView.swift in Sources */,
 				14E5F7721E78329C00D970EF /* VideoView.swift in Sources */,
 				14E5F7A01E78330400D970EF /* PhotosController.swift in Sources */,

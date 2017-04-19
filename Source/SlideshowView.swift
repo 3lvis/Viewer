@@ -1,18 +1,8 @@
 import UIKit
 
-protocol SlideshowViewDataSource: class {
-    func numberOfPagesInSlideshowView(_ slideshowView: SlideshowView) -> Int
-    func slideshowView(_ slideshowView: SlideshowView, controllerAtIndex index: Int) -> UIViewController
-}
-
-protocol SlideshowViewDelegate: class {
-    func slideshowView(_ slideshowView: SlideshowView, didMoveToIndex index: Int)
-    func slideshowView(_ slideshowView: SlideshowView, didMoveFromIndex index: Int)
-}
-
-class SlideshowView: UIView {
-    weak var dataSource: SlideshowViewDataSource?
-    weak var delegate: SlideshowViewDelegate?
+class SlideshowView: UIView, ViewableControllerContainer {
+    weak var dataSource: ViewableControllerContainerDataSource?
+    weak var delegate: ViewableControllerContainerDelegate?
     fileprivate unowned var parentController: UIViewController
     fileprivate var currentPage: Int
     fileprivate var currentController: ViewableController?
@@ -45,12 +35,12 @@ class SlideshowView: UIView {
     }
 
     fileprivate func loadPage(_ page: Int, animated: Bool, isInitial: Bool) {
-        let numPages = self.dataSource?.numberOfPagesInSlideshowView(self) ?? 0
+        let numPages = self.dataSource?.numberOfPagesInViewableControllerContainer(self) ?? 0
         if page >= numPages || page < 0 {
             return
         }
 
-        guard let controller = self.dataSource?.slideshowView(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil else { return }
+        guard let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil else { return }
         guard let image = controller.viewable?.placeholder else { return }
 
         controller.view.frame = image.centeredFrame()
@@ -73,8 +63,8 @@ class SlideshowView: UIView {
 
                 self.currentController = controller
 
-                self.delegate?.slideshowView(self, didMoveFromIndex: self.currentPage)
-                self.delegate?.slideshowView(self, didMoveToIndex: page)
+                self.delegate?.viewableControllerContainer(self, didMoveFromIndex: self.currentPage)
+                self.delegate?.viewableControllerContainer(self, didMoveToIndex: page)
 
                 self.currentPage = page
             })
@@ -82,7 +72,7 @@ class SlideshowView: UIView {
     }
 
     func loadNext() {
-        let numPages = self.dataSource?.numberOfPagesInSlideshowView(self) ?? 0
+        let numPages = self.dataSource?.numberOfPagesInViewableControllerContainer(self) ?? 0
         var newPage = self.currentPage + 1
 
         guard newPage <= numPages else { return }

@@ -387,7 +387,10 @@ extension ViewerController {
     }
 
     private func dismiss(_ viewableController: ViewableController, completion: (() -> Void)?) {
-        self.slideshowView.stop()
+        if self.isSlideshow {
+            self.slideshowView.stop()
+        }
+
         guard let indexPath = viewableController.indexPath else { return }
 
         guard let selectedCellFrame = self.collectionView.layoutAttributesForItem(at: indexPath)?.frame else { return }
@@ -585,20 +588,20 @@ extension ViewerController: UIGestureRecognizerDelegate {
     }
 }
 
-extension ViewerController: SlideshowViewDataSource {
-    func numberOfPagesInSlideshowView(_ slideshowView: SlideshowView) -> Int {
+extension ViewerController: ViewableControllerContainerDataSource {
+    func numberOfPagesInViewableControllerContainer(_ viewableControllerContainer: ViewableControllerContainer) -> Int {
         return self.dataSource?.numberOfItemsInViewerController(self) ?? 0
     }
 
-    func slideshowView(_ slideshowView: SlideshowView, controllerAtIndex index: Int) -> UIViewController {
+    func viewableControllerContainer(_ viewableControllerContainer: ViewableControllerContainer, controllerAtIndex index: Int) -> UIViewController {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
 
         return self.findOrCreateViewableController(indexPath)
     }
 }
 
-extension ViewerController: SlideshowViewDelegate {
-    func slideshowView(_ slideshowView: SlideshowView, didMoveToIndex index: Int) {
+extension ViewerController: ViewableControllerContainerDelegate {
+    func viewableControllerContainer(_ viewableControllerContainer: ViewableControllerContainer, didMoveToIndex index: Int) {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
         self.currentIndexPath = indexPath
@@ -607,38 +610,7 @@ extension ViewerController: SlideshowViewDelegate {
         viewableController.display()
     }
 
-    func slideshowView(_ slideshowView: SlideshowView, didMoveFromIndex index: Int) {
-        let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
-        let viewableController = self.findOrCreateViewableController(indexPath)
-        viewableController.willDismiss()
-    }
-}
-
-extension ViewerController: PaginatedScrollViewDataSource {
-
-    func numberOfPagesInPaginatedScrollView(_: PaginatedScrollView) -> Int {
-        return self.dataSource?.numberOfItemsInViewerController(self) ?? 0
-    }
-
-    func paginatedScrollView(_: PaginatedScrollView, controllerAtIndex index: Int) -> UIViewController {
-        let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
-
-        return self.findOrCreateViewableController(indexPath)
-    }
-}
-
-extension ViewerController: PaginatedScrollViewDelegate {
-
-    func paginatedScrollView(_: PaginatedScrollView, didMoveToIndex index: Int) {
-        let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
-        self.evaluateCellVisibility(collectionView: self.collectionView, currentIndexPath: self.currentIndexPath, upcomingIndexPath: indexPath)
-        self.currentIndexPath = indexPath
-        self.delegate?.viewerController(self, didChangeFocusTo: indexPath)
-        let viewableController = self.findOrCreateViewableController(indexPath)
-        viewableController.display()
-    }
-
-    func paginatedScrollView(_: PaginatedScrollView, didMoveFromIndex index: Int) {
+    func viewableControllerContainer(_ viewableControllerContainer: ViewableControllerContainer, didMoveFromIndex index: Int) {
         let indexPath = IndexPath.indexPathForIndex(self.collectionView, index: index)!
         let viewableController = self.findOrCreateViewableController(indexPath)
         viewableController.willDismiss()
