@@ -43,7 +43,7 @@ class Photo: Viewable {
         var sections = [Section]()
         let numberOfSections = 20
 
-        for sectionIndex in 10 ..< numberOfSections {
+        for sectionIndex in 0 ..< numberOfSections {
             var photos = [Photo]()
             for row in 0 ..< 10 {
                 let photo = Photo(id: "\(sectionIndex)-\(row)")
