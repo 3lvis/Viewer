@@ -17,7 +17,7 @@ class SlideshowView: UIView {
     var currentPage: Int
 
     lazy var timer: Timer = {
-        let timer = Timer(timeInterval: 4, target: self, selector: #selector(goRight), userInfo: nil, repeats: true)
+        let timer = Timer(timeInterval: 6, target: self, selector: #selector(goRight), userInfo: nil, repeats: true)
 
         return timer
     }()
@@ -73,6 +73,7 @@ class SlideshowView: UIView {
                 self.currentController = nil
 
                 self.currentController = controller
+                self.currentPage = page
             })
         }
     }
