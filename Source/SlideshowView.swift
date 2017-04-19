@@ -34,27 +34,33 @@ class SlideshowView: UIView, ViewableControllerContainer {
             view.removeFromSuperview()
         }
 
-        self.loadPage(self.currentPage, animated: false, isInitial: true)
+        self.loadPage(self.currentPage)
+        self.show(page: self.currentPage, isInitial: true)
     }
 
-    fileprivate func loadPage(_ page: Int, animated: Bool, isInitial: Bool) {
+    fileprivate func loadPage(_ page: Int) {
         let numPages = self.dataSource?.numberOfPagesInViewableControllerContainer(self) ?? 0
         if page >= numPages || page < 0 {
             return
         }
 
-        guard let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: page) as? ViewableController else { return }
+        guard let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: page) as? ViewableController, controller.view.superview == nil else { return }
         guard let image = controller.viewable?.placeholder else { return }
 
         controller.view.frame = image.centeredFrame()
         self.parentController.addChildViewController(controller)
         self.addSubview(controller.view)
         controller.didMove(toParentViewController: self.parentController)
+        controller.view.alpha = 0
+    }
+
+    func show(page: Int, isInitial: Bool) {
+        guard let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: page) as? ViewableController else { return }
 
         if isInitial {
             self.currentController = controller
+            controller.view.alpha = 1
         } else {
-            controller.view.alpha = 0
             UIView.animate(withDuration: SlideshowView.fadeDuration, delay: 0, options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction], animations: {
                 self.currentController?.view.alpha = 0
                 controller.view.alpha = 1
@@ -85,7 +91,12 @@ class SlideshowView: UIView, ViewableControllerContainer {
             newPage = 0
         }
 
-        self.loadPage(newPage, animated: true, isInitial: false)
+        self.loadPage(newPage)
+        self.show(page: newPage, isInitial: false)
+
+        let nextIsFirst = newPage + 1 == numPages
+        let nextPage = nextIsFirst ? 0 : newPage + 1
+        self.loadPage(nextPage)
     }
 
     func start() {
