@@ -1,11 +1,15 @@
 import UIKit
 
-class SlideshowView: UIView, ViewableControllerContainer {
-    fileprivate static let fadeDuration: Double = 1
-    fileprivate static let transitionToNextDuration: Double = 6
 
+/// The current implementation of SlideshowVideo will ignore videos, if a video is the initially presented element then
+/// it will instantly jump to the next element. If the next element is a video it will continue jumping until a photo
+/// is found.
+class SlideshowView: UIView, ViewableControllerContainer {
     weak var dataSource: ViewableControllerContainerDataSource?
     weak var delegate: ViewableControllerContainerDelegate?
+
+    fileprivate static let fadeDuration: Double = 1
+    fileprivate static let transitionToNextDuration: Double = 6
     fileprivate unowned var parentController: UIViewController
     fileprivate var currentPage: Int
     fileprivate var currentController: ViewableController?
@@ -30,16 +34,25 @@ class SlideshowView: UIView, ViewableControllerContainer {
     }
 
     func configure() {
-        self.subviews.forEach { view in
-            view.removeFromSuperview()
-        }
+        self.loadPage(self.currentPage, isInitial: true)
 
-        self.loadPage(self.currentPage, animated: false, isInitial: true)
+        if self.isVideo(at: self.currentPage) {
+            self.loadNext()
+        }
     }
 
-    fileprivate func loadPage(_ page: Int, animated: Bool, isInitial: Bool) {
-        let numPages = self.dataSource?.numberOfPagesInViewableControllerContainer(self) ?? 0
-        if page >= numPages || page < 0 {
+    func start() {
+        RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
+    }
+
+    func stop() {
+        self.timer.invalidate()
+    }
+}
+
+extension SlideshowView {
+    fileprivate func loadPage(_ page: Int, isInitial: Bool) {
+        if page >= self.numberOfPages || page < 0 {
             return
         }
 
@@ -75,24 +88,32 @@ class SlideshowView: UIView, ViewableControllerContainer {
     }
 
     func loadNext() {
-        let numPages = self.dataSource?.numberOfPagesInViewableControllerContainer(self) ?? 0
         var newPage = self.currentPage + 1
+        guard newPage <= self.numberOfPages else { return }
 
-        guard newPage <= numPages else { return }
-
-        let hasReachedEnd = newPage == numPages
+        let hasReachedEnd = newPage == self.numberOfPages
         if hasReachedEnd {
             newPage = 0
         }
 
-        self.loadPage(newPage, animated: true, isInitial: false)
+        if self.isVideo(at: newPage) {
+            self.currentPage = newPage
+            self.loadNext()
+        } else {
+            self.loadPage(newPage, isInitial: false)
+        }
     }
 
-    func start() {
-        RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
+
+    fileprivate func isVideo(at index: Int) -> Bool {
+        if let controller = self.dataSource?.viewableControllerContainer(self, controllerAtIndex: index) as? ViewableController {
+            return controller.viewable?.type == .video
+        }
+
+        return false
     }
 
-    func stop() {
-        self.timer.invalidate()
+    fileprivate var numberOfPages: Int {
+        return self.dataSource?.numberOfPagesInViewableControllerContainer(self) ?? 0
     }
 }
