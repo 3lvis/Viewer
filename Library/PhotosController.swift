@@ -49,13 +49,26 @@ class PhotosController: UICollectionViewController {
         }
 
         #if os(tvOS)
-        let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
-        playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
-        self.collectionView?.addGestureRecognizer(playPauseTapRecognizer)
+            let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
+            playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
+            self.collectionView?.addGestureRecognizer(playPauseTapRecognizer)
+
+            // Workaround for a bug where the collectionView won't select an item after dismissing the Viewer.
+            let selectTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.select(gesture:)))
+            selectTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
+            self.collectionView?.addGestureRecognizer(selectTapRecognizer)
         #endif
     }
 
     #if os(tvOS)
+    func select(gesture: UITapGestureRecognizer) {
+        if let focusedCell = UIScreen.main.focusedView as? UICollectionViewCell {
+            if let indexPath = self.collectionView?.indexPath(for: focusedCell) {
+                self.collectionView(self.collectionView!, didSelectItemAt: indexPath)
+            }
+        }
+    }
+
     func playPause(gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended else { return }
         guard let collectionView = self.collectionView else { return }
