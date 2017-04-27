@@ -10,6 +10,7 @@ public protocol ViewerControllerDelegate: class {
     func viewerController(_ viewerController: ViewerController, didChangeFocusTo indexPath: IndexPath)
     func viewerControllerDidDismiss(_ viewerController: ViewerController)
     func viewerController(_ viewerController: ViewerController, didFailDisplayingViewableAt indexPath: IndexPath, error: NSError)
+    func viewerController(_ viewerController: ViewerController, didLongPressViewableAt indexPath: IndexPath)
 }
 
 /// The ViewerController takes care of displaying the user's photos and videos in full-screen. You can swipe right or left to navigate between them.
@@ -179,47 +180,56 @@ public class ViewerController: UIViewController {
                 self.view.addGestureRecognizer(leftSwipeRecognizer)
             }
         #endif
+
+        let recognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gesture:)))
+        self.view.addGestureRecognizer(recognizer)
     }
 
     #if os(tvOS)
-        func menu(gesture: UITapGestureRecognizer) {
-            guard gesture.state == .ended else { return }
+    func menu(gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
 
-            self.dismiss(nil)
+        self.dismiss(nil)
+    }
+
+    func playPause(gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+
+        self.playIfVideo()
+    }
+
+    func select(gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+
+        self.playIfVideo()
+    }
+
+    func playIfVideo() {
+        let viewableController = self.findOrCreateViewableController(self.currentIndexPath)
+        let isVideo = viewableController.viewable?.type == .video
+        if isVideo {
+            viewableController.play()
         }
+    }
 
-        func playPause(gesture: UITapGestureRecognizer) {
-            guard gesture.state == .ended else { return }
+    func rightSwipe(gesture: UISwipeGestureRecognizer) {
+        guard gesture.state == .ended else { return }
 
-            self.playIfVideo()
-        }
+        self.scrollView.goRight()
+    }
 
-        func select(gesture: UITapGestureRecognizer) {
-            guard gesture.state == .ended else { return }
+    func leftSwipe(gesture: UISwipeGestureRecognizer) {
+        guard gesture.state == .ended else { return }
 
-            self.playIfVideo()
-        }
-
-        func playIfVideo() {
-            let viewableController = self.findOrCreateViewableController(self.currentIndexPath)
-            let isVideo = viewableController.viewable?.type == .video
-            if isVideo {
-                viewableController.play()
-            }
-        }
-
-        func rightSwipe(gesture: UISwipeGestureRecognizer) {
-            guard gesture.state == .ended else { return }
-
-            self.scrollView.goRight()
-        }
-
-        func leftSwipe(gesture: UISwipeGestureRecognizer) {
-            guard gesture.state == .ended else { return }
-
-            self.scrollView.goLeft()
-        }
+        self.scrollView.goLeft()
+    }
     #endif
+
+    func longPress(gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
+
+        self.delegate?.viewerController(self, didLongPressViewableAt: self.currentIndexPath)
+    }
 
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()

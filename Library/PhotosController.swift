@@ -138,6 +138,7 @@ extension PhotosController {
 
         self.viewerController = ViewerController(initialIndexPath: indexPath, collectionView: collectionView)
         self.viewerController!.dataSource = self
+        self.viewerController!.delegate = self
 
         #if os(iOS)
             let headerView = HeaderView()
@@ -146,8 +147,6 @@ extension PhotosController {
             let footerView = FooterView()
             footerView.viewDelegate = self
             self.viewerController?.footerView = footerView
-        #else
-            self.viewerController!.delegate = self
         #endif
 
         self.present(self.viewerController!, animated: false, completion: nil)
@@ -179,18 +178,25 @@ extension PhotosController: ViewerControllerDataSource {
     }
 }
 
-#if os(tvOS)
-    extension PhotosController: ViewerControllerDelegate {
-        func viewerController(_: ViewerController, didChangeFocusTo _: IndexPath) {}
+extension PhotosController: ViewerControllerDelegate {
+    func viewerController(_: ViewerController, didChangeFocusTo _: IndexPath) {}
 
-        func viewerControllerDidDismiss(_: ViewerController) {
+    func viewerControllerDidDismiss(_: ViewerController) {
+        #if os(tvOS)
+            // Used to refocus after swiping a few items in fullscreen.
             self.setNeedsFocusUpdate()
             self.updateFocusIfNeeded()
-        }
-
-        func viewerController(_: ViewerController, didFailDisplayingViewableAt _: IndexPath, error _: NSError) {}
+        #endif
     }
-#endif
+
+    func viewerController(_: ViewerController, didFailDisplayingViewableAt _: IndexPath, error _: NSError) {
+        
+    }
+
+    func viewerController(_ viewerController: ViewerController, didLongPressViewableAt indexPath: IndexPath) {
+        print("didLongPressViewableAt: \(indexPath)")
+    }
+}
 
 extension PhotosController: OptionsControllerDelegate {
 
