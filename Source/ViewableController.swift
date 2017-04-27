@@ -100,7 +100,18 @@ class ViewableController: UIViewController {
 
     var playerViewController: AVPlayerViewController?
 
+    init() {
+        super.init(nibName: nil, bundle: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(self.videoFinishedPlaying), name: .AVPlayerItemDidPlayToEndTime, object: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     deinit {
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         self.playerViewController?.player?.currentItem?.removeObserver(self, forKeyPath: ViewableController.playerItemStatusKeyPath, context: nil)
         self.playerViewController = nil
     }
@@ -342,6 +353,14 @@ class ViewableController: UIViewController {
                     self.playerViewController!.player?.play()
                 }
             }
+        #endif
+    }
+
+    func videoFinishedPlaying() {
+        #if os(tvOS)
+            guard let player = self.playerViewController?.player else { return }
+            player.pause()
+            self.playerViewController?.dismiss(animated: true, completion: nil)
         #endif
     }
 
