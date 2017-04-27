@@ -360,7 +360,7 @@ class ViewableController: UIViewController {
         #if os(tvOS)
             guard let player = self.playerViewController?.player else { return }
             player.pause()
-            self.playerViewController?.dismiss(animated: true, completion: nil)
+            self.playerViewController?.dismiss(animated: false, completion: nil)
         #endif
     }
 
