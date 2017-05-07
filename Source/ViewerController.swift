@@ -240,7 +240,7 @@ public class ViewerController: UIViewController {
             } else {
                 self.scrollView.configure()
             }
-            if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) {
+            if !self.collectionView.indexPathsForVisibleItems.contains(self.currentIndexPath) && self.collectionView.numberOfSections > self.currentIndexPath.section && self.collectionView.numberOfItems(inSection: self.currentIndexPath.section) > self.currentIndexPath.item {
                 self.collectionView.scrollToItem(at: self.currentIndexPath, at: .bottom, animated: true)
             }
         }
