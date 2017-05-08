@@ -223,6 +223,14 @@ public class ViewerController: UIViewController {
 
         self.scrollView.goLeft()
     }
+    
+    public override func shouldUpdateFocus(in context: UIFocusUpdateContext) -> Bool {
+        let result = super.shouldUpdateFocus(in: context)
+        if context.focusHeading == .up {
+            return false
+        }
+        return result
+    }
     #endif
 
     func longPress(gesture: UILongPressGestureRecognizer) {
