@@ -61,8 +61,14 @@ class ViewableController: UIViewController {
         let image = UIImage(named: "play")!
         button.setImage(image, for: UIControlState())
         button.alpha = 0
-        button.addTarget(self, action: #selector(ViewableController.playAction), for: .touchUpInside)
-
+        
+        #if os(tvOS)
+            // Disable user interaction on play button to allow drag to dismiss video thumb on tvOS
+            button.isUserInteractionEnabled = false
+        #else
+            button.addTarget(self, action: #selector(ViewableController.playAction), for: .touchUpInside)
+        #endif
+        
         return button
     }()
 
