@@ -308,7 +308,7 @@ extension ViewerController {
 
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(ViewerController.panAction(_:)))
             gesture.delegate = self
-            viewableController.imageView.addGestureRecognizer(gesture)
+            viewableController.panGesture = gesture
 
             self.viewableControllerCache.setObject(viewableController, forKey: indexPath.description as NSString)
         }
@@ -419,7 +419,7 @@ extension ViewerController {
 
         let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
         let image = viewable.placeholder
-        viewableController.imageView.alpha = 0
+        viewableController.zoomingScrollView.zoomView?.alpha = 0
         viewableController.view.backgroundColor = .clear
         viewableController.willDismiss()
 
@@ -438,8 +438,8 @@ extension ViewerController {
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
         presentedView.image = image
-        if self.isDragging {
-            presentedView.center = viewableController.imageView.center
+        if self.isDragging, let view = viewableController.zoomingScrollView.zoomView {
+            presentedView.center = view.center
         }
 
         let window = self.applicationWindow()
@@ -477,9 +477,11 @@ extension ViewerController {
 
     func panAction(_ gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewableController(self.currentIndexPath)
-        let viewHeight = controller.imageView.frame.size.height
+        let view = controller.zoomingScrollView.zoomView ?? gesture.view!
+        
+        let viewHeight = self.view.frame.size.height
         let viewHalfHeight = viewHeight / 2
-        var translatedPoint = gesture.translation(in: controller.imageView)
+        var translatedPoint = gesture.translation(in: view)
 
         if gesture.state == .began {
             self.shouldHideStatusBar = false
@@ -487,7 +489,7 @@ extension ViewerController {
                 self.setNeedsStatusBarAppearanceUpdate()
             #endif
             self.view.backgroundColor = .clear
-            self.originalDraggedCenter = controller.imageView.center
+            self.originalDraggedCenter = view.center
             self.isDragging = true
             self.updateHiddenCellsUsingVisibleIndexPath(self.currentIndexPath)
             controller.willDismiss()
@@ -499,7 +501,7 @@ extension ViewerController {
         let alpha = isDraggedUp ? 1 + alphaDiff : 1 - alphaDiff
 
         controller.dimControls(alpha)
-        controller.imageView.center = translatedPoint
+        view.center = translatedPoint
         controller.view.backgroundColor = UIColor.black.withAlphaComponent(alpha)
 
         if self.buttonsAreVisible {
@@ -507,14 +509,14 @@ extension ViewerController {
         }
 
         if gesture.state == .ended {
-            let centerAboveDraggingArea = controller.imageView.center.y < viewHalfHeight - ViewerController.DraggingMargin
-            let centerBellowDraggingArea = controller.imageView.center.y > viewHalfHeight + ViewerController.DraggingMargin
+            let centerAboveDraggingArea = view.center.y < viewHalfHeight - ViewerController.DraggingMargin
+            let centerBellowDraggingArea = view.center.y > viewHalfHeight + ViewerController.DraggingMargin
             if centerAboveDraggingArea || centerBellowDraggingArea {
                 self.dismiss(controller, completion: nil)
             } else {
                 self.isDragging = false
                 UIView.animate(withDuration: 0.20, animations: {
-                    controller.imageView.center = self.originalDraggedCenter
+                    view.center = self.originalDraggedCenter
                     controller.view.backgroundColor = .black
                     controller.dimControls(1.0)
 
@@ -599,6 +601,11 @@ extension ViewerController: UIGestureRecognizerDelegate {
 
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer is UIPanGestureRecognizer {
+            let controller = self.findOrCreateViewableController(self.currentIndexPath)
+            if controller.zoomingScrollView.zoomScale > 1 {
+                return false
+            }
+            
             let panGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
             let velocity = panGestureRecognizer.velocity(in: panGestureRecognizer.view!)
             let allowOnlyVerticalScrolls = fabs(velocity.y) > fabs(velocity.x)

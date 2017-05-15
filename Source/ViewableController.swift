@@ -23,8 +23,12 @@ class ViewableController: UIViewController {
 
     weak var delegate: ViewableControllerDelegate?
     weak var dataSource: ViewableControllerDataSource?
+    
+    var panGesture: UIPanGestureRecognizer?
 
-    lazy var zoomingScrollView: UIScrollView = {
+    lazy var zoomingScrollView: ImageScrollView = {
+        let scrollView = ImageScrollView(frame: self.view.bounds)
+        /*
         let scrollView = UIScrollView(frame: self.view.bounds)
         scrollView.delegate = self
         scrollView.backgroundColor = .clear
@@ -35,7 +39,8 @@ class ViewableController: UIViewController {
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = self.maxZoomScale()
         scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
+        */
+ 
         return scrollView
     }()
 
@@ -158,7 +163,7 @@ class ViewableController: UIViewController {
         self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.view.backgroundColor = .black
 
-        self.zoomingScrollView.addSubview(self.imageView)
+        //self.zoomingScrollView.addSubview(self.imageView)
         self.view.addSubview(self.zoomingScrollView)
 
         self.view.addSubview(self.videoView)
@@ -172,6 +177,7 @@ class ViewableController: UIViewController {
         tapRecognizer.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(tapRecognizer)
 
+        /*
         if viewable?.type == .image {
             let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.doubleTapAction))
             doubleTapRecognizer.numberOfTapsRequired = 2
@@ -179,6 +185,7 @@ class ViewableController: UIViewController {
 
             tapRecognizer.require(toFail: doubleTapRecognizer)
         }
+        */
     }
 
     // In iOS 10 going into landscape provides a very strange animation. Basically you'll see the other
@@ -196,12 +203,14 @@ class ViewableController: UIViewController {
             self.zoomingScrollView.isHidden = true
         }
         coordinator.animate(alongsideTransition: { _ in
-
+            self.zoomingScrollView.frame = self.view.bounds
+            self.zoomingScrollView.refresh()
         }) { _ in
             if viewable.type == .video || isFocused == false {
                 self.view.backgroundColor = .black
                 self.zoomingScrollView.isHidden = false
             }
+            self.zoomingScrollView.refresh()
         }
     }
 
@@ -268,8 +277,12 @@ class ViewableController: UIViewController {
         case .image:
             viewable.media { image, _ in
                 if let image = image {
-                    self.imageView.image = image
-                    self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
+                    //self.imageView.image = image
+                    //self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
+                    self.zoomingScrollView.display(image: image)
+                    if let view = self.zoomingScrollView.zoomView, let pan = self.panGesture {
+                        //view.addGestureRecognizer(pan)
+                    }
                 }
             }
         case .video:
