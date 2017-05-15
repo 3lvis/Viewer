@@ -128,7 +128,7 @@ class PhotoView: UIScrollView {
         return tapGesture
     }()
     
-    func display(image: UIImage) {
+    func display(image: UIImage, zoomable: Bool = true) {
         
         if let zoomView = zoomView {
             zoomView.removeFromSuperview()
@@ -140,6 +140,10 @@ class PhotoView: UIScrollView {
         addSubview(zoomView!)
         
         configureImageForSize(image.size)
+        
+        if !zoomable {
+            maximumZoomScale = minimumZoomScale
+        }
     }
     
     fileprivate func configureImageForSize(_ size: CGSize) {
@@ -155,7 +159,6 @@ class PhotoView: UIScrollView {
         let xScale = bounds.width / imageSize.width    // the scale needed to perfectly fit the image width-wise
         let yScale = bounds.height / imageSize.height   // the scale needed to perfectly fit the image height-wise
         
-        // fill width if the image and phone are both portrait or both landscape; otherwise take smaller scale
         var minScale = min(xScale, yScale)
         let maxScale = maxScaleFromMinScale * minScale
         

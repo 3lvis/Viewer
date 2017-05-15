@@ -258,7 +258,7 @@ class ViewableController: UIViewController {
     }
     
     private func updatePhotoView(image: UIImage, zoomable: Bool = true) {
-        self.photoView.display(image: image)
+        self.photoView.display(image: image, zoomable: zoomable)
         if let view = self.photoView.zoomView, let pan = self.panGesture {
             view.addGestureRecognizer(pan)
         }
