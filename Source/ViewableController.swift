@@ -26,31 +26,8 @@ class ViewableController: UIViewController {
     
     var panGesture: UIPanGestureRecognizer?
 
-    lazy var zoomingScrollView: ImageScrollView = {
-        let scrollView = ImageScrollView(frame: self.view.bounds)
-        /*
-        let scrollView = UIScrollView(frame: self.view.bounds)
-        scrollView.delegate = self
-        scrollView.backgroundColor = .clear
-        scrollView.alwaysBounceVertical = false
-        scrollView.alwaysBounceHorizontal = false
-        scrollView.showsVerticalScrollIndicator = true
-        scrollView.flashScrollIndicators()
-        scrollView.minimumZoomScale = 1.0
-        scrollView.maximumZoomScale = self.maxZoomScale()
-        scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        */
- 
-        return scrollView
-    }()
-
-    lazy var imageView: UIImageView = {
-        let view = UIImageView(frame: UIScreen.main.bounds)
-        view.backgroundColor = .clear
-        view.contentMode = .scaleAspectFit
-        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        view.isUserInteractionEnabled = true
-
+    lazy var photoView: PhotoView = {
+        let view = PhotoView(frame: self.view.bounds)
         return view
     }()
 
@@ -136,25 +113,10 @@ class ViewableController: UIViewController {
             self.indexPath = indexPath
             self.viewable = viewable
             self.videoView.image = viewable.placeholder
-            self.imageView.image = viewable.placeholder
+            //self.imageView.image = viewable.placeholder
             self.videoView.frame = viewable.placeholder.centeredFrame()
             self.changed = false
         }
-    }
-
-    func maxZoomScale() -> CGFloat {
-        guard let image = self.imageView.image else { return 1 }
-
-        var widthFactor = CGFloat(1.0)
-        var heightFactor = CGFloat(1.0)
-        if image.size.width > self.view.bounds.width {
-            widthFactor = image.size.width / self.view.bounds.width
-        }
-        if image.size.height > self.view.bounds.height {
-            heightFactor = image.size.height / self.view.bounds.height
-        }
-
-        return max(2.0, max(widthFactor, heightFactor))
     }
 
     override func viewDidLoad() {
@@ -164,10 +126,8 @@ class ViewableController: UIViewController {
         self.view.backgroundColor = .black
 
         //self.zoomingScrollView.addSubview(self.imageView)
-        self.view.addSubview(self.zoomingScrollView)
-
+        self.view.addSubview(self.photoView)
         self.view.addSubview(self.videoView)
-
         self.view.addSubview(self.playButton)
         self.view.addSubview(self.repeatButton)
         self.view.addSubview(self.pauseButton)
@@ -177,15 +137,7 @@ class ViewableController: UIViewController {
         tapRecognizer.numberOfTapsRequired = 1
         self.view.addGestureRecognizer(tapRecognizer)
 
-        /*
-        if viewable?.type == .image {
-            let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.doubleTapAction))
-            doubleTapRecognizer.numberOfTapsRequired = 2
-            self.zoomingScrollView.addGestureRecognizer(doubleTapRecognizer)
-
-            tapRecognizer.require(toFail: doubleTapRecognizer)
-        }
-        */
+        tapRecognizer.require(toFail: self.photoView.doubleTap)
     }
 
     // In iOS 10 going into landscape provides a very strange animation. Basically you'll see the other
@@ -200,17 +152,15 @@ class ViewableController: UIViewController {
         let isFocused = self.dataSource?.viewableControllerIsFocused(self)
         if viewable.type == .video || isFocused == false {
             self.view.backgroundColor = .clear
-            self.zoomingScrollView.isHidden = true
+            self.photoView.isHidden = true
         }
         coordinator.animate(alongsideTransition: { _ in
-            self.zoomingScrollView.frame = self.view.bounds
-            self.zoomingScrollView.refresh()
+            self.photoView.frame = self.view.bounds
         }) { _ in
             if viewable.type == .video || isFocused == false {
                 self.view.backgroundColor = .black
-                self.zoomingScrollView.isHidden = false
+                self.photoView.isHidden = false
             }
-            self.zoomingScrollView.refresh()
         }
     }
 
@@ -223,23 +173,6 @@ class ViewableController: UIViewController {
         }
 
         self.delegate?.viewableControllerDidTapItem(self)
-    }
-
-    func doubleTapAction(recognizer: UITapGestureRecognizer) {
-        let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
-
-        let touchPoint = recognizer.location(in: self.imageView)
-
-        let scrollViewSize = self.imageView.bounds.size
-
-        let width = scrollViewSize.width / zoomScale
-        let height = scrollViewSize.height / zoomScale
-        let originX = touchPoint.x - (width / 2.0)
-        let originY = touchPoint.y - (height / 2.0)
-
-        let rectToZoomTo = CGRect(x: originX, y: originY, width: width, height: height)
-
-        self.zoomingScrollView.zoom(to: rectToZoomTo, animated: true)
     }
 
     func play() {
@@ -277,12 +210,7 @@ class ViewableController: UIViewController {
         case .image:
             viewable.media { image, _ in
                 if let image = image {
-                    //self.imageView.image = image
-                    //self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
-                    self.zoomingScrollView.display(image: image)
-                    if let view = self.zoomingScrollView.zoomView, let pan = self.panGesture {
-                        //view.addGestureRecognizer(pan)
-                    }
+                    self.updatePhotoView(image: image)
                 }
             }
         case .video:
@@ -291,7 +219,7 @@ class ViewableController: UIViewController {
                 if !shouldAutoplayVideo {
                     viewable.media { image, _ in
                         if let image = image {
-                            self.imageView.image = image
+                            self.updatePhotoView(image: image, zoomable: false)
                         }
                     }
                 }
@@ -320,12 +248,19 @@ class ViewableController: UIViewController {
                 } else {
                     viewable.media { image, _ in
                         if let image = image {
-                            self.imageView.image = image
-                            self.playButton.alpha = 1
+                            self.updatePhotoView(image: image)
+                            playButton.alpha = 1
                         }
                     }
                 }
             #endif
+        }
+    }
+    
+    private func updatePhotoView(image: UIImage, zoomable: Bool = true) {
+        self.photoView.display(image: image)
+        if let view = self.photoView.zoomView, let pan = self.panGesture {
+            view.addGestureRecognizer(pan)
         }
     }
 
@@ -449,17 +384,6 @@ class ViewableController: UIViewController {
             self.shouldDimPause = false
             self.shouldDimPlay = false
             self.shouldDimVideoProgress = false
-        }
-    }
-}
-
-extension ViewableController: UIScrollViewDelegate {
-
-    func viewForZooming(in _: UIScrollView) -> UIView? {
-        if self.viewable?.type == .image {
-            return self.imageView
-        } else {
-            return nil
         }
     }
 }

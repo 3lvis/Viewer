@@ -1,14 +1,12 @@
 import UIKit
 
-class ImageScrollView: UIScrollView {
-    
-    static let kZoomInFactorFromMinWhenDoubleTap: CGFloat = 2
+class PhotoView: UIScrollView {
     
     var zoomView: UIImageView? = nil
     var imageSize: CGSize = CGSize.zero
     fileprivate var pointToCenterAfterResize: CGPoint = CGPoint.zero
     fileprivate var scaleToRestoreAfterResize: CGFloat = 1.0
-    var maxScaleFromMinScale: CGFloat = 3.0
+    var maxScaleFromMinScale: CGFloat = 4.0
     
     override open var frame: CGRect {
         willSet {
@@ -27,13 +25,15 @@ class ImageScrollView: UIScrollView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        initialize()
+        showsVerticalScrollIndicator = false
+        showsHorizontalScrollIndicator = false
+        bouncesZoom = true
+        decelerationRate = UIScrollViewDecelerationRateFast
+        delegate = self
     }
     
     required public init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        
-        initialize()
+        fatalError("init(coder:) has not been implemented")
     }
     
     fileprivate func initialize() {
@@ -122,6 +122,12 @@ class ImageScrollView: UIScrollView {
     
     // MARK: - Display image
     
+    lazy var doubleTap: UITapGestureRecognizer = {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.doubleTapGestureRecognizer(_:)))
+        tapGesture.numberOfTapsRequired = 2
+        return tapGesture
+    }()
+    
     func display(image: UIImage) {
         
         if let zoomView = zoomView {
@@ -130,11 +136,8 @@ class ImageScrollView: UIScrollView {
         
         zoomView = UIImageView(image: image)
         zoomView!.isUserInteractionEnabled = true
+        zoomView!.addGestureRecognizer(self.doubleTap)
         addSubview(zoomView!)
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ImageScrollView.doubleTapGestureRecognizer(_:)))
-        tapGesture.numberOfTapsRequired = 2
-        zoomView!.addGestureRecognizer(tapGesture)
         
         configureImageForSize(image.size)
     }
@@ -153,11 +156,8 @@ class ImageScrollView: UIScrollView {
         let yScale = bounds.height / imageSize.height   // the scale needed to perfectly fit the image height-wise
         
         // fill width if the image and phone are both portrait or both landscape; otherwise take smaller scale
-        let imagePortrait = imageSize.height > imageSize.width
-        let phonePortrait = bounds.height >= bounds.width
-        var minScale = (imagePortrait == phonePortrait) ? xScale : min(xScale, yScale)
-        
-        let maxScale = maxScaleFromMinScale*minScale
+        var minScale = min(xScale, yScale)
+        let maxScale = maxScaleFromMinScale * minScale
         
         // don't let minScale exceed maxScale. (If the image is smaller than the screen, we don't want to force it to be zoomed.)
         if minScale > maxScale {
@@ -197,15 +197,9 @@ class ImageScrollView: UIScrollView {
         
         return zoomRect
     }
-    
-    func refresh() {
-        if let image = zoomView?.image {
-            display(image: image)
-        }
-    }
 }
 
-extension ImageScrollView: UIScrollViewDelegate{
+extension PhotoView: UIScrollViewDelegate{
     
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return zoomView

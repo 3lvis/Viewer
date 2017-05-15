@@ -419,7 +419,7 @@ extension ViewerController {
 
         let viewable = self.dataSource!.viewerController(self, viewableAt: indexPath)
         let image = viewable.placeholder
-        viewableController.zoomingScrollView.zoomView?.alpha = 0
+        viewableController.photoView.zoomView?.alpha = 0
         viewableController.view.backgroundColor = .clear
         viewableController.willDismiss()
 
@@ -438,7 +438,7 @@ extension ViewerController {
         let presentedView = self.presentedViewCopy()
         presentedView.frame = image.centeredFrame()
         presentedView.image = image
-        if self.isDragging, let view = viewableController.zoomingScrollView.zoomView {
+        if self.isDragging, let view = viewableController.photoView.zoomView {
             presentedView.center = view.center
         }
 
@@ -477,7 +477,7 @@ extension ViewerController {
 
     func panAction(_ gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewableController(self.currentIndexPath)
-        let view = controller.zoomingScrollView.zoomView ?? gesture.view!
+        let view = controller.photoView.zoomView ?? gesture.view!
         
         let viewHeight = self.view.frame.size.height
         let viewHalfHeight = viewHeight / 2
@@ -602,7 +602,7 @@ extension ViewerController: UIGestureRecognizerDelegate {
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer is UIPanGestureRecognizer {
             let controller = self.findOrCreateViewableController(self.currentIndexPath)
-            if controller.zoomingScrollView.zoomScale > 1 {
+            if controller.photoView.zoomScale > 1 {
                 return false
             }
             
