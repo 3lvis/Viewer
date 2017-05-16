@@ -36,14 +36,6 @@ class PhotoView: UIScrollView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate func initialize() {
-        showsVerticalScrollIndicator = false
-        showsHorizontalScrollIndicator = false
-        bouncesZoom = true
-        decelerationRate = UIScrollViewDecelerationRateFast
-        delegate = self
-    }
-    
     func adjustFrameToCenter() {
         
         guard zoomView != nil else {
@@ -129,16 +121,18 @@ class PhotoView: UIScrollView {
     }()
     
     func display(image: UIImage, zoomable: Bool = true) {
-        
-        if let zoomView = zoomView {
-            zoomView.removeFromSuperview()
+
+        if zoomView == nil  {
+            zoomView = UIImageView(image: image)
+            zoomView!.isUserInteractionEnabled = true
+            zoomView!.addGestureRecognizer(self.doubleTap)
+            addSubview(zoomView!)
         }
         
-        zoomView = UIImageView(image: image)
-        zoomView!.isUserInteractionEnabled = true
-        zoomView!.addGestureRecognizer(self.doubleTap)
-        addSubview(zoomView!)
-        
+        zoomView!.transform = .identity
+        zoomView!.image = image
+        zoomView!.frame = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+
         configureImageForSize(image.size)
         
         if !zoomable {
@@ -156,18 +150,13 @@ class PhotoView: UIScrollView {
     
     fileprivate func setMaxMinZoomScalesForCurrentBounds() {
         // calculate min/max zoomscale
-        let xScale = bounds.width / imageSize.width    // the scale needed to perfectly fit the image width-wise
-        let yScale = bounds.height / imageSize.height   // the scale needed to perfectly fit the image height-wise
+        let xScale = bounds.size.width / imageSize.width    // the scale needed to perfectly fit the image width-wise
+        let yScale = bounds.size.height / imageSize.height   // the scale needed to perfectly fit the image height-wise
         
-        var minScale = min(xScale, yScale)
+        let minScale = min(xScale, yScale)
         let maxScale = maxScaleFromMinScale * minScale
         
-        // don't let minScale exceed maxScale. (If the image is smaller than the screen, we don't want to force it to be zoomed.)
-        if minScale > maxScale {
-            minScale = maxScale
-        }
-        
-        maximumZoomScale = maxScale
+        maximumZoomScale = max(minScale, maxScale)
         minimumZoomScale = minScale * 0.999 // the multiply factor to prevent user cannot scroll page while they use this control in UIPageViewController
     }
     
@@ -180,7 +169,7 @@ class PhotoView: UIScrollView {
         }
         else {
             let center = gestureRecognizer.location(in: gestureRecognizer.view)
-            let zoomRect = zoomRectForScale(maximumZoomScale, center: center)
+            let zoomRect = zoomRectForScale(minimumZoomScale * (maxScaleFromMinScale - 1), center: center)
             zoom(to: zoomRect, animated: true)
         }
     }

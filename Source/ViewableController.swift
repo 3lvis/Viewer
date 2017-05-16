@@ -28,6 +28,13 @@ class ViewableController: UIViewController {
 
     lazy var photoView: PhotoView = {
         let view = PhotoView(frame: self.view.bounds)
+        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        return view
+    }()
+    
+    lazy var placeholderView: UIImageView = {
+        let view = UIImageView()
+        view.alpha = 0
         return view
     }()
 
@@ -113,8 +120,10 @@ class ViewableController: UIViewController {
             self.indexPath = indexPath
             self.viewable = viewable
             self.videoView.image = viewable.placeholder
-            //self.imageView.image = viewable.placeholder
             self.videoView.frame = viewable.placeholder.centeredFrame()
+            self.placeholderView.image = viewable.placeholder
+            self.placeholderView.frame = viewable.placeholder.centeredFrame()
+            self.placeholderView.alpha = 1
             self.changed = false
         }
     }
@@ -132,6 +141,7 @@ class ViewableController: UIViewController {
         self.view.addSubview(self.repeatButton)
         self.view.addSubview(self.pauseButton)
         self.view.addSubview(self.videoProgressView)
+        self.view.addSubview(self.placeholderView)
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewableController.tapAction))
         tapRecognizer.numberOfTapsRequired = 1
@@ -262,6 +272,7 @@ class ViewableController: UIViewController {
         if let view = self.photoView.zoomView, let pan = self.panGesture {
             view.addGestureRecognizer(pan)
         }
+        self.placeholderView.alpha = 0
     }
 
     func resetButtonStates() {
