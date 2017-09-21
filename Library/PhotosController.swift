@@ -61,7 +61,7 @@ class PhotosController: UICollectionViewController {
     }
 
     #if os(tvOS)
-    func select(gesture: UITapGestureRecognizer) {
+    @objc func select(gesture: UITapGestureRecognizer) {
         if let focusedCell = UIScreen.main.focusedView as? UICollectionViewCell {
             if let indexPath = self.collectionView?.indexPath(for: focusedCell) {
                 self.collectionView(self.collectionView!, didSelectItemAt: indexPath)
@@ -69,7 +69,7 @@ class PhotosController: UICollectionViewController {
         }
     }
 
-    func playPause(gesture: UITapGestureRecognizer) {
+    @objc func playPause(gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended else { return }
         guard let collectionView = self.collectionView else { return }
 

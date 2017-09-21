@@ -205,7 +205,7 @@ class ViewableController: UIViewController {
         }
     }
 
-    func tapAction() {
+    @objc func tapAction() {
         if self.videoView.isPlaying() {
             UIView.animate(withDuration: 0.3, animations: {
                 self.pauseButton.alpha = self.pauseButton.alpha == 0 ? 1 : 0
@@ -216,7 +216,7 @@ class ViewableController: UIViewController {
         self.delegate?.viewableControllerDidTapItem(self)
     }
 
-    func doubleTapAction(recognizer: UITapGestureRecognizer) {
+    @objc func doubleTapAction(recognizer: UITapGestureRecognizer) {
         let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
 
         let touchPoint = recognizer.location(in: self.imageView)
@@ -323,7 +323,7 @@ class ViewableController: UIViewController {
         self.videoProgressView.alpha = 0
     }
 
-    func pauseAction() {
+    @objc func pauseAction() {
         self.repeatButton.alpha = 0
         self.pauseButton.alpha = 0
         self.playButton.alpha = 1
@@ -332,7 +332,7 @@ class ViewableController: UIViewController {
         self.videoView.pause()
     }
 
-    func playAction() {
+    @objc func playAction() {
         #if os(iOS)
             self.repeatButton.alpha = 0
             self.pauseButton.alpha = 0
@@ -362,7 +362,7 @@ class ViewableController: UIViewController {
         #endif
     }
 
-    func videoFinishedPlaying() {
+    @objc func videoFinishedPlaying() {
         #if os(tvOS)
             guard let player = self.playerViewController?.player else { return }
             player.pause()
@@ -382,7 +382,7 @@ class ViewableController: UIViewController {
         self.delegate?.viewableController(self, didFailDisplayingVieweableWith: error)
     }
 
-    func repeatAction() {
+    @objc func repeatAction() {
         self.repeatButton.alpha = 0
 
         let overlayIsVisible = self.dataSource?.viewableControllerOverlayIsVisible(self) ?? false
