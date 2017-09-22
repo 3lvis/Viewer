@@ -87,7 +87,7 @@ extension SlideshowView {
         }
     }
 
-    func loadNext() {
+    @objc func loadNext() {
         var newPage = self.currentPage + 1
         guard newPage <= self.numberOfPages else { return }
 

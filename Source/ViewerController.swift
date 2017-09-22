@@ -186,19 +186,19 @@ public class ViewerController: UIViewController {
     }
 
     #if os(tvOS)
-    func menu(gesture: UITapGestureRecognizer) {
+    @objc func menu(gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended else { return }
 
         self.dismiss(nil)
     }
 
-    func playPause(gesture: UITapGestureRecognizer) {
+    @objc func playPause(gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended else { return }
 
         self.playIfVideo()
     }
 
-    func select(gesture: UITapGestureRecognizer) {
+    @objc func select(gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended else { return }
 
         self.playIfVideo()
@@ -212,13 +212,13 @@ public class ViewerController: UIViewController {
         }
     }
 
-    func rightSwipe(gesture: UISwipeGestureRecognizer) {
+    @objc func rightSwipe(gesture: UISwipeGestureRecognizer) {
         guard gesture.state == .ended else { return }
 
         self.scrollView.goRight()
     }
 
-    func leftSwipe(gesture: UISwipeGestureRecognizer) {
+    @objc func leftSwipe(gesture: UISwipeGestureRecognizer) {
         guard gesture.state == .ended else { return }
 
         self.scrollView.goLeft()
@@ -233,7 +233,7 @@ public class ViewerController: UIViewController {
     }
     #endif
 
-    func longPress(gesture: UILongPressGestureRecognizer) {
+    @objc func longPress(gesture: UILongPressGestureRecognizer) {
         guard gesture.state == .began else { return }
 
         self.delegate?.viewerController(self, didLongPressViewableAt: self.currentIndexPath)
@@ -475,7 +475,7 @@ extension ViewerController {
         })
     }
 
-    func panAction(_ gesture: UIPanGestureRecognizer) {
+    @objc func panAction(_ gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewableController(self.currentIndexPath)
         let viewHeight = controller.imageView.frame.size.height
         let viewHalfHeight = viewHeight / 2

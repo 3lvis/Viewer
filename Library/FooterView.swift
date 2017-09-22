@@ -56,11 +56,11 @@ class FooterView: UIView {
         return (singleFrame * CGFloat(index), singleFrame)
     }
 
-    func favoriteAction(button: UIButton) {
+    @objc func favoriteAction(button: UIButton) {
         self.viewDelegate?.footerView(self, didPressFavoriteButton: button)
     }
 
-    func deleteAction(button: UIButton) {
+    @objc func deleteAction(button: UIButton) {
         self.viewDelegate?.footerView(self, didPressDeleteButton: button)
     }
 }

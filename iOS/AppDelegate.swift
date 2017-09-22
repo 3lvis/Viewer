@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         if AppDelegate.IsLightStatusBar {
             UINavigationBar.appearance().barTintColor = .orange
-            UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+            UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
             remoteNavigationController.navigationBar.barStyle = .black
             localNavigationController.navigationBar.barStyle = .black
         }

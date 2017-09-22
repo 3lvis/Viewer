@@ -176,7 +176,7 @@ class VideoProgressView: UIView {
         self.seekView.frame = seekViewFrame
     }
 
-    func seek(gestureRecognizer: UIPanGestureRecognizer) {
+    @objc func seek(gestureRecognizer: UIPanGestureRecognizer) {
         switch gestureRecognizer.state {
         case .began:
             self.delegate?.videoProgressViewDidBeginSeeking(self)

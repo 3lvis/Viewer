@@ -48,11 +48,11 @@ class HeaderView: UIView {
         self.menuButton.frame = CGRect(x: x, y: HeaderView.TopMargin, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
     }
 
-    func clearAction(button: UIButton) {
+    @objc func clearAction(button: UIButton) {
         self.viewDelegate?.headerView(self, didPressClearButton: button)
     }
 
-    func menuAction(button: UIButton) {
+    @objc func menuAction(button: UIButton) {
         self.viewDelegate?.headerView(self, didPressMenuButton: button)
     }
 }
