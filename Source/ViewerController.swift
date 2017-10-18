@@ -477,8 +477,6 @@ extension ViewerController {
 
     @objc func panAction(_ gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewableController(self.currentIndexPath)
-        guard !controller.hasZoomed else { return }
-        
         let viewHeight = controller.imageView.frame.size.height
         let viewHalfHeight = viewHeight / 2
         var translatedPoint = gesture.translation(in: controller.imageView)
