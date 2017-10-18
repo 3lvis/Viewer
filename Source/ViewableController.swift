@@ -110,6 +110,10 @@ class ViewableController: UIViewController {
 
     var playerViewController: AVPlayerViewController?
 
+    var hasZoomed: Bool {
+        return self.zoomingScrollView.zoomScale != 1.0
+    }
+    
     init() {
         super.init(nibName: nil, bundle: nil)
 
