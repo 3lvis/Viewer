@@ -35,6 +35,10 @@ class ViewableController: UIViewController {
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = self.maxZoomScale()
         scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        if #available(iOS 11.0, tvOS 11.0, *) {
+            scrollView.contentInsetAdjustmentBehavior = .never
+        }
 
         return scrollView
     }()
@@ -106,6 +110,10 @@ class ViewableController: UIViewController {
 
     var playerViewController: AVPlayerViewController?
 
+    var hasZoomed: Bool {
+        return self.zoomingScrollView.zoomScale != 1.0
+    }
+    
     init() {
         super.init(nibName: nil, bundle: nil)
 
@@ -149,7 +157,7 @@ class ViewableController: UIViewController {
             heightFactor = image.size.height / self.view.bounds.height
         }
 
-        return max(2.0, max(widthFactor, heightFactor))
+        return max(3.0, max(widthFactor, heightFactor))
     }
 
     override func viewDidLoad() {
@@ -202,6 +210,8 @@ class ViewableController: UIViewController {
                 self.view.backgroundColor = .black
                 self.zoomingScrollView.isHidden = false
             }
+            
+            self.configure()
         }
     }
 
@@ -259,6 +269,10 @@ class ViewableController: UIViewController {
             self.videoView.stop()
             self.resetButtonStates()
         }
+        
+        UIView.animate(withDuration: 0.3) {
+            self.zoomingScrollView.zoomScale = 1
+        }
     }
 
     func display() {
@@ -269,7 +283,7 @@ class ViewableController: UIViewController {
             viewable.media { image, _ in
                 if let image = image {
                     self.imageView.image = image
-                    self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
+                    self.configure()
                 }
             }
         case .video:
@@ -361,6 +375,65 @@ class ViewableController: UIViewController {
             }
         #endif
     }
+    
+    func configure() {
+        self.zoomingScrollView.maximumZoomScale = self.maxZoomScale()
+        
+        let viewFrame = self.view.frame
+        let zoomScale = self.zoomingScrollView.zoomScale
+        let frame = CGRect(x: viewFrame.origin.x,
+                           y: viewFrame.origin.y,
+                           width: zoomScale * viewFrame.width,
+                           height: zoomScale * viewFrame.height)
+        
+        self.zoomingScrollView.contentSize = frame.size
+        self.imageView.frame = frame
+        self.configureImageView()
+    }
+    
+    func configureImageView() {
+        guard let image = imageView.image else {
+            centerImageView()
+            return
+        }
+        
+        let imageViewSize = imageView.frame.size
+        let imageSize = image.size
+        let realImageViewSize: CGSize
+        
+        if imageSize.width / imageSize.height > imageViewSize.width / imageViewSize.height {
+            realImageViewSize = CGSize(
+                width: imageViewSize.width,
+                height: imageViewSize.width / imageSize.width * imageSize.height)
+        } else {
+            realImageViewSize = CGSize(
+                width: imageViewSize.height / imageSize.height * imageSize.width,
+                height: imageViewSize.height)
+        }
+        
+        imageView.frame = CGRect(origin: CGPoint.zero, size: realImageViewSize)
+        
+        centerImageView()
+    }
+    
+    func centerImageView() {
+        let boundsSize = self.view.frame.size
+        var imageViewFrame = imageView.frame
+        
+        if imageViewFrame.size.width < boundsSize.width {
+            imageViewFrame.origin.x = (boundsSize.width - imageViewFrame.size.width) / 2.0
+        } else {
+            imageViewFrame.origin.x = 0.0
+        }
+        
+        if imageViewFrame.size.height < boundsSize.height {
+            imageViewFrame.origin.y = (boundsSize.height - imageViewFrame.size.height) / 2.0
+        } else {
+            imageViewFrame.origin.y = 0.0
+        }
+        
+        imageView.frame = imageViewFrame
+    }
 
     @objc func videoFinishedPlaying() {
         #if os(tvOS)
@@ -448,6 +521,10 @@ extension ViewableController: UIScrollViewDelegate {
         } else {
             return nil
         }
+    }
+    
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        centerImageView()
     }
 }
 
