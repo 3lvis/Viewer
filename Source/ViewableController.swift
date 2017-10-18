@@ -35,6 +35,10 @@ class ViewableController: UIViewController {
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = self.maxZoomScale()
         scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        if #available(iOS 11.0, tvOS 11.0, *) {
+            scrollView.contentInsetAdjustmentBehavior = .never
+        }
 
         return scrollView
     }()
