@@ -21,11 +21,7 @@ class VideoView: UIView {
     fileprivate lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
 
-        #if os(tvOS)
-            playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        #else
-            playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        #endif
+        playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
 
         return playerLayer
     }()
