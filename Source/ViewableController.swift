@@ -53,6 +53,15 @@ class ViewableController: UIViewController {
         return view
     }()
 
+    lazy var imageLoadingIndicator: UIActivityIndicatorView = {
+        let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        activityView.center = self.view.center
+        activityView.startAnimating()
+        activityView.alpha = 0
+        
+        return activityView
+    }()
+    
     lazy var videoView: VideoView = {
         let view = VideoView()
         view.delegate = self
@@ -187,6 +196,10 @@ class ViewableController: UIViewController {
 
             tapRecognizer.require(toFail: doubleTapRecognizer)
         }
+        
+        // ==========================================================
+    
+        self.view.addSubview(imageLoadingIndicator)
     }
 
     // In iOS 10 going into landscape provides a very strange animation. Basically you'll see the other
@@ -280,7 +293,9 @@ class ViewableController: UIViewController {
 
         switch viewable.type {
         case .image:
+            self.imageLoadingIndicator.alpha = 1
             viewable.media { image, _ in
+                self.imageLoadingIndicator.alpha = 0
                 if let image = image {
                     self.imageView.image = image
                     self.configure()
