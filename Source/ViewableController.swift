@@ -177,6 +177,7 @@ class ViewableController: UIViewController {
 
         self.zoomingScrollView.addSubview(self.imageView)
         self.view.addSubview(self.zoomingScrollView)
+        self.view.addSubview(imageLoadingIndicator)
 
         self.view.addSubview(self.videoView)
 
@@ -196,10 +197,6 @@ class ViewableController: UIViewController {
 
             tapRecognizer.require(toFail: doubleTapRecognizer)
         }
-        
-        // ==========================================================
-    
-        self.view.addSubview(imageLoadingIndicator)
     }
 
     // In iOS 10 going into landscape provides a very strange animation. Basically you'll see the other
