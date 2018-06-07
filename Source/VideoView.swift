@@ -285,8 +285,6 @@ extension VideoView {
                 }
                 let requestOptions = PHVideoRequestOptions()
                 requestOptions.isNetworkAccessAllowed = true
-                requestOptions.version = .current
-                requestOptions.deliveryMode = .automatic
                 PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions) { playerItem, info in
                     guard let playerItem = playerItem else {
                         let error = NSError(domain: ViewerController.domain, code: 0, userInfo: [NSLocalizedDescriptionKey: "Couldn't create player: \(String(describing: info))."])
