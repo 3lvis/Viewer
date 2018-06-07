@@ -46,7 +46,6 @@ class VideoView: UIView {
     fileprivate var shouldRegisterForFailureOrEndingNotifications = true
     fileprivate var shouldRegisterForOutputVolume = true
 
-    fileprivate var slowMotionTimeObserver: Any?
     fileprivate var playbackProgressTimeObserver: Any?
 
     override init(frame: CGRect) {
@@ -286,8 +285,6 @@ extension VideoView {
                 }
                 let requestOptions = PHVideoRequestOptions()
                 requestOptions.isNetworkAccessAllowed = true
-                requestOptions.version = .original
-                requestOptions.deliveryMode = .fastFormat
                 PHImageManager.default().requestPlayerItem(forVideo: asset, options: requestOptions) { playerItem, info in
                     guard let playerItem = playerItem else {
                         let error = NSError(domain: ViewerController.domain, code: 0, userInfo: [NSLocalizedDescriptionKey: "Couldn't create player: \(String(describing: info))."])
@@ -302,25 +299,6 @@ extension VideoView {
                         player.rate = Float(playerItem.preferredPeakBitRate)
                         self.playerLayer.player = player
                         self.playerLayer.isHidden = true
-
-                        if let slowMotionTimeObserver = self.slowMotionTimeObserver {
-                            player.removeTimeObserver(slowMotionTimeObserver)
-                            self.slowMotionTimeObserver = nil
-                        }
-
-                        if asset.mediaSubtypes == .videoHighFrameRate {
-                            let interval = CMTime(seconds: 1.0, preferredTimescale: Int32(NSEC_PER_SEC))
-                            self.slowMotionTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: nil) { _ in
-                                let currentTime = CMTimeGetSeconds(player.currentTime())
-                                if currentTime >= 2 {
-                                    if player.rate != 0.000001 {
-                                        player.rate = 0.000001
-                                    }
-                                } else if player.rate != 1.0 {
-                                    player.rate = 1.0
-                                }
-                            }
-                        }
                     }
 
                     DispatchQueue.main.async {
@@ -352,11 +330,6 @@ extension VideoView {
     }
 
     fileprivate func removeWhilePlayingObservers() {
-        if let slowMotionTimeObserver = self.slowMotionTimeObserver {
-            self.playerLayer.player?.removeTimeObserver(slowMotionTimeObserver)
-            self.slowMotionTimeObserver = nil
-        }
-
         if let playbackProgressTimeObserver = self.playbackProgressTimeObserver {
             self.playerLayer.player?.removeTimeObserver(playbackProgressTimeObserver)
             self.playbackProgressTimeObserver = nil
