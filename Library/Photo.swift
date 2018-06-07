@@ -120,7 +120,7 @@ class Photo: Viewable {
             })
         }
 
-        return sections
+        return sections.reversed()
     }
 
     static func thumbnail(for asset: PHAsset) -> UIImage? {
