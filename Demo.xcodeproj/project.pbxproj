@@ -96,6 +96,8 @@
 		14EC47B91C58F6C00028A0CD /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EC47B71C58F6BC0028A0CD /* VideoView.swift */; };
 		14FAC8E21EA754D7003DA8F2 /* ViewableControllerContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */; };
 		14FAC8E31EA754D7003DA8F2 /* ViewableControllerContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */; };
+		4442A81D20C98CDA004B8BC3 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4442A81C20C98CDA004B8BC3 /* UIViewExtensions.swift */; };
+		4442A81E20C98CDA004B8BC3 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4442A81C20C98CDA004B8BC3 /* UIViewExtensions.swift */; };
 		E6D592841D226528006EF238 /* VideoProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D592821D226528006EF238 /* VideoProgressView.swift */; };
 		E6D592891D22A2B8006EF238 /* DINNextLTPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */; };
 /* End PBXBuildFile section */
@@ -154,6 +156,7 @@
 		14E5F7A41E7833B200D970EF /* SharedAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = SharedAssets.xcassets; sourceTree = "<group>"; };
 		14EC47B71C58F6BC0028A0CD /* VideoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		14FAC8E11EA754D7003DA8F2 /* ViewableControllerContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewableControllerContainer.swift; sourceTree = "<group>"; };
+		4442A81C20C98CDA004B8BC3 /* UIViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
 		E6D592821D226528006EF238 /* VideoProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoProgressView.swift; sourceTree = "<group>"; };
 		E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DINNextLTPro-Regular.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -264,6 +267,7 @@
 				143803351C2452A1003CA252 /* NSIndexPath+Contiguous.swift */,
 				143803361C2452A1003CA252 /* UIImage+CenteredFrame.swift */,
 				143803371C2452A1003CA252 /* UIViewController+Window.swift */,
+				4442A81C20C98CDA004B8BC3 /* UIViewExtensions.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -401,20 +405,20 @@
 				TargetAttributes = {
 					146D72AB1AB782920058798C = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = 29X3GG489T;
+						DevelopmentTeam = D34XZHQLE3;
 						DevelopmentTeamName = "Bakken & Bæck AS";
 						LastSwiftMigration = 0900;
 					};
 					14C983FC1C0DE79200B5E515 = {
 						CreatedOnToolsVersion = 7.2;
-						DevelopmentTeam = 29X3GG489T;
+						DevelopmentTeam = D34XZHQLE3;
 						DevelopmentTeamName = "Bakken & Bæck AS";
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					14E5F75E1E7831AF00D970EF = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 29X3GG489T;
+						DevelopmentTeam = D34XZHQLE3;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
@@ -535,6 +539,7 @@
 				14B905321E8BF05500214247 /* PhotosCollectionLayout.swift in Sources */,
 				143803441C2452A1003CA252 /* ViewerController.swift in Sources */,
 				14FAC8E21EA754D7003DA8F2 /* ViewableControllerContainer.swift in Sources */,
+				4442A81D20C98CDA004B8BC3 /* UIViewExtensions.swift in Sources */,
 				143803421C2452A1003CA252 /* UIViewController+Window.swift in Sources */,
 				14C984001C0DE79200B5E515 /* AppDelegate.swift in Sources */,
 				14E5F79F1E78330400D970EF /* PhotosController.swift in Sources */,
@@ -561,6 +566,7 @@
 				14B905331E8BF05500214247 /* PhotosCollectionLayout.swift in Sources */,
 				14E5F7781E78329C00D970EF /* UIViewController+Window.swift in Sources */,
 				14FAC8E31EA754D7003DA8F2 /* ViewableControllerContainer.swift in Sources */,
+				4442A81E20C98CDA004B8BC3 /* UIViewExtensions.swift in Sources */,
 				14E5F7751E78329C00D970EF /* PaginatedScrollView.swift in Sources */,
 				14E5F7721E78329C00D970EF /* VideoView.swift in Sources */,
 				14E5F7A01E78330400D970EF /* PhotosController.swift in Sources */,
@@ -690,6 +696,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				DEVELOPMENT_TEAM = D34XZHQLE3;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -709,6 +716,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				DEVELOPMENT_TEAM = D34XZHQLE3;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -727,11 +735,12 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = D34XZHQLE3;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.demoapp.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finn.demoapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -749,11 +758,12 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = D34XZHQLE3;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.demoapp.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finn.demoapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -770,10 +780,10 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 29X3GG489T;
+				DEVELOPMENT_TEAM = D34XZHQLE3;
 				INFOPLIST_FILE = tvOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.demo.tvOS;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finn.demo.tvOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -793,10 +803,10 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 29X3GG489T;
+				DEVELOPMENT_TEAM = D34XZHQLE3;
 				INFOPLIST_FILE = tvOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.demo.tvOS;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finn.demo.tvOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

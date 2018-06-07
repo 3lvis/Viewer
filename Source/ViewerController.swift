@@ -348,19 +348,29 @@ extension ViewerController {
         self.view.addSubview(presentedView)
 
         if let headerView = self.headerView {
-            let bounds = UIScreen.main.bounds
-            headerView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: ViewerController.HeaderHeight)
-            headerView.autoresizingMask = [.flexibleLeftMargin, .flexibleBottomMargin, .flexibleWidth]
+            headerView.translatesAutoresizingMaskIntoConstraints = false
             headerView.alpha = 0
             self.view.addSubview(headerView)
+
+            NSLayoutConstraint.activate([
+                headerView.topAnchor.constraint(equalTo: view.compatibleTopAnchor),
+                headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                headerView.heightAnchor.constraint(equalToConstant: ViewerController.HeaderHeight)
+                ])
         }
 
         if let footerView = self.footerView {
-            let bounds = UIScreen.main.bounds
-            footerView.frame = CGRect(x: 0, y: bounds.size.height - ViewerController.FooterHeight, width: bounds.width, height: ViewerController.FooterHeight)
-            footerView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleWidth]
+            footerView.translatesAutoresizingMaskIntoConstraints = false
             footerView.alpha = 0
             self.view.addSubview(footerView)
+
+            NSLayoutConstraint.activate([
+                footerView.bottomAnchor.constraint(equalTo: view.compatibleBottomAnchor),
+                footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                footerView.heightAnchor.constraint(equalToConstant: ViewerController.FooterHeight)
+                ])
         }
 
         let centeredImageFrame = image.centeredFrame()
