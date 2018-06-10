@@ -53,6 +53,15 @@ class ViewableController: UIViewController {
         return view
     }()
 
+    lazy var imageLoadingIndicator: UIActivityIndicatorView = {
+        let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        activityView.center = self.view.center
+        activityView.startAnimating()
+        activityView.alpha = 0
+        
+        return activityView
+    }()
+    
     lazy var videoView: VideoView = {
         let view = VideoView()
         view.delegate = self
@@ -168,6 +177,7 @@ class ViewableController: UIViewController {
 
         self.zoomingScrollView.addSubview(self.imageView)
         self.view.addSubview(self.zoomingScrollView)
+        self.view.addSubview(imageLoadingIndicator)
 
         self.view.addSubview(self.videoView)
 
@@ -280,7 +290,9 @@ class ViewableController: UIViewController {
 
         switch viewable.type {
         case .image:
+            self.imageLoadingIndicator.alpha = 1
             viewable.media { image, _ in
+                self.imageLoadingIndicator.alpha = 0
                 if let image = image {
                     self.imageView.image = image
                     self.configure()
