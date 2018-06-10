@@ -56,8 +56,7 @@ class ViewableController: UIViewController {
     lazy var imageLoadingIndicator: UIActivityIndicatorView = {
         let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
         activityView.center = self.view.center
-        activityView.startAnimating()
-        activityView.alpha = 0
+        activityView.hidesWhenStopped = true
         
         return activityView
     }()
@@ -290,9 +289,17 @@ class ViewableController: UIViewController {
 
         switch viewable.type {
         case .image:
-            self.imageLoadingIndicator.alpha = 1
+            // Needed to avoid showing the loading indicator for a fraction of a second thanks to this the
+            // loading indicator will only be displayed when the image is taking a lot of time to load.
+            let deadline = DispatchTime.now() + Double(Int64(0.5 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+            DispatchQueue.main.asyncAfter(deadline: deadline) {
+                if self.imageView.image == nil {
+                    self.imageLoadingIndicator.startAnimating()
+                }
+            }
+
             viewable.media { image, _ in
-                self.imageLoadingIndicator.alpha = 0
+                self.imageLoadingIndicator.stopAnimating()
                 if let image = image {
                     self.imageView.image = image
                     self.configure()
