@@ -289,7 +289,7 @@ class ViewableController: UIViewController {
 
         switch viewable.type {
         case .image:
-            // Needed to avoid showing the loading indicator for a fraction of a second thanks to this the
+            // Needed to avoid showing the loading indicator for a fraction of a second. Thanks to this the
             // loading indicator will only be displayed when the image is taking a lot of time to load.
             let deadline = DispatchTime.now() + Double(Int64(0.5 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
             DispatchQueue.main.asyncAfter(deadline: deadline) {
