@@ -229,14 +229,13 @@ class ViewableController: UIViewController {
     @objc func doubleTapAction(recognizer: UITapGestureRecognizer) {
         let zoomScale = self.zoomingScrollView.zoomScale == 1 ? self.maxZoomScale() : 1
 
-        let touchPoint = recognizer.location(in: self.imageView)
-
         let scrollViewSize = self.imageView.bounds.size
+        let center = self.imageView.center
 
         let width = scrollViewSize.width / zoomScale
         let height = scrollViewSize.height / zoomScale
-        let originX = touchPoint.x - (width / 2.0)
-        let originY = touchPoint.y - (height / 2.0)
+        let originX = center.x - (width / 2)
+        let originY = center.y - (height / 2.0)
 
         let rectToZoomTo = CGRect(x: originX, y: originY, width: width, height: height)
 
