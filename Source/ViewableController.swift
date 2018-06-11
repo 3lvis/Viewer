@@ -299,10 +299,12 @@ class ViewableController: UIViewController {
             }
 
             viewable.media { image, _ in
-                self.imageLoadingIndicator.stopAnimating()
-                if let image = image {
-                    self.imageView.image = image
-                    self.configure()
+                DispatchQueue.main.async {
+                    self.imageLoadingIndicator.stopAnimating()
+                    if let image = image {
+                        self.imageView.image = image
+                        self.configure()
+                    }
                 }
             }
         case .video:
@@ -310,8 +312,10 @@ class ViewableController: UIViewController {
                 let shouldAutoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
                 if !shouldAutoplayVideo {
                     viewable.media { image, _ in
-                        if let image = image {
-                            self.imageView.image = image
+                        DispatchQueue.main.async {
+                            if let image = image {
+                                self.imageView.image = image
+                            }
                         }
                     }
                 }
@@ -339,9 +343,11 @@ class ViewableController: UIViewController {
                     }
                 } else {
                     viewable.media { image, _ in
-                        if let image = image {
-                            self.imageView.image = image
-                            self.playButton.alpha = 1
+                        DispatchQueue.main.async {
+                            if let image = image {
+                                self.imageView.image = image
+                                self.playButton.alpha = 1
+                            }
                         }
                     }
                 }
