@@ -53,6 +53,14 @@ class ViewableController: UIViewController {
         return view
     }()
 
+    lazy var imageLoadingIndicator: UIActivityIndicatorView = {
+        let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        activityView.center = self.view.center
+        activityView.hidesWhenStopped = true
+        
+        return activityView
+    }()
+    
     lazy var videoView: VideoView = {
         let view = VideoView()
         view.delegate = self
@@ -168,6 +176,7 @@ class ViewableController: UIViewController {
 
         self.zoomingScrollView.addSubview(self.imageView)
         self.view.addSubview(self.zoomingScrollView)
+        self.view.addSubview(imageLoadingIndicator)
 
         self.view.addSubview(self.videoView)
 
@@ -280,10 +289,22 @@ class ViewableController: UIViewController {
 
         switch viewable.type {
         case .image:
+            // Needed to avoid showing the loading indicator for a fraction of a second. Thanks to this the
+            // loading indicator will only be displayed when the image is taking a lot of time to load.
+            let deadline = DispatchTime.now() + Double(Int64(0.5 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+            DispatchQueue.main.asyncAfter(deadline: deadline) {
+                if self.imageView.image == nil {
+                    self.imageLoadingIndicator.startAnimating()
+                }
+            }
+
             viewable.media { image, _ in
-                if let image = image {
-                    self.imageView.image = image
-                    self.configure()
+                DispatchQueue.main.async {
+                    self.imageLoadingIndicator.stopAnimating()
+                    if let image = image {
+                        self.imageView.image = image
+                        self.configure()
+                    }
                 }
             }
         case .video:
@@ -291,8 +312,10 @@ class ViewableController: UIViewController {
                 let shouldAutoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
                 if !shouldAutoplayVideo {
                     viewable.media { image, _ in
-                        if let image = image {
-                            self.imageView.image = image
+                        DispatchQueue.main.async {
+                            if let image = image {
+                                self.imageView.image = image
+                            }
                         }
                     }
                 }
@@ -320,9 +343,11 @@ class ViewableController: UIViewController {
                     }
                 } else {
                     viewable.media { image, _ in
-                        if let image = image {
-                            self.imageView.image = image
-                            self.playButton.alpha = 1
+                        DispatchQueue.main.async {
+                            if let image = image {
+                                self.imageView.image = image
+                                self.playButton.alpha = 1
+                            }
                         }
                     }
                 }
