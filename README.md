@@ -4,13 +4,13 @@
   <a href="https://cocoapods.org/pods/Viewer">
     <img src="https://img.shields.io/cocoapods/v/Viewer.svg?style=flat" />
   </a>
-  
+
   <a href="https://github.com/3lvis/Viewer">
     <img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat" />
   </a>
-  
+
   <img src="https://img.shields.io/badge/platforms-iOS%20%7C%20tvOS%20-lightgrey.svg" />
-  
+
   <a href="https://cocoapods.org/pods/Viewer">
     <img src="https://img.shields.io/cocoapods/l/Viewer.svg?style=flat" />
   </a>
@@ -110,13 +110,3 @@ github "3lvis/Viewer"
 ## License
 
 **Viewer** is available under the MIT license. See the [LICENSE](/LICENSE.md) file for more info.
-
-## Author
-
-<a href=https://3lvis.com>
-  <img src="https://raw.githubusercontent.com/3lvis/Viewer/master/GitHub/3lvis-logo.jpg" />
-</a>
-
-We are a digital studio that helps startups and established companies invent, build, and launch their next product or venture.
-
-We also build startups of our own. If you would like to work on open source components like this one you would probably be interested in [joining us](https://3lvis.com/jobs).
