@@ -15,7 +15,7 @@ public protocol ViewerControllerDelegate: class {
 
 /// The ViewerController takes care of displaying the user's photos and videos in full-screen. You can swipe right or left to navigate between them.
 public class ViewerController: UIViewController {
-    static let domain = "com.bakkenbaeck.Viewer"
+    static let domain = "com.3lvis.Viewer"
     fileprivate static let HeaderHeight = CGFloat(64)
     fileprivate static let FooterHeight = CGFloat(50)
     fileprivate static let DraggingMargin = CGFloat(60)

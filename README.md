@@ -1,11 +1,11 @@
-![Viewer](https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/viewer-logo-2.jpg)
+![Viewer](https://raw.githubusercontent.com/3lvis/Viewer/master/GitHub/viewer-logo-2.jpg)
 
 <div align = "center">
   <a href="https://cocoapods.org/pods/Viewer">
     <img src="https://img.shields.io/cocoapods/v/Viewer.svg?style=flat" />
   </a>
   
-  <a href="https://github.com/bakkenbaeck/Viewer">
+  <a href="https://github.com/3lvis/Viewer">
     <img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat" />
   </a>
   
@@ -36,7 +36,7 @@
 Select an image to enter into lightbox mode.
 
 <p align="center">
-  <img src="https://github.com/bakkenbaeck/Viewer/raw/master/GitHub/focus.gif"/>
+  <img src="https://github.com/3lvis/Viewer/raw/master/GitHub/focus.gif"/>
 </p>
 
 ### Browse
@@ -44,7 +44,7 @@ Select an image to enter into lightbox mode.
 Open an image or video to browse.
 
 <p align="center">
-  <img src="https://github.com/bakkenbaeck/Viewer/raw/master/GitHub/play.gif"/>
+  <img src="https://github.com/3lvis/Viewer/raw/master/GitHub/play.gif"/>
 </p>
 
 ### Rotation
@@ -52,7 +52,7 @@ Open an image or video to browse.
 Portrait or landscape, it just works.
 
 <p align="center">
-  <img src="https://github.com/bakkenbaeck/Viewer/raw/master/GitHub/rotation.gif"/>
+  <img src="https://github.com/3lvis/Viewer/raw/master/GitHub/rotation.gif"/>
 </p>
 
 ### Zoom
@@ -60,7 +60,7 @@ Portrait or landscape, it just works.
 Pinch-to-zoom works seamlessly in images.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/zoom.gif"/>
+  <img src="https://raw.githubusercontent.com/3lvis/Viewer/master/GitHub/zoom.gif"/>
 </p>
 
 ### tvOS
@@ -68,12 +68,12 @@ Pinch-to-zoom works seamlessly in images.
 Support for the Apple TV.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/tv.gif"/>
+  <img src="https://raw.githubusercontent.com/3lvis/Viewer/master/GitHub/tv.gif"/>
 </p>
 
 ## Setup
 
-You'll need a collection of items that comform to the [Viewable protocol](https://github.com/bakkenbaeck/Viewer/blob/master/Source/Viewable.swift). Then, from your UICollectionView:
+You'll need a collection of items that comform to the [Viewable protocol](https://github.com/3lvis/Viewer/blob/master/Source/Viewable.swift). Then, from your UICollectionView:
 
 ```swift
 import Viewer
@@ -104,7 +104,7 @@ pod 'Viewer'
 ### Carthage
 
 ```ruby
-github "bakkenbaeck/Viewer"
+github "3lvis/Viewer"
 ```
 
 ## License
@@ -113,10 +113,10 @@ github "bakkenbaeck/Viewer"
 
 ## Author
 
-<a href=https://bakkenbaeck.com>
-  <img src="https://raw.githubusercontent.com/bakkenbaeck/Viewer/master/GitHub/bakkenbaeck-logo.jpg" />
+<a href=https://3lvis.com>
+  <img src="https://raw.githubusercontent.com/3lvis/Viewer/master/GitHub/3lvis-logo.jpg" />
 </a>
 
 We are a digital studio that helps startups and established companies invent, build, and launch their next product or venture.
 
-We also build startups of our own. If you would like to work on open source components like this one you would probably be interested in [joining us](https://bakkenbaeck.com/jobs).
+We also build startups of our own. If you would like to work on open source components like this one you would probably be interested in [joining us](https://3lvis.com/jobs).

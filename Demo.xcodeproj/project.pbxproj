@@ -406,13 +406,13 @@
 					146D72AB1AB782920058798C = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = D34XZHQLE3;
-						DevelopmentTeamName = "Bakken & Bæck AS";
+						DevelopmentTeamName = "Elvis Nuñez AS";
 						LastSwiftMigration = 0900;
 					};
 					14C983FC1C0DE79200B5E515 = {
 						CreatedOnToolsVersion = 7.2;
 						DevelopmentTeam = D34XZHQLE3;
-						DevelopmentTeamName = "Bakken & Bæck AS";
+						DevelopmentTeamName = "Elvis Nuñez AS";
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
