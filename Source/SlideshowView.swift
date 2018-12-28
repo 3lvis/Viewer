@@ -42,7 +42,7 @@ class SlideshowView: UIView, ViewableControllerContainer {
     }
 
     func start() {
-        RunLoop.current.add(self.timer, forMode: .defaultRunLoopMode)
+        RunLoop.current.add(self.timer, forMode: .default)
     }
 
     func stop() {
@@ -60,9 +60,9 @@ extension SlideshowView {
         guard let image = controller.viewable?.placeholder else { return }
 
         controller.view.frame = image.centeredFrame()
-        self.parentController.addChildViewController(controller)
+        self.parentController.addChild(controller)
         self.addSubview(controller.view)
-        controller.didMove(toParentViewController: self.parentController)
+        controller.didMove(toParent: self.parentController)
 
         if isInitial {
             self.currentController = controller
@@ -75,9 +75,9 @@ extension SlideshowView {
                 self.currentController?.view.alpha = 0
                 controller.view.alpha = 1
             }, completion: { isFinished in
-                self.currentController?.willMove(toParentViewController: nil)
+                self.currentController?.willMove(toParent: nil)
                 self.currentController?.view.removeFromSuperview()
-                self.currentController?.removeFromParentViewController()
+                self.currentController?.removeFromParent()
                 self.currentController = nil
 
                 self.currentController = controller

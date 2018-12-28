@@ -16,7 +16,7 @@ class VideoView: UIView {
     static let playerItemStatusKeyPath = "status"
     static let audioSessionVolumeKeyPath = "outputVolume"
     weak var delegate: VideoViewDelegate?
-    var playerCurrentItemStatus = AVPlayerItemStatus.unknown
+    var playerCurrentItemStatus = AVPlayerItem.Status.unknown
 
     fileprivate lazy var playerLayer: AVPlayerLayer = {
         let playerLayer = AVPlayerLayer()
@@ -29,7 +29,7 @@ class VideoView: UIView {
     var image: UIImage?
 
     private lazy var loadingIndicator: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        let view = UIActivityIndicatorView(style: .whiteLarge)
         view.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin]
 
         return view
@@ -95,7 +95,7 @@ class VideoView: UIView {
 
         if keyPath == VideoView.audioSessionVolumeKeyPath {
             do {
-                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: [])
+                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
             } catch let error {
                 print("Failed to start playback sound: \(error.localizedDescription)")
             }
@@ -181,7 +181,7 @@ class VideoView: UIView {
     }
 
     func `repeat`() {
-        self.playerLayer.player?.seek(to: kCMTimeZero)
+        self.playerLayer.player?.seek(to: CMTime.zero)
         self.playerLayer.player?.play()
     }
 
@@ -191,10 +191,10 @@ class VideoView: UIView {
 
         self.playerLayer.isHidden = true
         self.playerLayer.player?.pause()
-        self.playerLayer.player?.seek(to: kCMTimeZero)
+        self.playerLayer.player?.seek(to: CMTime.zero)
         self.playerLayer.player = nil
 
-        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategorySoloAmbient, with: [])
+        try? AVAudioSession.sharedInstance().setCategory(.soloAmbient, mode: .default, options: [])
     }
 
     func play() {
@@ -231,7 +231,7 @@ class VideoView: UIView {
     // How do I achieve smooth video scrubbing with AVPlayer seekToTime:?
     // https://developer.apple.com/library/content/qa/qa1820/_index.html
     var isSeekInProgress = false
-    var chaseTime = kCMTimeZero
+    var chaseTime = CMTime.zero
 
     func stopPlayingAndSeekSmoothlyToTime(duration: Double) {
         guard let timescale = self.playerLayer.player?.currentItem?.currentTime().timescale else { return }
@@ -262,7 +262,7 @@ class VideoView: UIView {
     func actuallySeekToTime() {
         self.isSeekInProgress = true
         let seekTimeInProgress = self.chaseTime
-        self.playerLayer.player?.seek(to: seekTimeInProgress, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { _ in
+        self.playerLayer.player?.seek(to: seekTimeInProgress, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero) { _ in
             if CMTimeCompare(seekTimeInProgress, self.chaseTime) == 0 {
                 self.isSeekInProgress = false
             } else {
@@ -367,6 +367,6 @@ extension VideoView {
 
 extension CMTime {
     public init(seconds: Double, preferredTimescale: CMTimeScale) {
-        self = CMTimeMakeWithSeconds(seconds, preferredTimescale)
+        self = CMTimeMakeWithSeconds(seconds, preferredTimescale: preferredTimescale)
     }
 }
