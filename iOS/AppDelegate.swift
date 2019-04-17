@@ -6,7 +6,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    public func application(_: UIApplication, willFinishLaunchingWithOptions _: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
+    public func application(_: UIApplication, willFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         self.window = UIWindow(frame: UIScreen.main.bounds)
 
         let localController = PhotosController(dataSourceType: .local)
@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         if AppDelegate.IsLightStatusBar {
             UINavigationBar.appearance().barTintColor = .orange
-            UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
+            UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
             remoteNavigationController.navigationBar.barStyle = .black
             localNavigationController.navigationBar.barStyle = .black
         }

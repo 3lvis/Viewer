@@ -94,11 +94,9 @@ class VideoView: UIView {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change _: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
 
         if keyPath == VideoView.audioSessionVolumeKeyPath {
-            do {
-                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
-            } catch let error {
-                print("Failed to start playback sound: \(error.localizedDescription)")
-            }
+            #if os(iOS)
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+            #endif
             return
         }
 
@@ -194,7 +192,9 @@ class VideoView: UIView {
         self.playerLayer.player?.seek(to: CMTime.zero)
         self.playerLayer.player = nil
 
+        #if os(iOS)
         try? AVAudioSession.sharedInstance().setCategory(.soloAmbient, mode: .default, options: [])
+        #endif
     }
 
     func play() {
@@ -255,6 +255,8 @@ class VideoView: UIView {
         case .readyToPlay:
             self.actuallySeekToTime()
         case .failed:
+            break
+        @unknown default:
             break
         }
     }

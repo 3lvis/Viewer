@@ -3,25 +3,28 @@ import UIKit
 class PhotosCollectionLayout: UICollectionViewFlowLayout {
     static let headerSize = CGFloat(69)
     class var numberOfColumns: Int {
+
         #if os(iOS)
-            var isPortrait: Bool
-            switch UIDevice.current.orientation {
-            case .portrait, .portraitUpsideDown, .unknown, .faceUp, .faceDown:
-                isPortrait = true
-            case .landscapeLeft, .landscapeRight:
-                isPortrait = false
-            }
+        var isPortrait: Bool = false
+        switch UIDevice.current.orientation {
+        case .portrait, .portraitUpsideDown, .unknown, .faceUp, .faceDown:
+            isPortrait = true
+        case .landscapeLeft, .landscapeRight:
+            isPortrait = false
+        @unknown default:
+            break
+        }
 
-            var numberOfColumns = 0
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                numberOfColumns = isPortrait ? 3 : 6
-            } else {
-                numberOfColumns = isPortrait ? 5 : 8
-            }
+        var numberOfColumns = 0
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            numberOfColumns = isPortrait ? 3 : 6
+        } else {
+            numberOfColumns = isPortrait ? 5 : 8
+        }
 
-            return numberOfColumns
+        return numberOfColumns
         #else
-            return 6
+        return 6
         #endif
     }
 

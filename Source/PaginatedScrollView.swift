@@ -21,7 +21,10 @@ class PaginatedScrollView: UIScrollView, ViewableControllerContainer {
         self.showsVerticalScrollIndicator = false
         self.delegate = self
         self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+        #if os(iOS)
         self.decelerationRate = UIScrollView.DecelerationRate.fast
+        #endif
     }
 
     required init?(coder _: NSCoder) {
