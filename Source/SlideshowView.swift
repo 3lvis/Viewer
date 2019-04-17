@@ -42,7 +42,7 @@ class SlideshowView: UIView, ViewableControllerContainer {
     }
 
     func start() {
-        RunLoop.current.add(self.timer, forMode: .default)
+        RunLoop.current.add(self.timer, forMode: RunLoop.Mode.default)
     }
 
     func stop() {

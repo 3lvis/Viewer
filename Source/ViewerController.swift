@@ -152,23 +152,23 @@ public class ViewerController: UIViewController {
             self.view.addSubview(self.scrollView)
         #else
             let menuTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menu(gesture:)))
-            menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
+            menuTapRecognizer.allowedPressTypes = [NSNumber(value: UIPress.PressType.menu.rawValue)]
             self.view.addGestureRecognizer(menuTapRecognizer)
 
             if self.isSlideshow {
                 self.view.addSubview(self.slideshowView)
             } else {
-                self.addChildViewController(self.pageController)
+                self.addChild(self.pageController)
                 self.pageController.view.frame = UIScreen.main.bounds
                 self.view.addSubview(self.pageController.view)
-                self.pageController.didMove(toParentViewController: self)
+                self.pageController.didMove(toParent: self)
 
                 let playPauseTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPause(gesture:)))
-                playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
+                playPauseTapRecognizer.allowedPressTypes = [NSNumber(value: UIPress.PressType.playPause.rawValue)]
                 self.view.addGestureRecognizer(playPauseTapRecognizer)
 
                 let selectTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.select(gesture:)))
-                selectTapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
+                selectTapRecognizer.allowedPressTypes = [NSNumber(value: UIPress.PressType.select.rawValue)]
                 self.view.addGestureRecognizer(selectTapRecognizer)
 
                 let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightSwipe(gesture:)))
