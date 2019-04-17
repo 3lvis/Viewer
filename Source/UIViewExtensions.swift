@@ -5,12 +5,12 @@
 import UIKit
 
 public extension UIView {
-    public convenience init(withAutoLayout autoLayout: Bool) {
+    convenience init(withAutoLayout autoLayout: Bool) {
         self.init()
         translatesAutoresizingMaskIntoConstraints = !autoLayout
     }
 
-    public var compatibleTopAnchor: NSLayoutYAxisAnchor {
+    var compatibleTopAnchor: NSLayoutYAxisAnchor {
         if #available(iOS 11.0, *) {
             return safeAreaLayoutGuide.topAnchor
         } else {
@@ -18,7 +18,7 @@ public extension UIView {
         }
     }
 
-    public var compatibleBottomAnchor: NSLayoutYAxisAnchor {
+    var compatibleBottomAnchor: NSLayoutYAxisAnchor {
         if #available(iOS 11.0, *) {
             return safeAreaLayoutGuide.bottomAnchor
         } else {

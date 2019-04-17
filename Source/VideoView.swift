@@ -256,6 +256,8 @@ class VideoView: UIView {
             self.actuallySeekToTime()
         case .failed:
             break
+        @unknown default:
+            break
         }
     }
 
