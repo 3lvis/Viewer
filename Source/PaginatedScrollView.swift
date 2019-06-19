@@ -5,7 +5,6 @@ class PaginatedScrollView: UIScrollView, ViewableControllerContainer {
     weak var viewDelegate: ViewableControllerContainerDelegate?
     fileprivate unowned var parentController: UIViewController
     fileprivate var currentPage: Int
-    fileprivate var shoudEvaluate = false
 
     init(frame: CGRect, parentController: UIViewController, initialPage: Int) {
         self.parentController = parentController
@@ -93,27 +92,21 @@ class PaginatedScrollView: UIScrollView, ViewableControllerContainer {
 
 extension PaginatedScrollView: UIScrollViewDelegate {
 
-    func scrollViewWillBeginDragging(_: UIScrollView) {
-        self.shoudEvaluate = true
-    }
+    func scrollViewWillBeginDragging(_: UIScrollView) {}
 
     func scrollViewDidEndDecelerating(_: UIScrollView) {
-        self.shoudEvaluate = false
-    }
-
-    func scrollViewDidScroll(_: UIScrollView) {
-        if self.shoudEvaluate {
-            let pageWidth = self.frame.size.width
-            let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
-            if page != self.currentPage {
-                self.viewDelegate?.viewableControllerContainer(self, didMoveToIndex: page)
-                self.viewDelegate?.viewableControllerContainer(self, didMoveFromIndex: self.currentPage)
-            }
-            self.currentPage = page
-
-            self.loadScrollViewWithPage(page - 1)
-            self.loadScrollViewWithPage(page)
-            self.loadScrollViewWithPage(page + 1)
+        let pageWidth = self.frame.size.width
+        let page = Int(floor((self.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
+        if page != self.currentPage {
+            self.viewDelegate?.viewableControllerContainer(self, didMoveToIndex: page)
+            self.viewDelegate?.viewableControllerContainer(self, didMoveFromIndex: self.currentPage)
         }
+        self.currentPage = page
+        
+        self.loadScrollViewWithPage(page - 1)
+        self.loadScrollViewWithPage(page)
+        self.loadScrollViewWithPage(page + 1)
     }
+
+    func scrollViewDidScroll(_: UIScrollView) {}
 }
