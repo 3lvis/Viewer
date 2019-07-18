@@ -10,7 +10,7 @@ class FooterView: UIView {
     static let ButtonSize = CGFloat(50.0)
 
     lazy var favoriteButton: UIButton = {
-        let image = UIImage(named: "favorite")!
+        let image = UIImage(named: "favorite", in: Bundle(for: type(of: self)), compatibleWith: nil)!
         let button = UIButton(type: .custom)
         button.setImage(image, for: .normal)
 
@@ -18,7 +18,7 @@ class FooterView: UIView {
     }()
 
     lazy var deleteButton: UIButton = {
-        let image = UIImage(named: "delete")!
+        let image = UIImage(named: "delete", in: Bundle(for: type(of: self)), compatibleWith: nil)!
         let button = UIButton(type: .custom)
         button.setImage(image, for: .normal)
 

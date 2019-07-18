@@ -51,22 +51,22 @@ class Photo: Viewable {
                 let index = Int(arc4random_uniform(6))
                 switch index {
                 case 0:
-                    photo.placeholder = UIImage(named: "0.jpg")!
+                    photo.placeholder = UIImage(named: "0.jpg", in: Bundle(for: Photo.self), compatibleWith: nil)!
                     break
                 case 1:
-                    photo.placeholder = UIImage(named: "1.jpg")!
+                    photo.placeholder = UIImage(named: "1.jpg", in: Bundle(for: Photo.self), compatibleWith: nil)!
                     break
                 case 2:
-                    photo.placeholder = UIImage(named: "2.jpg")!
+                    photo.placeholder = UIImage(named: "2.jpg", in: Bundle(for: Photo.self), compatibleWith: nil)!
                     break
                 case 3:
-                    photo.placeholder = UIImage(named: "3.jpg")!
+                    photo.placeholder = UIImage(named: "3.jpg", in: Bundle(for: Photo.self), compatibleWith: nil)!
                     break
                 case 4:
-                    photo.placeholder = UIImage(named: "4.jpg")!
+                    photo.placeholder = UIImage(named: "4.jpg", in: Bundle(for: Photo.self), compatibleWith: nil)!
                     break
                 case 5:
-                    photo.placeholder = UIImage(named: "5.png")!
+                    photo.placeholder = UIImage(named: "5.png", in: Bundle(for: Photo.self), compatibleWith: nil)!
                     photo.url = "http://techslides.com/demos/sample-videos/small.mp4"
                     photo.type = .video
                 default: break

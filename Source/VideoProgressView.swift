@@ -105,7 +105,7 @@ class VideoProgressView: UIView {
     lazy var seekView: UIImageView = {
         let view = UIImageView()
         view.isUserInteractionEnabled = true
-        view.image = UIImage(named: "seek")
+        view.image = UIImage(named: "seek", in: Bundle(for: type(of: self)), compatibleWith: nil)
         view.contentMode = .scaleAspectFit
 
         return view
