@@ -136,6 +136,7 @@
 		73465DA122DF7EC200F91F9C /* PhotosController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E5F7871E78330400D970EF /* PhotosController.swift */; };
 		73465DA222DF7EC200F91F9C /* PopupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E5F7881E78330400D970EF /* PopupController.swift */; };
 		73465DA322DF7EC200F91F9C /* PhotosCollectionLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B905301E8BF05500214247 /* PhotosCollectionLayout.swift */; };
+		73465DA622E134FA00F91F9C /* SharedAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14E5F7A41E7833B200D970EF /* SharedAssets.xcassets */; };
 		E6D592841D226528006EF238 /* VideoProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D592821D226528006EF238 /* VideoProgressView.swift */; };
 		E6D592891D22A2B8006EF238 /* DINNextLTPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E6D592861D229795006EF238 /* DINNextLTPro-Regular.otf */; };
 /* End PBXBuildFile section */
@@ -640,6 +641,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73465DA622E134FA00F91F9C /* SharedAssets.xcassets in Resources */,
 				73465D8122DF7E7600F91F9C /* DINNextLTPro-Regular.otf in Resources */,
 				73465D8222DF7E7600F91F9C /* pause.png in Resources */,
 				73465D8322DF7E7600F91F9C /* pause@2x.png in Resources */,
