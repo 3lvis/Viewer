@@ -36,7 +36,7 @@ class VideoView: UIView {
     }()
 
     private lazy var loadingIndicatorBackground: UIImageView = {
-        let view = UIImageView(image: UIImage(named: "dark-circle")!)
+        let view = UIImageView(image: UIImage(named: "dark-circle", in: Bundle(for: type(of: self)), compatibleWith: nil)!)
         view.alpha = 0
 
         return view

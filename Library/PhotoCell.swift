@@ -32,7 +32,7 @@ class PhotoCell: UICollectionViewCell {
 
     lazy var videoIndicator: UIImageView = {
         let view = UIImageView()
-        view.image = UIImage(named: "video-indicator")!
+        view.image = UIImage(named: "video-indicator", in: Bundle(for: type(of: self)), compatibleWith: nil)!
         view.isHidden = true
         view.contentMode = .center
 
