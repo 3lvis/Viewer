@@ -358,8 +358,12 @@ class ViewableController: UIViewController {
     func resetButtonStates() {
         self.repeatButton.alpha = 0
         self.pauseButton.alpha = 0
-        self.playButton.alpha = 1
         self.videoProgressView.alpha = 0
+
+        let shouldAutoplayVideo = self.dataSource?.viewableControllerShouldAutoplayVideo(self) ?? false
+        if !shouldAutoplayVideo {
+            self.playButton.alpha = 1
+        }
     }
 
     @objc func pauseAction() {
