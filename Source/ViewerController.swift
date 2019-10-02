@@ -125,6 +125,14 @@ public class ViewerController: UIViewController {
 
     public var footerView: UIView?
 
+    private lazy var defaultHeaderView: DefaultHeaderView = {
+        let defaultHeaderView = DefaultHeaderView()
+        defaultHeaderView.delegate = self
+        defaultHeaderView.translatesAutoresizingMaskIntoConstraints = false
+        defaultHeaderView.alpha = 0
+        return defaultHeaderView
+    }()
+
     lazy var scrollView: PaginatedScrollView = {
         let view = PaginatedScrollView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
         view.viewDataSource = self
@@ -346,6 +354,10 @@ extension ViewerController {
 
         self.view.addSubview(self.overlayView)
         self.view.addSubview(presentedView)
+
+        if self.headerView == nil {
+            self.headerView = defaultHeaderView
+        }
 
         if let headerView = self.headerView {
             headerView.translatesAutoresizingMaskIntoConstraints = false
@@ -692,5 +704,11 @@ extension ViewerController: UIPageViewControllerDataSource {
         }
 
         return nil
+    }
+}
+
+extension ViewerController: DefaultHeaderViewDelegate {
+    func headerView(_ headerView: DefaultHeaderView, didPressClearButton button: UIButton) {
+        dismiss(nil)
     }
 }

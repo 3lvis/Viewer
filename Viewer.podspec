@@ -11,5 +11,6 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = '11.0'
   s.requires_arc = true
   s.source_files = 'Source'
+  s.resources = "Source/*.xcassets"
   s.frameworks = 'UIKit'
 end
