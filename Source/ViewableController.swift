@@ -70,7 +70,7 @@ class ViewableController: UIViewController {
 
     lazy var playButton: UIButton = {
         let button = UIButton(type: .custom)
-        let image = UIImage(named: "play", in: Bundle(for: type(of: self)), compatibleWith: nil)!
+        let image = UIImage.play
         button.setImage(image, for: UIControl.State())
         button.alpha = 0
         
@@ -86,7 +86,7 @@ class ViewableController: UIViewController {
 
     lazy var repeatButton: UIButton = {
         let button = UIButton(type: .custom)
-        let image = UIImage(named: "repeat", in: Bundle(for: type(of: self)), compatibleWith: nil)!
+        let image = UIImage.repeat
         button.setImage(image, for: UIControl.State())
         button.alpha = 0
         button.addTarget(self, action: #selector(ViewableController.repeatAction), for: .touchUpInside)
@@ -96,7 +96,7 @@ class ViewableController: UIViewController {
 
     lazy var pauseButton: UIButton = {
         let button = UIButton(type: .custom)
-        let image = UIImage(named: "pause", in: Bundle(for: type(of: self)), compatibleWith: nil)!
+        let image = UIImage.pause
         button.setImage(image, for: UIControl.State())
         button.alpha = 0
         button.addTarget(self, action: #selector(ViewableController.pauseAction), for: .touchUpInside)
@@ -261,7 +261,7 @@ class ViewableController: UIViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
-        let buttonImage = UIImage(named: "play", in: Bundle(for: type(of: self)), compatibleWith: nil)!
+        let buttonImage = UIImage.play
         let buttonHeight = buttonImage.size.height
         let buttonWidth = buttonImage.size.width
         self.playButton.frame = CGRect(x: (self.view.frame.size.width - buttonWidth) / 2, y: (self.view.frame.size.height - buttonHeight) / 2, width: buttonHeight, height: buttonHeight)
