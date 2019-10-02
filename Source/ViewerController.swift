@@ -125,6 +125,14 @@ public class ViewerController: UIViewController {
 
     public var footerView: UIView?
 
+    private lazy var defaultHeaderView: DefaultHeaderView = {
+        let defaultHeaderView = DefaultHeaderView()
+        defaultHeaderView.delegate = self
+        defaultHeaderView.translatesAutoresizingMaskIntoConstraints = false
+        defaultHeaderView.alpha = 0
+        return defaultHeaderView
+    }()
+
     lazy var scrollView: PaginatedScrollView = {
         let view = PaginatedScrollView(frame: self.view.frame, parentController: self, initialPage: self.initialIndexPath.totalRow(self.collectionView))
         view.viewDataSource = self
@@ -347,6 +355,10 @@ extension ViewerController {
         self.view.addSubview(self.overlayView)
         self.view.addSubview(presentedView)
 
+        if self.headerView == nil {
+            self.headerView = defaultHeaderView
+        }
+
         if let headerView = self.headerView {
             headerView.translatesAutoresizingMaskIntoConstraints = false
             headerView.alpha = 0
@@ -357,19 +369,6 @@ extension ViewerController {
                 headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 headerView.heightAnchor.constraint(equalToConstant: ViewerController.HeaderHeight)
-                ])
-        } else {
-            let defaultHeaderView = DefaultHeaderView()
-            defaultHeaderView.delegate = self
-            defaultHeaderView.translatesAutoresizingMaskIntoConstraints = false
-            defaultHeaderView.alpha = 0
-            self.view.addSubview(defaultHeaderView)
-
-            NSLayoutConstraint.activate([
-                defaultHeaderView.topAnchor.constraint(equalTo: view.compatibleTopAnchor),
-                defaultHeaderView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                defaultHeaderView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                defaultHeaderView.heightAnchor.constraint(equalToConstant: ViewerController.HeaderHeight)
                 ])
         }
 

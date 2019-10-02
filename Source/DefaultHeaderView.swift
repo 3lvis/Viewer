@@ -7,7 +7,7 @@ protocol DefaultHeaderViewDelegate: class {
 class DefaultHeaderView: UIView {
     weak var delegate: DefaultHeaderViewDelegate?
     static let ButtonSize = CGFloat(50.0)
-    static let TopMargin = CGFloat(15.0)
+    static let TopMargin = CGFloat(14.0)
 
     lazy var clearButton: UIButton = {
         let image = UIImage.close
@@ -31,7 +31,7 @@ class DefaultHeaderView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        self.clearButton.frame = CGRect(x: 0, y: DefaultHeaderView.TopMargin, width: DefaultHeaderView.ButtonSize, height: DefaultHeaderView.ButtonSize)
+        self.clearButton.frame = CGRect(x: 4, y: DefaultHeaderView.TopMargin, width: DefaultHeaderView.ButtonSize, height: DefaultHeaderView.ButtonSize)
     }
 
     @objc func clearAction(button: UIButton) {
