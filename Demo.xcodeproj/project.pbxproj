@@ -71,6 +71,9 @@
 		44341CCF234490F90008503A /* Viewer.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44341CC823448E420008503A /* Viewer.xcassets */; };
 		4442A81D20C98CDA004B8BC3 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4442A81C20C98CDA004B8BC3 /* UIViewExtensions.swift */; };
 		4442A81E20C98CDA004B8BC3 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4442A81C20C98CDA004B8BC3 /* UIViewExtensions.swift */; };
+		4494E4F523449A6600176734 /* DefaultHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4494E4F423449A6600176734 /* DefaultHeaderView.swift */; };
+		4494E4F623449A6600176734 /* DefaultHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4494E4F423449A6600176734 /* DefaultHeaderView.swift */; };
+		4494E4F723449A6600176734 /* DefaultHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4494E4F423449A6600176734 /* DefaultHeaderView.swift */; };
 		73465D7822DF7E4A00F91F9C /* Viewer.h in Headers */ = {isa = PBXBuildFile; fileRef = 73465D7622DF7E4A00F91F9C /* Viewer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		73465D7B22DF7E4A00F91F9C /* Viewer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73465D7422DF7E4900F91F9C /* Viewer.framework */; };
 		73465D7C22DF7E4A00F91F9C /* Viewer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 73465D7422DF7E4900F91F9C /* Viewer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -165,6 +168,7 @@
 		44341CC823448E420008503A /* Viewer.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Viewer.xcassets; sourceTree = "<group>"; };
 		44341CCA23448ED60008503A /* ViewerAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerAssets.swift; sourceTree = "<group>"; };
 		4442A81C20C98CDA004B8BC3 /* UIViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
+		4494E4F423449A6600176734 /* DefaultHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultHeaderView.swift; sourceTree = "<group>"; };
 		73465D7422DF7E4900F91F9C /* Viewer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Viewer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		73465D7622DF7E4A00F91F9C /* Viewer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Viewer.h; sourceTree = "<group>"; };
 		73465D7722DF7E4A00F91F9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -276,6 +280,7 @@
 				4442A81C20C98CDA004B8BC3 /* UIViewExtensions.swift */,
 				44341CC823448E420008503A /* Viewer.xcassets */,
 				44341CCA23448ED60008503A /* ViewerAssets.swift */,
+				4494E4F423449A6600176734 /* DefaultHeaderView.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -582,6 +587,7 @@
 				44341CCC234490E90008503A /* ViewerAssets.swift in Sources */,
 				1438033E1C2452A1003CA252 /* NSIndexPath+Contiguous.swift in Sources */,
 				E6D592841D226528006EF238 /* VideoProgressView.swift in Sources */,
+				4494E4F523449A6600176734 /* DefaultHeaderView.swift in Sources */,
 				14C327B91CBE69F800CC0F98 /* PaginatedScrollView.swift in Sources */,
 				143803401C2452A1003CA252 /* UIImage+CenteredFrame.swift in Sources */,
 			);
@@ -610,6 +616,7 @@
 				44341CCD234490E90008503A /* ViewerAssets.swift in Sources */,
 				14E5F7711E78329C00D970EF /* ViewableController.swift in Sources */,
 				14E5F7621E7831B000D970EF /* AppDelegate.swift in Sources */,
+				4494E4F623449A6600176734 /* DefaultHeaderView.swift in Sources */,
 				14E5F7761E78329C00D970EF /* NSIndexPath+Contiguous.swift in Sources */,
 				14E5F7771E78329C00D970EF /* UIImage+CenteredFrame.swift in Sources */,
 			);
@@ -623,6 +630,7 @@
 				73465D9E22DF7EC200F91F9C /* HeaderView.swift in Sources */,
 				73465D9F22DF7EC200F91F9C /* Photo.swift in Sources */,
 				73465DA022DF7EC200F91F9C /* PhotoCell.swift in Sources */,
+				4494E4F723449A6600176734 /* DefaultHeaderView.swift in Sources */,
 				73465DA122DF7EC200F91F9C /* PhotosController.swift in Sources */,
 				73465DA222DF7EC200F91F9C /* PopupController.swift in Sources */,
 				73465DA322DF7EC200F91F9C /* PhotosCollectionLayout.swift in Sources */,

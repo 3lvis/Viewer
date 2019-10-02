@@ -358,6 +358,19 @@ extension ViewerController {
                 headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 headerView.heightAnchor.constraint(equalToConstant: ViewerController.HeaderHeight)
                 ])
+        } else {
+            let defaultHeaderView = DefaultHeaderView()
+            defaultHeaderView.delegate = self
+            defaultHeaderView.translatesAutoresizingMaskIntoConstraints = false
+            defaultHeaderView.alpha = 0
+            self.view.addSubview(defaultHeaderView)
+
+            NSLayoutConstraint.activate([
+                defaultHeaderView.topAnchor.constraint(equalTo: view.compatibleTopAnchor),
+                defaultHeaderView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                defaultHeaderView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                defaultHeaderView.heightAnchor.constraint(equalToConstant: ViewerController.HeaderHeight)
+                ])
         }
 
         if let footerView = self.footerView {
@@ -692,5 +705,11 @@ extension ViewerController: UIPageViewControllerDataSource {
         }
 
         return nil
+    }
+}
+
+extension ViewerController: DefaultHeaderViewDelegate {
+    func headerView(_ headerView: DefaultHeaderView, didPressClearButton button: UIButton) {
+        dismiss(nil)
     }
 }

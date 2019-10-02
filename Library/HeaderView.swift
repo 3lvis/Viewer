@@ -11,7 +11,7 @@ class HeaderView: UIView {
     static let TopMargin = CGFloat(15.0)
 
     lazy var clearButton: UIButton = {
-        let image = UIImage(named: "clear", in: Bundle(for: type(of: self)), compatibleWith: nil)!
+        let image = UIImage.close
         let button = UIButton(type: .custom)
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(HeaderView.clearAction(button:)), for: .touchUpInside)
