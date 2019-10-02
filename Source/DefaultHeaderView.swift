@@ -31,7 +31,7 @@ class DefaultHeaderView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        self.clearButton.frame = CGRect(x: 0, y: HeaderView.TopMargin, width: HeaderView.ButtonSize, height: HeaderView.ButtonSize)
+        self.clearButton.frame = CGRect(x: 0, y: DefaultHeaderView.TopMargin, width: DefaultHeaderView.ButtonSize, height: DefaultHeaderView.ButtonSize)
     }
 
     @objc func clearAction(button: UIButton) {
