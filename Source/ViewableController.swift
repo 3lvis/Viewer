@@ -116,6 +116,8 @@ class ViewableController: UIViewController {
     var viewable: Viewable?
     var indexPath: IndexPath?
 
+    var viewableBackgroundColor: UIColor = .black
+
     var playerViewController: AVPlayerViewController?
 
     var hasZoomed: Bool {
@@ -172,7 +174,7 @@ class ViewableController: UIViewController {
         super.viewDidLoad()
 
         self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.view.backgroundColor = .black
+        self.view.backgroundColor = self.viewableBackgroundColor
 
         self.zoomingScrollView.addSubview(self.imageView)
         self.view.addSubview(self.zoomingScrollView)
