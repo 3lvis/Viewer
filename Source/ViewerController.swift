@@ -55,7 +55,7 @@ public class ViewerController: UIViewController {
     public var autoplayVideos: Bool = false
 
     /**
-     Viewable background clor
+     Viewable background color
      */
     public var viewableBackgroundColor: UIColor = .black
     /**
