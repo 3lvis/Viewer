@@ -55,6 +55,10 @@ public class ViewerController: UIViewController {
     public var autoplayVideos: Bool = false
 
     /**
+     Viewable background color
+     */
+    public var viewableBackgroundColor: UIColor = .black
+    /**
      Cache for the reused ViewableControllers
      */
     fileprivate let viewableControllerCache = NSCache<NSString, ViewableController>()
@@ -87,7 +91,7 @@ public class ViewerController: UIViewController {
     /**
      Keeps track of where the status bar should be light or not
      */
-    fileprivate var shouldUseLightStatusBar = true
+    public var shouldUseLightStatusBar = true
 
     /**
      Critical button visibility state tracker, it's used to force the buttons to keep being hidden when they are toggled
@@ -106,7 +110,7 @@ public class ViewerController: UIViewController {
 
     fileprivate lazy var overlayView: UIView = {
         let view = UIView(frame: UIScreen.main.bounds)
-        view.backgroundColor = .black
+        view.backgroundColor = self.viewableBackgroundColor
         view.alpha = 0
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
@@ -322,7 +326,7 @@ extension ViewerController {
         }
 
         viewableController.update(with: viewable, at: indexPath)
-
+        viewableController.viewableBackgroundColor = self.viewableBackgroundColor
         return viewableController
     }
 
@@ -500,7 +504,7 @@ extension ViewerController {
     @objc func panAction(_ gesture: UIPanGestureRecognizer) {
         let controller = self.findOrCreateViewableController(self.currentIndexPath)
         guard !controller.hasZoomed else { return }
-        
+
         let viewHeight = controller.imageView.frame.size.height
         let viewHalfHeight = viewHeight / 2
         var translatedPoint = gesture.translation(in: controller.imageView)
@@ -524,7 +528,7 @@ extension ViewerController {
 
         controller.dimControls(alpha)
         controller.imageView.center = translatedPoint
-        controller.view.backgroundColor = UIColor.black.withAlphaComponent(alpha)
+        controller.view.backgroundColor = self.viewableBackgroundColor.withAlphaComponent(alpha)
 
         if self.buttonsAreVisible {
             self.fadeButtons(alpha)
@@ -539,7 +543,7 @@ extension ViewerController {
                 self.isDragging = false
                 UIView.animate(withDuration: 0.20, animations: {
                     controller.imageView.center = self.originalDraggedCenter
-                    controller.view.backgroundColor = .black
+                    controller.view.backgroundColor = self.viewableBackgroundColor
                     controller.dimControls(1.0)
 
                     if self.buttonsAreVisible {
@@ -547,14 +551,13 @@ extension ViewerController {
                     }
 
                     self.shouldHideStatusBar = !self.buttonsAreVisible
-                    self.shouldUseLightStatusBar = true
 
                     #if os(iOS)
                         self.setNeedsStatusBarAppearanceUpdate()
                     #endif
                 }, completion: { _ in
                     controller.display()
-                    self.view.backgroundColor = .black
+                    self.view.backgroundColor = self.viewableBackgroundColor
                 })
             }
         }
